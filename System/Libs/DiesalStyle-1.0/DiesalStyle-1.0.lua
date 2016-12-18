@@ -101,7 +101,7 @@ LibSharedMedia:Register("font","Standard0755",getMedia('font','Standard0755'))
 LibSharedMedia:Register("font","FFF Intelligent",getMedia('font','FFF Intelligent Thin Condensed'))
 -- Set Fonts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CreateFont("DiesalFontNormal")
-DiesalFontNormal:SetFont( getMedia('font','calibrib'),11 )
+DiesalFontNormal:SetFont( getMedia('font','calibrib'),12 )
 CreateFont("DiesalFontPixel")
 DiesalFontPixel:SetFont( getMedia('font','Standard0755'), 8 )
 CreateFont("DiesalFontPixelOutLine")

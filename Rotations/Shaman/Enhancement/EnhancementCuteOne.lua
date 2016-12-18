@@ -513,7 +513,7 @@ local function runRotation()
                     if buff.stormbringer.exists and hasEquiped(137103) then
                         for i = 1, #enemies.yards5 do
                             local thisUnit = enemies.yards5[i]
-                            if not debuff.tempest[thisUnit].exists then
+                            if not debuff.stormTempests[thisUnit].exists then
                                 if buff.ascendance.exists then
                                     if cast.windstrike(thisUnit) then return end
                                 else
@@ -583,7 +583,7 @@ local function runRotation()
                     if hasEquiped(137103) then
                         for i = 1, #enemies.yards5 do
                             local thisUnit = enemies.yards5[i]
-                            if not debuff.tempest[thisUnit].exists then
+                            if not debuff.stormTempests[thisUnit].exists then
                                 if buff.ascendance.exists then
                                     if cast.windstrike(thisUnit) then return end
                                 else

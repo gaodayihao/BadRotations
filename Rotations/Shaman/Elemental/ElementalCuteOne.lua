@@ -309,8 +309,8 @@ local function runRotation()
                 end
         -- Earthquake Totem
                 if isChecked("Earthquake Totem") then
-                    if inCombat and php <= getOptionValue("Earthquake Totem") and lastSpell ~= spell.earthquakeTotem then
-                        if cast.earthquakeTotem() then return end
+                    if inCombat and php <= getOptionValue("Earthquake Totem") and lastSpell ~= spell.earthquake then
+                        if cast.earthquake() then return end
                     end
                 end
         -- Healing Surge
@@ -361,9 +361,9 @@ local function runRotation()
                             end
                         end
         -- Earthquake Totem
-                        if isChecked("Earthquake Totem - Interrupt") and cd.windShear > gcd and cd.lightningSurgeTotem > gcd and lastSpell ~= spell.earthquakeTotem then
+                        if isChecked("Earthquake Totem - Interrupt") and cd.windShear > gcd and cd.lightningSurgeTotem > gcd and lastSpell ~= spell.earthquake then
                             if getDistance(thisUnit) < 8 then
-                                if cast.earthquakeTotem() then return end
+                                if cast.earthquake() then return end
                             end
                         end
                     end
@@ -597,8 +597,8 @@ local function runRotation()
             end
         -- Earthquake Totem
             -- earthquake_totem
-            if lastSpell ~= spell.earthquakeTotem then
-                if cast.earthquakeTotem() then return end
+            if lastSpell ~= spell.earthquake then
+                if cast.earthquake() then return end
             end
         -- Lava Burst
             -- lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning=3

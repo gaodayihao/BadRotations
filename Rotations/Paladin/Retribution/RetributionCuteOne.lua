@@ -230,7 +230,7 @@ local function runRotation()
             end
         -- Hand of Hinderance
             if isMoving("target") and not getFacing("target","player") and getDistance("target") > 8 then
-                if cast.handOfHinderance("target") then return end
+                if cast.handOfHindrance("target") then return end
             end
         -- Greater Blessing of Might
             if isChecked("Greater Blessing of Might") and greaterBuff < 3 then

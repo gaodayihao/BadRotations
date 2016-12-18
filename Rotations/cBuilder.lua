@@ -19,6 +19,10 @@ function br.loader:new(spec,specName)
     -- Spells From Spell Table
     self.spell = mergeIdTables(self.spell)
 
+    -- Spell Range
+    self.spellRange             = {}
+    self.spellRange.rage        = {["y8"]=8,["y9"]=9,["y10"]=10,["y12"]=12,["y20"]=20}
+    self.spellRange.inited      = false
     -- if br.spellList == nil then br.spellList = {} end
     -- -- All Spells
     -- for i = 1, 999999 do
@@ -109,19 +113,26 @@ function br.loader:new(spec,specName)
         -- Update Talent Info
         br.activeSpecGroup = GetActiveSpecGroup()
         if self.talent == nil then self.talent = {} end
+        local tempTalents = {}
         for r = 1, 7 do --search each talent row
             for c = 1, 3 do -- search each talent column
                 if not activeOnly then
                 -- Cache Talent IDs for talent checks
                     local _,_,_,selected,_,talentID = GetTalentInfo(r,c,br.activeSpecGroup)
-                    local spellName = convertName(GetSpellInfo(talentID))
-                    self.talent[spellName] = selected
-                    if not IsPassiveSpell(talentID) then
-                        self.spell['abilities'][spellName] = talentID
-                        self.spell[spellName] = talentID 
-                    end
+                    -- local spellName = convertName(GetSpellInfo(talentID))
+                    -- self.talent[spellName] = selected
+                    -- if not IsPassiveSpell(talentID) then
+                    --     self.spell['abilities'][spellName] = talentID
+                    --     self.spell[spellName] = talentID 
+                    -- end
+                    table.insert(tempTalents,talentID,selected)
                 end
             end
+        end
+
+        -- Build Talent Info
+        for k,v in pairs(self.spell.talents) do
+            self.talent[k] = tempTalents[v]
         end
     end
     getTalentInfo()
@@ -145,13 +156,38 @@ function br.loader:new(spec,specName)
     function self.update()
         -- Call baseUpdate()
         self.baseUpdate()
+        self.buildSpellRange()
         self.cBuilder()
-        self.getPetInfo()
+        if select(2,UnitClass("player")) == "HUNTER" or select(2,UnitClass("player")) == "WARLOCK" then
+            self.getPetInfo()
+        end
         self.getToggleModes()
         -- Start selected rotation
         self:startRotation()
     end
 
+------------------------
+--- Build SpellRange ---
+------------------------
+    function self.buildSpellRange()
+        if self.spellRange.inited then
+            return
+        end
+        -- Build Unit/Enemies Tables per Spell Range
+        for k,v in pairs(self.spell.abilities) do
+            local spellCast = v
+            local spellName = GetSpellInfo(v)
+            local minRange = select(5,GetSpellInfo(spellName))
+            local maxRange = select(6,GetSpellInfo(spellName))
+            if maxRange == nil or maxRange <= 0 then
+                maxRange = 5
+            end
+            if not self.spellRange.rage["y"..tostring(maxRange)] then
+                self.spellRange.rage["y"..tostring(maxRange)] = maxRange
+            end
+        end
+        self.spellRange.inited = true
+    end
 ---------------
 --- BUILDER ---
 ---------------
@@ -182,28 +218,42 @@ function br.loader:new(spec,specName)
         self.powerRegen     = getRegen("player")
         self.timeToMax      = getTimeToMax("player")
 
-        -- Build Best Unit per Range
-        local typicalRanges = {
-            40, -- Typical Ranged Limit
-            35,
-            30,
-            25,
-            20,
-            15,
-            13, -- Feral Interrupt
-            12, 
-            10, -- Other Typical AoE Effect
-            9, -- Monk Artifact
-            8, -- Typical AoE Effect
-            5, -- Typical Melee
-        }
-        for x = 1, #typicalRanges do
-            local i = typicalRanges[x]
-            self.units["dyn"..tostring(i)]                  = dynamicTarget(i, true)
-            self.units["dyn"..tostring(i).."AoE"]           = dynamicTarget(i, false) 
-            self.enemies["yards"..tostring(i)]              = getEnemies("player",i)
-            self.enemies["yards"..tostring(i).."t"]         = getEnemies(self.units["dyn"..tostring(i)],i)
+        self.units.dyn40 = dynamicTarget(40,  true)
+        self.units.dyn40AoE = dynamicTarget(40,  false)
+        self.enemies.yards40 = getEnemies("player",40)
+        self.enemies.yards40t  = getEnemies(self.units.dyn40,40)
+        local theseUnits = self.enemies.yards40
+        for k,v in pairs(self.spellRange.rage) do
+            if v ~= 40 then
+                self.units["dyn"..tostring(v)]           = dynamicTarget(v,  true)
+                self.units["dyn"..tostring(v).."AoE"]    = dynamicTarget(v,  false)
+                self.enemies["yards"..tostring(v)]       = getTableEnemies("player",v,theseUnits)
+                self.enemies["yards"..tostring(v).."t"]  = getTableEnemies(self.units["dyn"..tostring(v)],v,theseUnits)
+            end
         end
+
+        -- -- Build Best Unit per Range
+        -- local typicalRanges = {
+        --     40, -- Typical Ranged Limit
+        --     35,
+        --     30,
+        --     25,
+        --     20,
+        --     15,
+        --     13, -- Feral Interrupt
+        --     12, 
+        --     10, -- Other Typical AoE Effect
+        --     9, -- Monk Artifact
+        --     8, -- Typical AoE Effect
+        --     5, -- Typical Melee
+        -- }
+        -- for x = 1, #typicalRanges do
+        --     local i = typicalRanges[x]
+        --     self.units["dyn"..tostring(i)]                  = dynamicTarget(i, true)
+        --     self.units["dyn"..tostring(i).."AoE"]           = dynamicTarget(i, false) 
+        --     self.enemies["yards"..tostring(i)]              = getTableEnemies("player",i,theseUnits)
+        --     self.enemies["yards"..tostring(i).."t"]         = getTableEnemies(self.units["dyn"..tostring(i)],i,theseUnits)
+        -- end
 
         if not UnitAffectingCombat("player") then
             -- Build Artifact Info
@@ -332,37 +382,7 @@ function br.loader:new(spec,specName)
                 if (not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit)) and not UnitIsUnit(thisUnit,"target") then self.debuff[k][c] = nil end
             end 
         end
-        -- for k,v in pairs(self.spell.debuffs) do
-        --     -- Build Debuff Table for all units in 40yrds
-        --     if self.debuff[k] == nil then self.debuff[k] = {} end
-        --     for i = 1, #self.enemies.yards40 do
-        --         local thisUnit = self.enemies.yards40[i]
-        --         -- Setup debuff table per unit and per debuff
-        --         if self.debuff[k][thisUnit]         == nil then self.debuff[k][thisUnit]            = {} end
-        --         if self.debuff[k][thisUnit].applied == nil then self.debuff[k][thisUnit].applied    = 0 end
-        --         if br.tracker.query(UnitGUID(thisUnit),v) ~= false then
-        --             local spell = br.tracker.query(UnitGUID(thisUnit),v)
-        --             -- Get the Debuff Info
-        --             self.debuff[k][thisUnit].exists         = true
-        --             self.debuff[k][thisUnit].duration       = spell.duration
-        --             self.debuff[k][thisUnit].remain         = spell.remain
-        --             self.debuff[k][thisUnit].refresh        = spell.refresh
-        --             self.debuff[k][thisUnit].stack          = spell.stacks
-        --             self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
-        --             -- self.debuff[k][thisUnit].applied        = 0
-        --         else
-        --             -- Zero Out the Debuff Info
-        --             self.debuff[k][thisUnit].exists         = false
-        --             self.debuff[k][thisUnit].duration       = 0
-        --             self.debuff[k][thisUnit].remain         = 0
-        --             self.debuff[k][thisUnit].refresh        = true
-        --             self.debuff[k][thisUnit].stack          = 0
-        --             self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
-        --             self.debuff[k][thisUnit].applied        = 0
-        --         end
-        --     end
-        -- end
-
+        
         -- Cycle through Abilities List
         for k,v in pairs(self.spell.abilities) do
             if self.cast            == nil then self.cast               = {} end        -- Cast Spell Functions
@@ -444,33 +464,153 @@ function br.loader:new(spec,specName)
 --- PET INFO ---
 ----------------
     function self.getPetInfo()
-        if select(2,UnitClass("player")) == "HUNTER" or select(2,UnitClass("player")) == "WARLOCK" then
-            self.petInfo = {}
-            for i = 1, ObjectCount() do
-                -- define our unit
-                local thisUnit = GetObjectWithIndex(i)
-                -- check if it a unit first
-                if ObjectIsType(thisUnit, ObjectTypes.Unit)  then
-                    local unitName      = UnitName(thisUnit)
-                    local unitID        = GetObjectID(thisUnit)
+        if self.petType == nil then
+            self.petType                    = {
+                darkglare                   = 103673,
+                doomguard                   = 11859,
+                dreadStalkers               = 98035,
+                felguard                    = 17252,
+                felhunter                   = 417,
+                Imp                         = 416,
+                infernal                    = 89,
+                succubus                    = 1863,
+                voidwalker                  = 1860,
+                wildImp                     = 55659,
+            }
+        end
+
+        if self.petVaild == nil then
+            self.petVaild                   ={
+                [103673]                    = true,     -- darkglare
+                [11859]                     = true,     -- doomguard
+                [98035]                     = true,     -- dreadStalkers
+                [17252]                     = true,     -- felguard
+                [417]                       = true,     -- felhunter
+                [416]                       = true,     -- Imp
+                [89]                        = true,     -- infernal
+                [1863]                      = true,     -- succubus
+                [1860]                      = true,     -- voidwalker
+                [55659]                     = true,     -- wildImp
+            }
+        end
+        
+        if self.petDuration == nil then
+            self.petDuration                ={
+                [103673]                    = 12,     -- darkglare
+                [11859]                     = 25,     -- doomguard
+                [98035]                     = 12,     -- dreadStalkers
+                [17252]                     = -1,     -- felguard
+                [417]                       = -1,     -- felhunter
+                [416]                       = -1,     -- Imp
+                [89]                        = 25,     -- infernal
+                [1863]                      = -1,     -- succubus
+                [1860]                      = -1,     -- voidwalker
+                [55659]                     = 12,     -- wildImp
+            }
+        end
+        if self.petStartTime == nil then
+            self.petStartTime = {}
+        end
+
+        self.petInfo            = {}
+        self.petPool            = {
+            count               = {
+                wildImp         = 0,
+            },
+            remain              = {
+                wildImp         = 999,
+                dreadStalkers   = 999,
+            },
+            noDEcount           ={
+                wildImp         = 0,
+                others          = 0,
+            },
+            useFelstorm         = false,
+            demonwrathPet       = false,
+        }
+        for i = 1, ObjectCount() do
+            -- define our unit
+            --local thisUnit = GetObjectIndex(i)
+            local thisUnit = GetObjectWithIndex(i)
+            -- check if it a unit first
+            if ObjectIsType(thisUnit, ObjectTypes.Unit) then
+                local unitID        = GetObjectID(thisUnit)
+                local unitCreator   = UnitCreator(thisUnit)
+                local player        = GetObjectWithGUID(UnitGUID("player"))
+                if unitCreator == player and (self.petVaild[unitID] or false) then
+                --------------------
+                -- build Pet Info --
+                --------------------
+                    --local unitName      = UnitName(thisUnit)
                     local unitGUID      = UnitGUID(thisUnit)
-                    local unitCreator   = UnitCreator(thisUnit)
-                    local player        = GetObjectWithGUID(UnitGUID("player"))
-                    if unitCreator == player and (unitID == 55659 or unitID == 98035 or unitID == 103673 or unitID == 11859 or unitID == 89 
-                        or unitID == 416 or unitID == 1860 or unitID == 417 or unitID == 1863 or unitID == 17252) 
-                    then
-                        if self.spell.buffs.demonicEmpowerment ~= nil then
-                            demoEmpBuff   = UnitBuffID(thisUnit,self.spell.buffs.demonicEmpowerment) ~= nil
-                        else
-                            demoEmpBuff   = false
-                        end
-                        local unitCount     = #getEnemies(tostring(thisUnit),10) or 0
-                        tinsert(self.petInfo,{name = unitName, guid = unitGUID, id = unitID, creator = unitCreator, deBuff = demoEmpBuff, numEnemies = unitCount})
+                    local demoEmpBuff   = UnitBuffID(thisUnit,self.spell.buffs.demonicEmpowerment) ~= nil
+                    --local unitCount     = #getEnemies(tostring(thisUnit),10) or 0
+                    
+                    local pet = {
+                                    name = "-", 
+                                    guid = unitGUID, 
+                                    id = unitID, 
+                                    creator = unitCreator, 
+                                    deBuff = demoEmpBuff, 
+                                    numEnemies = 0,
+                                    duration = self.petDuration[unitID] or -1,
+                                    remain = 999,
+                                }
+                    if self.talent.grimoireOfSupremacy and (unitID == self.petType.doomguard or unitID == self.petType.infernal) then
+                        pet.duration = -1
                     end
+
+                    if pet.duration > 0 then
+                        if self.petStartTime[pet.guid] == nil then
+                            self.petStartTime[pet.guid] = GetTime()
+                            pet.remain = pet.duration
+                        else
+                            pet.remain = pet.duration - (GetTime() - self.petStartTime[pet.guid])
+                            if pet.remain < 0 then pet.remain = 0 end
+                        end
+                    end
+
+                --------------------
+                -- build Pet Pool --
+                --------------------
+                    if pet.id == self.petType.wildImp then
+                        self.petPool.count.wildImp = self.petPool.count.wildImp + 1
+                        self.petPool.remain.wildImp = math.min(self.petPool.remain.wildImp,pet.remain)
+                        if not pet.deBuff then self.petPool.noDEcount.wildImp = self.petPool.noDEcount.wildImp + 1 end
+                    elseif pet.id == self.petType.dreadStalkers then
+                        self.petPool.remain.dreadStalkers = math.min(self.petPool.remain.dreadStalkers,pet.remain)
+                        if not pet.deBuff then self.petPool.noDEcount.others = self.petPool.noDEcount.others + 1 end
+                    else
+                        if not pet.deBuff then self.petPool.noDEcount.others = self.petPool.noDEcount.others + 1 end
+                    end
+
+                    if not self.petPool.useFelstorm and pet.id == self.petType.felguard and (#getEnemies(tostring(thisUnit),10) or 0) > 0 then
+                        self.petPool.useFelstorm = true
+                    end
+                    
+                    if not self.petPool.demonwrathPet and (#getEnemies(tostring(thisUnit),10) or 0) >= 3 then
+                        self.petPool.demonwrathPet = true
+                    end
+
+                    tinsert(self.petInfo,pet)
+                end -- End If
+            end -- End If
+        end -- End for
+
+        -- Clear up the pool
+        if br.timer:useTimer("ClearPetStartTime",5) then
+            local tempPool = {}
+            for i = 1,#self.petInfo do
+                local pet = self.petInfo[i]
+                if pet.duration > 0 then
+                    tempPool[self.petInfo[i].guid] = self.petStartTime[self.petInfo[i].guid]
                 end
             end
+            table.wipe(self.petStartTime)
+            self.petStartTime = tempPool
         end
-    end    
+    end
+
 
 ---------------
 --- TOGGLES ---
