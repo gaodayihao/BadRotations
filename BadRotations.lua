@@ -9,6 +9,13 @@ br.dropOptions.Toggle2 ={"LeftCtrl","LeftShift","LeftAlt","RightCtrl","RightShif
 br.dropOptions.CD = {"Never","CDs","Always" }
 br.loadedIn = false
 br.rotations = {}
+
+SetCVar("targetnearestuseold", 1)
+SetCVar("nameplateMaxDistance", 40)
+SetCVar("nameplateOtherTopInset", -1)
+SetCVar("nameplateOtherBottomInset", -1)
+SetCVar("alwaysCompareItems", "1")
+
 -- developers debug, use /run br.data.settings[br.selectedSpec].toggles["isDebugging"] = true
 br.debug = {}
 function br.debug:Print(message)
@@ -126,11 +133,7 @@ end
 function br.pulse:makeEnTable()
 	EnemiesEngine()
     if br.pulse.makeTable then
-    	if br.pulse.makeTableTimer == nil then br.pulse.makeTableTimer = GetTime() end 
-		if br.pulse.makeTableTimer < GetTime() - 1 or br.enemy == nil then
-        	makeEnemiesTable(40);
-        	br.pulse.makeTableTimer = GetTime()
-        end
+        makeEnemiesTable(40)
     end
 end
 function br.pulse:ttd()

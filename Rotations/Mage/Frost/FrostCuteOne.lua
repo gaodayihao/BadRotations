@@ -166,7 +166,7 @@ local function runRotation()
         
    		if leftCombat == nil then leftCombat = GetTime() end
 		if profileStop == nil then profileStop = false end
-        if aritfact.icyHand then iceHand= 1 else iceHand = 0 end
+        if artifact.icyHand then iceHand= 1 else iceHand = 0 end
 
 --------------------
 --- Action Lists ---

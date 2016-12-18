@@ -311,9 +311,7 @@ function getDistance(thatCaster,thisCaster)
 	local thatCaster,thisCaster = thatCaster,thisCaster
 	if GetObjectExists(thatCaster.unit) and UnitIsVisible(thatCaster.unit) == true
 		and GetObjectExists(thisCaster.unit) and UnitIsVisible(thisCaster.unit) == true then
-		local X1,Y1,Z1 = thatCaster.pos
-		local X2,Y2,Z2 = thisCaster.pos
-		return math.sqrt(((X2-X1)^2) + ((Y2-Y1)^2) + ((Z2-Z1)^2))
+		return GetDistanceBetweenObjects(thatCaster.unit,thisCaster.unit)
 	else
 		return 100
 	end

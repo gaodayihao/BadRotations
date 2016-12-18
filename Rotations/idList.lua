@@ -86,11 +86,18 @@ br.idList = {
         -- Frost
         [251] = {
             abilities                       = {
+                blindingSleet               = 207167,
+                breathOfSindragosa          = 152279,
                 chainsOfIce                 = 45524,
                 empowerRuneWeapon           = 47568,
+                frostscythe                 = 207230,
                 frostStrike                 = 49143,
+                glacialAdvance              = 194913,
+                hornOfWinter                = 57330,
                 howlingBlast                = 49184,
+                hungeringRuneWeapon         = 207127,
                 obliterate                  = 49020,
+                obliteration                = 207256,
                 pillarOfFrost               = 51271,
                 remorselessWinter           = 196770,
             },
@@ -125,8 +132,9 @@ br.idList = {
                 rime                        = 59052,
             },
             debuffs                         = {
-                frostFever                  = 55095,
                 chainsOfIce                 = 45524,
+                frostFever                  = 55095,
+                razorice                    = 51714,
             },
             glyphs                          = {
 
@@ -1216,32 +1224,53 @@ br.idList = {
         -- Protection
         [66] = {
             abilities                       = {
-
+                aegisOfLight                = 204150,
+                ardentDefender              = 31850,
+                avengersShield              = 31935,
+                bastionOfLight              = 204035,
+                blessedHammer               = 204019,
+                consecration                = 26573,
+                eyeOfTyr                    = 209202,
+                guardianOfAncientKings      = 86659,
+                hammerOfTheRighteous        = 53595,
+                handOfTheProtector          = 213652,
+                lightOfTheProtector         = 184092,
+                seraphim                    = 152262,
+                shieldOfTheRighteous        = 53600,
             },
             artifacts                       = {
 
             },
             buffs                           = {
-
+                seraphim                    = 152262,
+                aegisOfLight                = 204150,
+                ardentDefender              = 31850,
+                guardianOfAncientKings      = 86659,
+                shieldOfTheRighteous        = 132403,
             },
             debuffs                         = {
-
+                eyeOfTyr                    = 209202,
             },
             glyphs                          = {
 
             },
             talents                         = {
-
+                bastionOfLight              = 204035,
+                blessedHammer               = 204019,
+                crusadersJudgment           = 204023,
+                handOfTheProtector          = 213652,
+                knightTemplar               = 204139,
+                lightOfTheProtector         = 184092,
+                seraphim                    = 152262,
             },
         },
         -- Retribution
         [70] = {
             abilities                       = {
-                avengingWrath               = 31884,
                 bladeOfJustice              = 184575,
                 cleanseToxins               = 213644,
                 consecration                = 205228,
-                crusade                     = 224668,
+                crusade                     = 231895,
                 divineHammer                = 198034,
                 divineStorm                 = 53385,
                 executionSentence           = 213757,
@@ -1249,10 +1278,9 @@ br.idList = {
                 greaterBlessingOfKings      = 203538,
                 greaterBlessingOfMight      = 203528,
                 greaterBlessingOfWisdom     = 203539,
-                handOfHinderance            = 183218,
+                handOfHindrance             = 183218,
                 holyWrath                   = 210220,
                 justicarsVengeance          = 215661,
-                rebuke                      = 96231,
                 sealOfLight                 = 202273,
                 shieldOfVengeance           = 184662,
                 templarsVerdict             = 85256,
@@ -1281,6 +1309,8 @@ br.idList = {
                 wrathOfTheAshbringer        = 186945,
             },
             buffs                           = {
+                avengingWrath               = 31884,
+                crusade                     = 231895,
                 divinePurpose               = 223819,
                 greaterBlessingOfMight      = 203528,
                 greaterBlessingOfKings      = 203538,
@@ -1317,17 +1347,20 @@ br.idList = {
         -- All
         Shared = {
             abilities                       = {
+                avengingWrath               = 31884,
                 blessingOfFreedom           = 1044,
                 blessingOfProtection        = 1022,
                 blindingLight               = 115750,
                 contemplation               = 121183,
                 crusaderStrike              = 35395,
                 divineShield                = 642,
+                divineSteed                 = 190784,
                 flashOfLight                = 19750,
                 hammerOfJustice             = 853,
                 handOfReckoning             = 62124,
                 judgment                    = 20271,
                 layOnHands                  = 633,
+                rebuke                      = 96231,
                 redemption                  = 7328,
                 repentance                  = 20066,
                 tyrsDeliverance             = 200654,
@@ -1336,7 +1369,7 @@ br.idList = {
 
             },
             buffs                           = {
-
+                divineSteed                 = 221885,
             },
             debuffs                         = {
                 judgment                    = 197277,
@@ -1807,7 +1840,7 @@ br.idList = {
                 ascendance                  = 114050,
                 chainLightning              = 188443,
                 earthElemental              = 198103,
-                earthquakeTotem             = 61882,
+                earthquake                  = 61882,
                 earthShock                  = 8042,
                 elementalBlast              = 117014,
                 elementalMastery            = 16166,
@@ -1826,20 +1859,24 @@ br.idList = {
                 totemMastery                = 210643,
             },
             artifacts                       = {
+                powerOfTheMaelstrom         = 191861,
                 stormkeeper                 = 205495,
             },
             buffs                           = {
                 ascendance                  = 114050,
                 bloodlust                   = 2825,
+                echoesOfTheGreatSundering   = 208722,
+                elementalFocus              = 16246,
                 elementalMastery            = 16166,
-                emberTotem                  = 210657,
+                emberTotem                  = 210658,
                 heroism                     = 32182,
                 icefury                     = 210714,
                 lavaSurge                   = 77762,
-                resonanceTotem              = 202188,
+                powerOfTheMaelstrom         = 191861,
+                resonanceTotem              = 202192,
                 stormkeeper                 = 205495,
-                stormTotem                  = 210651,
-                tailwindTotem               = 210660,
+                stormTotem                  = 210652,
+                tailwindTotem               = 210659,
             },
             debuffs                         = {
                 flameShock                  = 188389,
@@ -1908,6 +1945,7 @@ br.idList = {
                 prolongedPower              = 229206,
                 stormbringer                = 201846,
                 temptation                  = 234143,
+                windStrikes                 = 198293,
             },
             debuffs                         = {
                 frostbrand                  = 147732,

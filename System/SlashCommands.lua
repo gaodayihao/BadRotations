@@ -5,6 +5,7 @@ function Print(msg)
 end
 commandHelp = "|cffFF0000Slash Commands"
 function SlashCommandHelp(cmd,msg)
+	if commandHelp == nil then commandHelp = "|cffFF0000Slash Commands" end
 	if cmd == nil then cmd = "" end
 	if msg == nil then msg = "" end
 	if cmd == "Print Help" then Print(tostring(commandHelp)); return end

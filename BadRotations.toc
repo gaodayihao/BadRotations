@@ -8,6 +8,11 @@
 BadRotations.lua
 bindings.xml
 
+## Localization
+Localization\localization.lua
+Localization\localization_tw.lua
+Localization\localization_cn.lua
+
 ## System
 System\Core.lua
 System\Debugging.lua
@@ -82,6 +87,7 @@ Rotations\idList.lua
 
 ## DeathKnight ---------------------------------------------------
 
+Rotations\Death Knight\Frost\FrostEllis.lua
 Rotations\Death Knight\Frost\FrostCuteOne.lua
 
 Rotations\Death Knight\Blood\BloodCuteOne.lua
@@ -125,8 +131,9 @@ Rotations\Monk\Windwalker\WindwalkerCuteOne.lua
 
 Rotations\Paladin\Holy\HolyGabbz.lua
 
-Rotations\Paladin\Protection\protectionSimC.lua
+Rotations\Paladin\Protection\ProtectionEllis.lua
 
+Rotations\Paladin\Retribution\RetributionEllis.lua
 Rotations\Paladin\Retribution\RetributionCuteOne.lua
 
 ## Priest ---------------------------------------------------
@@ -148,6 +155,7 @@ Rotations\Rogue\Subtlety\SubtletyCuteOne.lua
 
 Rotations\Shaman\Elemental\ElementalCuteOne.lua
 
+Rotations\Shaman\Enhancement\EnhancementEllis.lua
 Rotations\Shaman\Enhancement\EnhancementCuteOne.lua
 
 Rotations\Shaman\Restoration\RestorationKuu.lua
@@ -157,6 +165,7 @@ Rotations\Shaman\Restoration\RestorationKuu.lua
 Rotations\Warlock\Affliction\AfflictionCuteOne.lua
 
 Rotations\Warlock\Demonology\DemonologyCuteOne.lua
+Rotations\Warlock\Demonology\DemonologyEllis.lua
 
 Rotations\Warlock\Destruction\DestructionCuteOne.lua
 

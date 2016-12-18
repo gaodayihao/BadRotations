@@ -31,6 +31,7 @@ function cCharacter:new(class)
 		t18_classTrinket = false,
 	}
 	self.gcd            = 1.5       -- Global Cooldown
+	self.gcdMax         = 1.5       -- Global Cooldown
 	self.glyph          = {}        -- Glyphs
 	self.faction  		= select(1,UnitFactionGroup("player")) -- Faction non-localised name
     self.flask 			= {}
@@ -39,8 +40,8 @@ function cCharacter:new(class)
         agilityLow 		= 127848, 	-- Flask of the Seventh Demon (Legion)
         agilityBig 		= 127848, 	-- Flask of the Seventh Demon (Legion)
         -- Intellect
-        intellectLow 	= 109147,
-        intellectBig 	= 109155,
+        intellectLow 	= 127847, 	-- Flask of the Whispered Pact (Legion)
+        intellectBig 	= 127847, 	-- Flask of the Whispered Pact (Legion)
         -- Stamina
         staminaLow 		= 109152,
         staminaBig		= 109160,
@@ -53,8 +54,8 @@ function cCharacter:new(class)
         agilityLow 		= 188033, 	-- Flask of the Seventh Demon (Legion)
         agilityBig 		= 188033, 	-- Flask of the Seventh Demon (Legion)
         -- Intellect
-        intellectLow 	= 156070,
-        intellectBig 	= 156079,
+        intellectLow 	= 188031,	-- Flask of the Whispered Pact (Legion)
+        intellectBig 	= 188031,	-- Flask of the Whispered Pact (Legion)
         -- Stamina
         staminaLow 		= 156077,
         staminaBig 		= 156084,
@@ -159,6 +160,7 @@ function cCharacter:new(class)
 	function self.getCharacterInfo()
 
 		self.gcd 				= self.getGlobalCooldown()
+		self.gcdMax				= self.getGlobalCooldownMaximum()
 		self.health 			= getHP("player")
 		self.instance 			= select(2,IsInInstance())
 		self.level 				= UnitLevel("player") -- TODO: EVENT - UNIT_LEVEL
@@ -231,27 +233,32 @@ function cCharacter:new(class)
 		            self.units.dyn40AoE = dynamicTarget(40,false) -- used for most heals
 		        end
         	else
-	            -- Normal
-	            self.units.dyn5  = dynamicTarget(5,true) -- Melee
-	            self.units.dyn30 = dynamicTarget(30,true) -- used for most range attacks
-	            self.units.dyn40 = dynamicTarget(40,true) -- used for most heals
+	            -- -- Normal
+	            -- self.units.dyn5  = dynamicTarget(5,true) -- Melee
+	            -- self.units.dyn30 = dynamicTarget(30,true) -- used for most range attacks
+	            -- self.units.dyn40 = dynamicTarget(40,true) -- used for most heals
 
-	            -- AoE
-	            self.units.dyn5AoE  = dynamicTarget(5,false) -- Melee
-	            self.units.dyn30AoE = dynamicTarget(30,false) -- used for most range attacks
-	            self.units.dyn40AoE = dynamicTarget(40,false) -- used for most heals
+	            -- -- AoE
+	            -- self.units.dyn5AoE  = dynamicTarget(5,false) -- Melee
+	            -- self.units.dyn30AoE = dynamicTarget(30,false) -- used for most range attacks
+	            -- self.units.dyn40AoE = dynamicTarget(40,false) -- used for most heals
 	        end
         end
 	end
 
 -- Returns the Global Cooldown time
 	function self.getGlobalCooldown()
-		local gcd = getSpellCD(61304) --(1.5 / ((UnitSpellHaste("player")/100)+1))
-		if gcd < 1 then
-			return  1
+		local gcd = (1.5 / ((UnitSpellHaste("player")/100)+1)) --getSpellCD(61304)
+		if gcd < 0.75 then
+			return  0.75
 		else
 			return gcd
 		end
+	end
+
+-- Return the Maximum Global Cooldown time
+	function self.getGlobalCooldownMaximum()
+		return 1.5
 	end
 
 -- Starts auto attack when in melee range and facing enemy

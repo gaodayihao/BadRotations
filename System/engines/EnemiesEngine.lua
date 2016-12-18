@@ -22,10 +22,11 @@ function EnemiesEngine()
 	--[[------------------------------------------------------------------------------------------------------------------]]
 	local varDir = br.data.settings[br.selectedSpec]
 	br.enemy = {}
+	brEnemyCount = 0
 	function makeEnemiesTable(maxDistance)
 		br.enemyTimer = 0
 		--local LibDraw = LibStub("LibDraw-1.0")
-		local  maxDistance = maxDistance or 50
+		local  maxDistance = maxDistance or 40
 		if br.enemy then cleanupEngine() end
 		if br.enemy == nil or br.enemyTimer == nil or br.enemyTimer <= GetTime() - 0.1 then
             local startTime
@@ -41,80 +42,49 @@ function EnemiesEngine()
 			-- 	table.wipe(br.enemy)
 			-- end
 			-- use objectmanager to build up table
-            -- DEBUG
-            br.debug.cpu.enemiesEngine.sanityTargets = 0
-            br.debug.cpu.enemiesEngine.unitTargets = 0
-            -- DEBUG --
-            --for i = 1, GetObjectCountBR() do
-            for i = 1, ObjectCount() do
+			-- DEBUG
+			br.debug.cpu.enemiesEngine.sanityTargets = 0
+			br.debug.cpu.enemiesEngine.unitTargets = 0
+			-- DEBUG --
+			--for i = 1, GetObjectCountBR() do
+			for i = 1, ObjectCount() do
 				-- define our unit
 				--local thisUnit = GetObjectIndex(i)
-                local thisUnit = GetObjectWithIndex(i)
+				local thisUnit = GetObjectWithIndex(i)
 				-- check if it a unit first
-                if ObjectIsType(thisUnit, ObjectTypes.Unit)  then
-                    br.debug.cpu.enemiesEngine.unitTargets = br.debug.cpu.enemiesEngine.unitTargets + 1
+				if brEnemyCount < 50 
+					and ObjectIsType(thisUnit, ObjectTypes.Unit) 
+					and UnitCanAttack("player", thisUnit)
+					and not UnitIsDeadOrGhost(thisUnit) 
+					--and getLineOfSight("player",thisUnit)
+					and getDistance("player",thisUnit) <= 40 --and (GetDistanceBetweenObjects("player",thisUnit) - UnitCombatReach("player") - UnitCombatReach(thisUnit) <= 40) then
+				then
+					br.debug.cpu.enemiesEngine.unitTargets = br.debug.cpu.enemiesEngine.unitTargets + 1
+
+					-- Check if Enemy exists already and update info.
+					local addEnemy = true
+					if br.enemy ~= nil and br.enemy[thisUnit] ~= nil then
+						addEnemy = false
+						-- for k, v in pairs(br.enemy) do
+						-- 	if k == thisUnit then
+						-- 		addEnemy = false
+						-- 		break
+						-- 	end
+						-- end
+					end
+
 					-- sanity checks
 					-- if getSanity(thisUnit) == true then --and isValidUnit(thisUnit) then
-					if isValidUnit(thisUnit) then
-                        br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
-                        -- get unit Infos
-                        local safeUnit 			= isSafeToAttack(thisUnit)
-						local burnValue 		= isBurnTarget(thisUnit) or 0
-						local unitName 			= UnitName(thisUnit)
-						local unitID 			= GetObjectID(thisUnit)
-						local unitGUID 			= UnitGUID(thisUnit)
-						local shouldCC 			= isCrowdControlCandidates(thisUnit)
-						local unitThreat 		= UnitThreatSituation("player",thisUnit) or -1
-						local shieldValue 		= isShieldedTarget(thisUnit) or 0
-						-- local X1,Y1,Z1 = GetObjectPosition(thisUnit)
-						local unitCoeficient 	= getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or 0
-						local unitHP 			= getHP(thisUnit)
-						local inCombat 			= UnitAffectingCombat(thisUnit)
-						local longTimeCC
-						if getOptionCheck("Don't break CCs") then
-							longTimeCC 			= isLongTimeCCed(thisUnit)
-						else
-							longTimeCC 			= false
-						end
-						local shouldDispel 		= getOffensiveBuffs(thisUnit,unitGUID)
-                        -- Check if Enemy exists already and update info.
-                        local addEnemy
-						if addEnemy == nil then addEnemy = true end
-						if br.enemy ~= nil then
-							for k, v in pairs(br.enemy) do
-								if k == thisUnit then
-									addEnemy = false
-									break
-								end
-							end
-						end
-						-- If not then add enemy
-						if addEnemy then							
-							br.enemy[thisUnit] 	= {
-								name 			= unitName,
-								guid 			= unitGUID,
-								id 				= unitID,
-								coeficient 		= unitCoeficient,
-								cc 				= shouldCC,
-								isCC 			= longTimeCC,
-								facing 			= getFacing("player",thisUnit),
-								threat 			= unitThreat,
-								unit 			= thisUnit,
-								-- distance = unitDistance,
-								hp 				= unitHP,
-								hpabs 			= UnitHealth(thisUnit),
-								safe 			= safeUnit,
-								burn 			= burnUnit,
-								offensiveBuff 	= shouldDispel,
-							}
-						end
+					if addEnemy and isValidUnit(thisUnit) then			
+						br.enemy[thisUnit] 	= { }
+						brEnemyCount = brEnemyCount + 1
 					end
 				end
 			end
 			-- sort them by coeficient
-			table.sort(br.enemy, function(x,y)
-				return x.coeficient and y.coeficient and x.coeficient > y.coeficient or false
-			end)
+			-- table.sort(br.enemy, function(x,y)
+			-- 	return x.coeficient and y.coeficient and x.coeficient > y.coeficient or false
+			-- end)
 
 			-- update infos
 			if br.enemy ~= nil then
@@ -126,7 +96,7 @@ function EnemiesEngine()
 					br.enemy[k].name 			= UnitName(thisUnit)
 					br.enemy[k].guid 			= UnitGUID(thisUnit)
 					br.enemy[k].id 				= GetObjectID(thisUnit)
-					br.enemy[k].coeficient 		= getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or 0
+					br.enemy[k].coeficient 		= --[[ getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or ]] 0
 					br.enemy[k].cc 				= isCrowdControlCandidates(thisUnit)
 					if getOptionCheck("Don't break CCs") then
 						br.enemy[k].isCC 		= isLongTimeCCed(thisUnit)
@@ -151,18 +121,20 @@ function EnemiesEngine()
                 br.debug.cpu.enemiesEngine.makeEnemiesTable = br.debug.cpu.enemiesEngine.makeEnemiesTable + debugprofilestop()-startTime
                 br.debug.cpu.enemiesEngine.makeEnemiesTableAverage = br.debug.cpu.enemiesEngine.makeEnemiesTable / br.debug.cpu.enemiesEngine.makeEnemiesTableCount
             end
-
 		end
 	end
 	-- remove invalid units on pulse
 	function cleanupEngine()
 		for k, v in pairs(br.enemy) do
 			-- here i want to scan the enemies table and find any occurances of invalid units
-			if not GetObjectExists(br.enemy[k].unit) or UnitIsDeadOrGhost(br.enemy[k].unit) then
+			if not GetObjectExists(br.enemy[k].unit) 
+				or UnitIsDeadOrGhost(br.enemy[k].unit) 
+				or not UnitCanAttack("player",br.enemy[k].unit) 
+				or getDistance(br.enemy[k].unit) > 40
+			then
 				-- i will remove such units from table
 				br.enemy[k] = nil
-			elseif getDistance(br.enemy[k].unit) > 40 then
-				br.enemy[k] = nil
+				brEnemyCount = brEnemyCount - 1
 			end
 		end
 	end
@@ -227,12 +199,7 @@ function EnemiesEngine()
 	end
 	-- to enlight redundant checks in getDistance within getEnemies
 	function getDistanceXYZ(unit1,unit2)
-		-- check if unit is valid
-		if GetObjectExists(unit1) and GetObjectExists(unit2) then
-			local x1, y1, z1 = GetObjectPosition(unit1)
-			local x2, y2, z2 = GetObjectPosition(unit2)
-			return math.sqrt(((x2-x1)^2)+((y2-y1)^2)+((z2-z1)^2));
-		end
+		return GetDistanceBetweenObjects(unit1,unit2)
 	end
 	-- /dump UnitGUID("target")
 	-- /dump getEnemies("target",10)
@@ -241,11 +208,10 @@ function EnemiesEngine()
 			local getEnemiesTable = { }
 			for k, v in pairs(br.enemy) do
 				local thisUnit = br.enemy[k].unit
-				local thisDistance = getDistance("player",thisUnit)
 				-- check if unit is valid
 				if GetObjectExists(thisUnit) and (not InCombat or br.enemy[k].inCombat) then
                     if unit == "player" and not precise then
-                        if thisDistance <= Radius then
+                        if getDistance("player",thisUnit) <= Radius then
                             tinsert(getEnemiesTable,thisUnit)
                         end
                     else
@@ -416,9 +382,9 @@ function EnemiesEngine()
 				coef = coef + burnValue
 				-- if user checked avoid shielded, we add the % this shield remove to coef
 				coef = coef + shieldValue
-				local displayCoef = math.floor(coef*10)/10
-				local displayName = UnitName(unit) or "invalid"
-				-- Print("Unit "..displayName.." - "..displayCoef)
+				-- local displayCoef = math.floor(coef*10)/10
+				-- local displayName = UnitName(unit) or "invalid"
+				-- -- Print("Unit "..displayName.." - "..displayCoef)
 			end
 		end
 		return coef

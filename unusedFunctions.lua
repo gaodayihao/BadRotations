@@ -45,7 +45,7 @@ end
 function findTarget(range,facingCheck,minimumHealth)
     if br.enemy ~= nil then
         for k, v in pairs(br.enemy) do
-            if br.enemy[k].distance <= range then
+            if getDistance("player",br.enemy[k].unit) <= range then
                 if FacingCheck == false or getFacing("player",br.enemy[k].unit) == true then
                     if not minimumHealth or minimumHealth and minimumHealth >= br.enemy[k].hp then
                         TargetUnit(br.enemy[k].unit)

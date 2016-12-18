@@ -78,6 +78,7 @@ Raidable means if its good to raid with.
 |:----|------:|:-------|:---:|:-----:|
 ||||
 | **Death Knight** |||
+|Frost|100% (SimC)|Ellis|7.1|:interrobang:
 |Frost|0%|CuteOne|7.1|:interrobang:
 |Blood|100%|CuteOne/Vilt|7.1|:white_check_mark:
 |Unholy|0%||7.0|
@@ -111,11 +112,13 @@ Raidable means if its good to raid with.
 |Holy|0%||7.0|
 |Protection|0%||7.0|
 |Retribution|100%|CuteOne|7.1|:interrobang:
+|Retribution|100%|Ellis|7.1|:white_check_mark:
 ||||
 | **Priest** |||
 |Discipline|70%|Cpoworks/Svs|7.1|:heavy_check_mark:
 |Holy|0%|||
 |Shadow|70%|Cpoworks/Svs|7.1|:heavy_check_mark:
+|Shadow|100%(SimC)|Ellis|7.1|:white_check_mark:
 ||||
 | **Rogue** |||
 |Assassination|100%|CuteOne|7.1|:interrobang:
@@ -125,11 +128,13 @@ Raidable means if its good to raid with.
 | **Shaman** |||
 |Elemental|100%|CuteOne|7.0|:interrobang:
 |Enhancement|100%|CuteOne|7.1|:white_check_mark:
+|Enhancement|100%(SimC)|Ellis|7.1|:white_check_mark:
 |Restoration|0%||7.0|
 ||||
 | **Warlock** |||
 |Affliction|100%|CuteOne|7.1|:interrobang:
 |Demonology|100%|CuteOne|7.1|:interrobang:
+|Demonology|90%|Ellis|7.1|:interrobang:
 |Destruction|100%|CuteOne|7.1|:white_check_mark:
 ||||
 | **Warrior** |||

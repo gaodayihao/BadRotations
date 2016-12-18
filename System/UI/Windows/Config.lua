@@ -19,6 +19,8 @@ function br.ui:createConfigWindow()
         br.ui:createCheckbox(section, "Auto-Sell/Repair", "Automatically sells grays and repais when you open a repairman trade.")
         br.ui:createCheckbox(section, "Accept Queues", "Automatically accept LFD, LFR, .. queue.")
         br.ui:createCheckbox(section, "Overlay Messages", "Check to enable chat overlay messages.")
+        br.ui:createSpinnerWithout(section,  LC_ROTATION_TPS ,10, 1, 30, 1, "", LC_ROTATION_TPS_DESCRIPTION)
+        br.ui:createSpinnerWithout(section,  LC_UNITS_TPS ,5, 1, 10, 1, "", LC_UNITS_TPS_DESCRIPTION)
         br.ui:checkSectionState(section)
     end
 
