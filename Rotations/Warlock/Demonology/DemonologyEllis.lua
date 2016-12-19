@@ -286,16 +286,26 @@ local function runRotation()
             self.cast.summonInfernal = function(thisUnit,debug)
                 local spellCast = self.spell.summonInfernal
                 local thisUnit = thisUnit
-                if thisUnit == nil then thisUnit = "player" end
+                local moveCheck = true
+                if thisUnit == nil then
+                    if self.talent.grimoireOfSupremacy then
+                        thisUnit = "player"
+                        moveCheck = true
+                    else
+                        thisUnit = "target"
+                        moveCheck = false
+                    end
+                end
                 if debug == nil then debug = false end
 
                 if self.cd.summonInfernal == 0 and self.power.amount.soulShards >= 1 then
                     if debug then
-                        return castSpell(thisUnit,spellCast,false,true,false,false,false,false,false,true)
+                        return castSpell(thisUnit,spellCast,false,moveCheck,false,false,false,false,false,true)
                     elseif self.talent.grimoireOfSupremacy then
-                        return castSpell(thisUnit,spellCast,false,true)
+                        return castSpell(thisUnit,spellCast,false,moveCheck)
                     else
-                        return castGroundAtBestLocation(spellCast,10,1,30)
+                        return castSpell(thisUnit,spellCast,true,moveCheck)
+                        --return castGroundAtBestLocation(spellCast,10,1,30)
                     end 
                 elseif debug then
                     return false
@@ -668,7 +678,6 @@ local function runRotation()
     --- In Combat - Cooldowns ---
     -----------------------------
                 if actionList_Cooldowns() then return end
-   
     ---------------------------
     --- In Combat - Default ---
     ---------------------------
