@@ -2110,6 +2110,7 @@ br.idList = {
                 demonicEmpowerment          = 193396,
                 demonwrath                  = 193440,
                 doom                        = 603,
+                Felstorm                    = 89751,
                 grimoireFelguard            = 111898,
                 handOfGuldan                = 105174,
                 implosion                   = 196277,
@@ -2136,6 +2137,8 @@ br.idList = {
             },
             talents                         = {
                 demonbolt                   = 157695,
+                grimoireOfService           = 108501,
+                grimoireOfSupremacy         = 152107,
                 grimoireOfSynergy           = 171975,
                 handOfDoom                  = 196283,
                 implosion                   = 196277,

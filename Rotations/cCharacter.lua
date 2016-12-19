@@ -176,7 +176,7 @@ function cCharacter:new(class)
 		self.spec 				= select(2, GetSpecializationInfo(GetSpecialization())) or "None"
 		self.pet 				= UnitCreatureFamily("pet") or "None"
 		if self.pet ~= "None" then
-			self.petId 			= tonumber(UnitGUID("pet"):match("-(%d+)-%x+$"), 10)
+			self.petId 			= GetObjectID("pet")
 		else
 			self.petId 			= 0
 		end

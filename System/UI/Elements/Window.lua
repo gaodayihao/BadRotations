@@ -219,7 +219,7 @@ function br.ui:toggleWindow(windowName)
 end
 
 function br.ui:recreateWindows()
-    br.ui:closeWindows("all")
+    br.ui:closeWindow("all")
     br.ui:createConfigWindow()
     br.ui:createDebugWindow()
 end

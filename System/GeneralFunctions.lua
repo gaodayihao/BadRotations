@@ -1122,7 +1122,10 @@ end
 -- if getDebuffRemain("target",12345) < 3 then
 function getDebuffRemain(Unit,DebuffID,Source)
     if UnitDebuffID(Unit,DebuffID,Source) ~= nil then
-        return (select(7,UnitDebuffID(Unit,DebuffID,Source)) - GetTime())
+        local expires = select(7,UnitDebuffID(Unit,DebuffID,Source))
+        local timeMod = select(16,UnitDebuffID(Unit,DebuffID,Source))
+        -- the real time remaining on the aura is (expirationTime - GetTime()) / timeMod, likely used e.g. on Chronomatic Anomaly (number)
+        return (expires - GetTime()) / timeMod
     end
     return 0
 end
@@ -1134,27 +1137,34 @@ function getDebuffStacks(Unit,DebuffID,Source)
         return 0
     end
 end
+-- if getDebuffStart("target",138756) > 0 then
+function getDebuffStart(Unit,DebuffID,Source)
+    if UnitDebuffID(Unit,DebuffID,Source) then
+        return select(7,UnitDebuffID(Unit,DebuffID,Source)) - select(6,UnitDebuffID(Unit,DebuffID,Source))
+    end
+    return 0
+end
 -- if getDisease(30,true,min) < 2 then
 function getDisease(range,aoe,mod)
     if mod == nil then mod = "min" end
     if range == nil then range = 5 end
     if aoe == nil then aoe = false end
-    local range         = tonumber(range)
-    local mod             = tostring(mod)
-    local dynTar         = dynamicTarget(range,true)
-    local dynTarAoE     = dynamicTarget(range,false)
-    local dist             = getDistance("player",dynTar)
-    local distAoE         = getDistance("player",dynTarAoE)
-    local ff             = getDebuffRemain(dynTar,55095,"player") or 0
-    local ffAoE         = getDebuffRemain(dynTarAoE,55095,"player") or 0
-    local bp             = getDebuffRemain(dynTar,55078,"player") or 0
-    local bpAoE         = getDebuffRemain(dynTarAoE,55078,"player") or 0
-    local np             = getDebuffRemain(dynTar,155159,"player") or 0
-    local npAoE         = getDebuffRemain(dynTarAoE,155159,"player") or 0
-    local diseases         = {ff,bp}
-    local diseasesAoE     = {ffAoE,bpAoE}
-    local minD            = 99
-    local maxD             = 0
+    local range             = tonumber(range)
+    local mod               = tostring(mod)
+    local dynTar            = dynamicTarget(range,true)
+    local dynTarAoE         = dynamicTarget(range,false)
+    local dist              = getDistance("player",dynTar)
+    local distAoE           = getDistance("player",dynTarAoE)
+    local ff                = getDebuffRemain(dynTar,55095,"player") or 0
+    local ffAoE             = getDebuffRemain(dynTarAoE,55095,"player") or 0
+    local bp                = getDebuffRemain(dynTar,55078,"player") or 0
+    local bpAoE             = getDebuffRemain(dynTarAoE,55078,"player") or 0
+    local np                = getDebuffRemain(dynTar,155159,"player") or 0
+    local npAoE             = getDebuffRemain(dynTarAoE,155159,"player") or 0
+    local diseases          = {ff,bp}
+    local diseasesAoE       = {ffAoE,bpAoE}
+    local minD              = 99
+    local maxD              = 0
     if mod == "min" then
           if aoe == false then
             if dist < range then

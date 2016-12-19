@@ -173,7 +173,7 @@ function br.loader:new(spec,specName)
                 self.power[k].amount    = UnitPower("player",v)
                 self.power[k].max       = UnitPowerMax("player",v)
                 self.power[k].deficit   = UnitPowerMax("player",v) - UnitPower("player",v)
-                self.power[k].percent   = (UnitPower("player",v) / UnitPowerMax("player",v)) / 100
+                self.power[k].percent   = (UnitPower("player",v) / UnitPowerMax("player",v)) * 100
                 self.power.amount[k]    = UnitPower("player",v)
                 -- DKs are special snowflakes
                 if select(2,UnitClass("player")) == "DEATHKNIGHT" and v == 5 then
@@ -285,34 +285,38 @@ function br.loader:new(spec,specName)
         for k,v in pairs(self.spell.debuffs) do
             -- Build Debuff Table for all enemy units
             if self.debuff[k] == nil then self.debuff[k] = {} end
+                local debufCount = getDebuffCount(v)
+                local debuffCalc = self.getSnapshotValue(v)
             -- Setup debuff table per valid unit and per debuff
                 if #br.friend > 0 then
                     for i = 1, #br.friend do
                         local thisUnit = br.friend[i].unit
-                        if self.debuff[k][thisUnit]         == nil then self.debuff[k][thisUnit]            = {} end
-                        if self.debuff[k][thisUnit].applied == nil then self.debuff[k][thisUnit].applied    = 0 end
+                        if self.debuff[k][thisUnit]             == nil then self.debuff[k][thisUnit]            = {} end
+                        if self.debuff[k][thisUnit].applied     == nil then self.debuff[k][thisUnit].applied    = 0 end
                         self.debuff[k][thisUnit].exists         = UnitDebuffID(thisUnit,v,"player") ~= nil
                         self.debuff[k][thisUnit].duration       = getDebuffDuration(thisUnit,v,"player")
                         self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
                         self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
                         self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
-                        self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
-                        self.debuff[k][thisUnit].count          = getDebuffCount(v)
+                        self.debuff[k][thisUnit].calc           = debuffCalc
+                        self.debuff[k][thisUnit].count          = debufCount
+                        self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
                     end
                 end
                 if #self.enemies.yards40 > 0 then
                     for i = 1, #self.enemies.yards40 do
                         local thisUnit = self.enemies.yards40[i]
-                        if self.debuff[k][thisUnit]         == nil then self.debuff[k][thisUnit]            = {} end
-                        if self.debuff[k][thisUnit].applied == nil then self.debuff[k][thisUnit].applied    = 0 end
-                        self.debuff[k][thisUnit].exists         = UnitDebuffID(thisUnit,v,"player") ~= nil
+                        if self.debuff[k][thisUnit]                 == nil then self.debuff[k][thisUnit]            = {} end
+                        if self.debuff[k][thisUnit].applied         == nil then self.debuff[k][thisUnit].applied    = 0 end
+                        self.debuff[k][thisUnit].exists             = UnitDebuffID(thisUnit,v,"player") ~= nil
                         if self.debuff[k][thisUnit].exists then
                             self.debuff[k][thisUnit].duration       = getDebuffDuration(thisUnit,v,"player")
                             self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
                             self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
                             self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
-                            self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
-                            self.debuff[k][thisUnit].count          = getDebuffCount(v)
+                            self.debuff[k][thisUnit].calc           = debuffCalc
+                            self.debuff[k][thisUnit].count          = debufCount
+                            self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
                         else
                             self.debuff[k][thisUnit].duration       = 0
                             self.debuff[k][thisUnit].remain         = 0
@@ -320,6 +324,7 @@ function br.loader:new(spec,specName)
                             self.debuff[k][thisUnit].stack          = 0
                             self.debuff[k][thisUnit].calc           = 0
                             self.debuff[k][thisUnit].count          = 0
+                            self.debuff[k][thisUnit].start          = 0
                         end
                         if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
                         if self.debuff[k]["target"] == nil then 
@@ -331,10 +336,12 @@ function br.loader:new(spec,specName)
                             self.debuff[k]["target"].stack          = 0
                             self.debuff[k]["target"].calc           = 0
                             self.debuff[k]["target"].count          = 0
+                            self.debuff[k]["target"].start          = 0
                         end
                     end
                 else
-                    if self.debuff[k]["target"] == nil then self.debuff[k]["target"] = {} end
+                    if self.debuff[k]["target"]             == nil then self.debuff[k]["target"]            = {} end
+                    if self.debuff[k]["target"].applied     == nil then self.debuff[k]["target"].applied    = 0 end
                     self.debuff[k]["target"].exists         = false
                     self.debuff[k]["target"].duration       = 0
                     self.debuff[k]["target"].remain         = 0
@@ -342,6 +349,7 @@ function br.loader:new(spec,specName)
                     self.debuff[k]["target"].stack          = 0
                     self.debuff[k]["target"].calc           = 0
                     self.debuff[k]["target"].count          = 0
+                    self.debuff[k]["target"].start          = 0
                 end
             -- Remove non-valid entries
             for c,v in pairs(self.debuff[k]) do
