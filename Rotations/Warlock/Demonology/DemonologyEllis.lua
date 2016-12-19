@@ -90,6 +90,168 @@ end
 --- ROTATION ---
 ----------------
 local function runRotation()
+-------------------
+--- Pet Manager ---
+-------------------
+        if br.player.petInfo == nil then
+            br.player.petInfo = {}
+            local function buildPetPool(...)
+                local self = br.player
+                if self.petType == nil then
+                    self.petType                    = {
+                        [103673]                    = "darkglare",
+                        [11859]                     = "doomguard",
+                        [17252]                     = "felguard",
+                        [1860]                      = "voidwalker",
+                        [1863]                      = "succubus",
+                        [416]                       = "Imp",
+                        [417]                       = "felhunter",
+                        [55659]                     = "wildImp",
+                        [89]                        = "infernal",
+                        [98035]                     = "dreadStalkers",
+                        [99737]                     = "wildImp",
+                    }
+                end
+                if self.petDuration == nil then
+                    self.petDuration                ={
+                        [103673]                    = 12,     -- darkglare
+                        [11859]                     = 25,     -- doomguard
+                        -- [17252]                     = -1,     -- felguard
+                        -- [1860]                      = -1,     -- voidwalker
+                        -- [1863]                      = -1,     -- succubus
+                        -- [416]                       = -1,     -- Imp
+                        -- [417]                       = -1,     -- felhunter
+                        [55659]                     = 12,     -- wildImp
+                        [89]                        = 25,     -- infernal
+                        [98035]                     = 12,     -- dreadStalkers
+                        [99737]                     = 12,     -- wildImp
+                    }
+                end
+                if ... == nil then
+                    if UnitCreatureFamily("pet") then
+                        local pet = {
+                                        name = UnitName("pet"),
+                                        guid = UnitGUID("pet"),
+                                        id = GetObjectID("pet"), 
+                                        deBuff = false, 
+                                        numEnemies = 0,
+                                        duration = self.petDuration[GetObjectID("pet")] or -1,
+                                        remain = 999,
+                                        start = GetTime(),
+                                        unit = "pet",
+                                    }
+                        tinsert(self.petInfo,pet)
+                    end
+                    return
+                end
+                local timestamp, combatEvent, _, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = ...
+                local _, _, _, _, _, _, _, unitID, _ = destGUID:find('(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)')
+                unitID = tonumber(unitID)
+                if combatEvent == "SPELL_SUMMON" then
+                    local pet = {
+                                    name = destName, 
+                                    guid = destGUID, 
+                                    id = unitID, 
+                                    deBuff = false, 
+                                    numEnemies = 0,
+                                    duration = self.petDuration[unitID] or -1,
+                                    remain = 999,
+                                    start = timestamp,
+                                    unit = nil
+                                }
+                    if pet.duration == -1 and (spellId == self.spell.grimoireImp or (spellId >= self.spell.grimoireVoidwalker and spellId <= self.spell.grimoireFelguard)) then
+                        pet.duration = 25
+                    end
+                    tinsert(self.petInfo,pet)
+                elseif combatEvent == "SPELL_INSTAKILL" then
+                    for i,_ in pairs(self.petInfo) do
+                        if self.petInfo[i].guid == destGUID then
+                            self.petInfo[i] = nil
+                        end
+                    end
+                end
+            end
+
+            buildPetPool()
+            AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+                local _, _, _, sourceGUID = ...
+                if sourceGUID ~= UnitGUID("player") then
+                    return
+                end
+                buildPetPool(...)
+            end)
+        end
+
+        local function refreshPetPool()
+            local self = br.player
+            self.petPool            = {
+                    count               = {
+                        -- wildImp         = 0,
+                    },
+                    remain              = {
+                        -- wildImp         = 999,
+                        -- dreadStalkers   = 999,
+                    },
+                    noDEcount           ={
+                        wildImp         = 0,
+                        others          = 0,
+                    },
+                    useFelstorm         = false,
+                    demonwrathPet       = false,
+                }
+            for k,v in pairs(self.petType) do
+                self.petPool.count[v] = 0
+                self.petPool.remain[v] = 999
+            end
+            for i,v in pairs(self.petInfo) do
+                local pet = v
+
+                if pet.unit == nil then
+                    local sucess,thisUnit = pcall(GetObjectWithGUID,pet.guid)
+                    if sucess == true then
+                        pet.unit = thisUnit
+                    end
+                end
+
+                if (pet.unit ~= nil and not ObjectExists(pet.unit)) or (pet.duration ~= -1 and GetTime() - pet.start >= pet.duration) then
+                    self.petInfo[i] = nil
+                end
+
+                if self.petInfo[i] ~= nil and self.petInfo[i].unit ~= nil then
+                    if pet.duration ~= -1 then
+                        pet.remain = math.max(pet.duration - (GetTime() - pet.start),0)
+                    end
+
+                    local petType = self.petType[pet.id]
+                    if petType ~= nil then
+                        self.petPool.count[petType] = self.petPool.count[petType] + 1
+
+                        self.petPool.remain[petType] = math.min(self.petPool.remain[petType],pet.remain)
+                        
+                        local noDE = UnitBuffID(pet.unit,self.spell.buffs.demonicEmpowerment) == nil
+                        if noDE then
+                            if petType == "wildImp" then
+                                self.petPool.noDEcount.wildImp = self.petPool.noDEcount.wildImp + 1
+                            else
+                                self.petPool.noDEcount.others = self.petPool.noDEcount.others + 1
+                            end
+                        end
+                        
+                        if not self.petPool.useFelstorm and petType == "felguard" and (#getEnemies(pet.unit,8) or 0) > 0 then
+                            self.petPool.useFelstorm = true
+                        end
+
+                        if not self.petPool.demonwrathPet and (#getEnemies(pet.unit,10) or 0) >= 3 then
+                            self.petPool.demonwrathPet = true
+                        end
+                    else
+                        Print("Pet Type is null:"..tostring(pet.id))
+                    end
+                end
+            end
+            --Print("Felguard Count:"..tostring(self.petPool.count.felguard))
+        end
+        refreshPetPool()
     --if br.timer:useTimer("debugDemonology", math.random(0.15,0.3)) then
         --print("Running: "..rotationName)
 ---------------
@@ -505,7 +667,8 @@ local function runRotation()
         -- summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>=3&equipped.132379&!cooldown.sindorei_spite_icd.remains
     -- Call Dreadstalkers
         -- call_dreadstalkers,if=!talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)
-            if not (hasEquiped(132393) and buff.demonicCalling.exists and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard)) 
+            if ((not (hasEquiped(132393) and buff.demonicCalling.exists and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard))) 
+                    or (hasEquiped(132393) and not talent.demonicCalling and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard)))
                 and not talent.summonDarkglare 
                 and (not talent.implosion or #enemies.yards10t < 3)
             then
