@@ -156,7 +156,7 @@ local function runRotation()
                                     numEnemies = 0,
                                     duration = self.petDuration[unitID] or -1,
                                     remain = 999,
-                                    start = timestamp,
+                                    start = GetTime(),
                                     unit = nil
                                 }
                     if pet.duration == -1 and (spellId == self.spell.grimoireImp or (spellId >= self.spell.grimoireVoidwalker and spellId <= self.spell.grimoireFelguard)) then
