@@ -503,7 +503,9 @@ function br.loader:new(spec,specName)
             useFelstorm         = false,
             demonwrathPet       = false,
         }
-        for i = 1, ObjectCount() do
+        local totalObjects = ObjectCount()
+        local player        = GetObjectWithGUID(UnitGUID("player"))
+        for i = 1, totalObjects do
             -- define our unit
             --local thisUnit = GetObjectIndex(i)
             local thisUnit = GetObjectWithIndex(i)
@@ -511,7 +513,6 @@ function br.loader:new(spec,specName)
             if ObjectIsType(thisUnit, ObjectTypes.Unit) then
                 local unitID        = GetObjectID(thisUnit)
                 local unitCreator   = UnitCreator(thisUnit)
-                local player        = GetObjectWithGUID(UnitGUID("player"))
                 if unitCreator == player and (self.petVaild[unitID] or false) then
                 --------------------
                 -- build Pet Info --
