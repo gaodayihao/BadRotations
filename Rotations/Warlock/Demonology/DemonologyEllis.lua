@@ -145,7 +145,7 @@ local function runRotation()
         local nextShard         = 0
         local doomRemain        = 20 / (1+hasteAmount)
         if doom ~= nil and doom.exists then
-            if doom.trick == 0 then
+            if doom.trick == 0 or doom.trick == nil then
                 doom.trick = doom.start + doomRemain
             end
             if doom.trick <= GetTime() then
