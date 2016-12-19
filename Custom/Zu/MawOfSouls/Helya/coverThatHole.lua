@@ -36,8 +36,7 @@ if GetTime() - mahtime >= 20 then
   mahtime = GetTime()
 end
 function coverThatHole()
-  local totalObjects = ObjectCount()
-  for i = 1, totalObjects do
+  for i = 1, ObjectCount() do
     local name = ObjectName(ObjectWithIndex(i))
     local object = ObjectWithIndex(i)
     local x,y,z = ObjectPosition(object)

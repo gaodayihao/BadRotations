@@ -47,8 +47,7 @@ function EnemiesEngine()
 			br.debug.cpu.enemiesEngine.unitTargets = 0
 			-- DEBUG --
 			--for i = 1, GetObjectCountBR() do
-			local totalObjects = ObjectCount()
-			for i = 1, totalObjects do
+			for i = 1, ObjectCount() do
 				-- define our unit
 				--local thisUnit = GetObjectIndex(i)
 				local thisUnit = GetObjectWithIndex(i)
@@ -269,8 +268,7 @@ function EnemiesEngine()
 		local minX = math.min(nrX,nlX,frX,flX)
 		local maxY = math.max(nrY,nlY,frY,flY)
 		local minY = math.min(nrY,nlY,frY,flY)
-		local totalObjects = ObjectCount()
-		for i = 1, totalObjects do
+		for i = 1, ObjectCount() do
             local thisUnit = GetObjectWithIndex(i)
             if ObjectIsType(thisUnit, ObjectTypes.Unit) and isDummy(thisUnit) then
 				local tX, tY, tZ = GetObjectPosition(thisUnit)

@@ -503,9 +503,8 @@ function br.loader:new(spec,specName)
             useFelstorm         = false,
             demonwrathPet       = false,
         }
-        local totalObjects = ObjectCount()
-        local player        = GetObjectWithGUID(UnitGUID("player"))
-        for i = 1, totalObjects do
+        local player = GetObjectWithGUID(UnitGUID("player"))
+        for i = 1, ObjectCount() do
             -- define our unit
             --local thisUnit = GetObjectIndex(i)
             local thisUnit = GetObjectWithIndex(i)
