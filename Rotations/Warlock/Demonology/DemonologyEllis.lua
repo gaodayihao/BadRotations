@@ -72,9 +72,33 @@ local function createOptions()
         br.ui:checkSectionState(section)
     -- Cooldown Options
         section = br.ui:createSection(br.ui.window.profile, LC_COOLDOWNS)
+        -- Racial
+            br.ui:createCheckbox(section,LC_RACIAL,LC_RACIAL_DESCRIPTION)
+        -- Trinkets
+            br.ui:createCheckbox(section,LC_TRINKETS,LC_TRINKETS_DESCRIPTION)
+        -- Soul Harvest
+            br.ui:createCheckbox(section,LC_SOUL_HARVEST,LC_SOUL_HARVEST_DESCRIPTION)
+        -- Doomguard
+            br.ui:createCheckbox(section,LC_COOLDOWN_DOOMGUARD)
+        -- Infernal
+            br.ui:createCheckbox(section,LC_COOLDOWN_INFERNAL)
         br.ui:checkSectionState(section)
     -- Defensive Options
         section = br.ui:createSection(br.ui.window.profile, LC_DEFENSIVE)
+        -- Healthstone
+            br.ui:createSpinner(section, LC_POT_STONED,  60,  0,  100,  5,  LC_POT_STONED_DESCRIPTION)
+        -- Gift of The Naaru
+            if br.player.race == "Draenei" then
+                br.ui:createSpinner(section, LC_GIFT_OF_THE_NAARU,  50,  0,  100,  5,  LC_GIFT_OF_THE_NAARU_DESCRIPTION)
+            end
+        -- Dark Pact
+            br.ui:createSpinner(section, LC_DARK_PACT, 50, 0, 100, 5, LC_DARK_PACT_DESCRIPTION)
+        -- Drain Life
+            br.ui:createSpinner(section, LC_DRAIN_LIFE, 30, 0, 100, 5, LC_DRAIN_LIFE_DESCRIPTION)
+        -- Health Funnel
+            br.ui:createSpinner(section, LC_HEALTH_FUNNEL, 30, 0, 100, 5, LC_HEALTH_FUNNEL_DESCRIPTION)
+        -- Unending Resolve
+            br.ui:createSpinner(section, LC_UNENDING_RESOLVE, 40, 0, 100, 5, LC_UNENDING_RESOLVE_DESCRIPTION)
         br.ui:checkSectionState(section)
     -- Interrupt Options
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
@@ -95,10 +119,7 @@ local function runRotation()
 -------------------
         if br.player.petInfo == nil then
             br.player.petInfo = {}
-            local function buildPetPool(...)
-                local self = br.player
-                if self.petType == nil then
-                    self.petType                    = {
+            br.player.petType                    = {
                         [103673]                    = "darkglare",
                         [11859]                     = "doomguard",
                         [17252]                     = "felguard",
@@ -113,9 +134,7 @@ local function runRotation()
                         [98035]                     = "dreadStalkers",
                         [99737]                     = "wildImp",
                     }
-                end
-                if self.petDuration == nil then
-                    self.petDuration                ={
+            br.player.petDuration                ={
                         [103673]                    = 12,     -- darkglare
                         [11859]                     = 25,     -- doomguard
                         -- [17252]                     = -1,     -- felguard
@@ -128,7 +147,8 @@ local function runRotation()
                         [98035]                     = 12,     -- dreadStalkers
                         [99737]                     = 12,     -- wildImp
                     }
-                end
+            local function buildPetPool(...)
+                local self = br.player
                 if ... == nil then
                     if UnitCreatureFamily("pet") then
                         local pet = {
@@ -146,10 +166,10 @@ local function runRotation()
                     end
                     return
                 end
-                local timestamp, combatEvent, _, sourceGUID, sourceName, sourceFlags, sourceFlags2, destGUID, destName, destFlags, destFlags2, spellId, spellName, spellSchool = ...
-                local _, _, _, _, _, _, _, unitID, _ = destGUID:find('(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)')
-                unitID = tonumber(unitID)
+                local _, combatEvent, _, _, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
                 if combatEvent == "SPELL_SUMMON" then
+                    local _, _, _, _, _, _, _, unitID, _ = destGUID:find('(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)')
+                    unitID = tonumber(unitID)
                     local pet = {
                                     name = destName, 
                                     guid = destGUID, 
@@ -187,14 +207,9 @@ local function runRotation()
         local function refreshPetPool()
             local self = br.player
             self.petPool            = {
-                    count               = {
-                        -- wildImp         = 0,
-                    },
-                    remain              = {
-                        -- wildImp         = 999,
-                        -- dreadStalkers   = 999,
-                    },
-                    noDEcount           ={
+                    count               = {},
+                    remain              = {},
+                    noDEcount           = {
                         wildImp         = 0,
                         others          = 0,
                     },
@@ -288,6 +303,7 @@ local function runRotation()
         local inInstance                                    = br.player.instance=="party"
         local inRaid                                        = br.player.instance=="raid"
         local lastSpell                                     = lastSpellCast
+        local lastTarget                                    = lastSpellTarget
         local manaPercent                                   = br.player.power.mana.percent
         local mode                                          = br.player.mode
         local moving                                        = isMoving("player")
@@ -303,7 +319,16 @@ local function runRotation()
         local travelTime                                    = getDistance("target")/16
         local ttd                                           = getTimeToDie
         local units                                         = br.player.units
-        
+        local useArtifact                                   = false
+
+        if isChecked(LC_ARTIFACT) then
+            if getOptionValue(LC_ARTIFACT) == 1 then
+                useArtifact = artifact.thalkielsConsumption
+            else
+                useArtifact = useCDs() and artifact.thalkielsConsumption
+            end
+        end
+
         -- Doom
         local doom              = debuff.doom[units.dyn40]
         local nextShard         = 0
@@ -521,6 +546,29 @@ local function runRotation()
     -- Action List - Defensive
         local function actionList_Defensive()
             if useDefensive() then
+        -- Pot/Stoned
+                if isChecked(LC_POT_STONED) and php <= getOptionValue(LC_POT_STONED) 
+                    and inCombat and (hasHealthPot() or hasItem(5512)) 
+                then
+                    if canUse(5512) and useItem(5512) then return true end
+                    if canUse(healPot) and useItem(healPot) then return true end
+                end
+        -- Gift of the Naaru
+                if isChecked(LC_GIFT_OF_THE_NAARU) and getSpellCD(racial)==0 and php <= getOptionValue(LC_GIFT_OF_THE_NAARU) and php > 0 and race == "Draenei" then
+                    if castSpell("player",racial,false,false,false) then return true end
+                end
+        -- Dark Pact
+                if talent.darkPact and isChecked(LC_DARK_PACT) and php <= getOptionValue(LC_DARK_PACT) and getHP("pet") * 0.8 > getOptionValue(LC_HEALTH_FUNNEL) then
+                    if cast.darkPact() then return true end
+                end
+        -- Unending Resolve
+                if isChecked(LC_UNENDING_RESOLVE) and php <= getOptionValue(LC_UNENDING_RESOLVE) then
+                    if cast.unendingResolve() then return true end
+                end
+        -- Health Funnel
+                if not inRaid and isChecked(LC_HEALTH_FUNNEL) and activePet ~= "None" and getHP("pet") <= getOptionValue(LC_HEALTH_FUNNEL) and php >= 30 then
+                    if cast.healthFunnel() then return true end
+                end
             end -- End Defensive Toggle
         end -- End Action List - Defensive
     -- Action List - Interrupts
@@ -532,6 +580,22 @@ local function runRotation()
     -- Action List - Cooldowns
         local function actionList_Cooldowns()
             if useCDs() and getDistance(units.dyn40) < 40 then
+            -- Trinkets
+                if isChecked(LC_TRINKETS) then
+                    if canUse(13) and useItem(13) then return true end
+                    if canUse(14) and useItem(14) then return true end
+                end
+            -- Racial
+                if isChecked(LC_RACIAL) 
+                    and br.player.race == "Orc"
+                    and getSpellCD(racial) == 0
+                then
+                    if castSpell("player",racial,false,false,false) then return true end
+                end
+            -- Soul Harvest
+                if talent.soulHarvest and isChecked(LC_SOUL_HARVEST) then
+                    if cast.soulHarvest() then return true end
+                end
             end -- End useCDs check
         end -- End Action List - Cooldowns
     -- Action List - PreCombat
@@ -583,7 +647,7 @@ local function runRotation()
             local targetUnit = nil
             for i = 1, #theEnemies do
                 local thisUnit = theEnemies[i]
-                if not targetUnit and UnitGUID(thisUnit) ~= lastTarget and UnitGUID("player") ~= lastTarget then
+                if not targetUnit and UnitGUID(thisUnit) ~= lastTarget then
                     targetUnit = thisUnit
                 elseif targetUnit ~= nil then
                     local health = UnitHealth(thisUnit)
@@ -610,10 +674,6 @@ local function runRotation()
     -- Pet Attack
             if not UnitIsUnit("pettarget","target") then
                 PetAttack()
-            end
-    -- Stop Demon Wrath
-            if isCastingSpell(spell.demonwrath) and not petPool.demonwrathPet and not moving then
-                SpellStopCasting()
             end
     -- Implosion
         -- implosion,if=wild_imp_remaining_duration<=action.shadow_bolt.execute_time&buff.demonic_synergy.remains
@@ -655,12 +715,12 @@ local function runRotation()
             end
     -- Summon Doomguard
         --summon_doomguard,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening<3&(target.time_to_die>180|target.health.pct<=20|target.time_to_die<30)
-            if not talent.grimoireOfSupremacy and (ttd("target") > 180 or getHP("target") <=20 or ttd("target") < 30) and #enemies.yards10t < 3 then
+            if useCDs() and isChecked(LC_COOLDOWN_DOOMGUARD) and not talent.grimoireOfSupremacy and (ttd("target") > 180 or getHP("target") <=20 or ttd("target") < 30) and #enemies.yards10t < 3 then
                 if cast.summonDoomguard() then return end
             end
     -- Summon Infernal
         --summon_infernal,if=!talent.grimoire_of_supremacy.enabled&spell_targets.infernal_awakening>=3
-            if not talent.grimoireOfSupremacy and #enemies.yards10t >= 3 then
+            if useCDs() and isChecked(LC_COOLDOWN_INFERNAL) and not talent.grimoireOfSupremacy and #enemies.yards10t >= 3 then
                 if cast.summonInfernal() then return end
             end
     -- Summon Doomguard
@@ -761,7 +821,11 @@ local function runRotation()
                 and petPool.count.wildImp > 3 and petPool.remain.wildImp > getCastTime(spell.thalkielsConsumption) 
                 and petPool.noDEcount.others + petPool.noDEcount.wildImp == 0
             then
-                if cast.thalkielsConsumption() then return end
+                if useArtifact and cast.thalkielsConsumption() then return end
+            end
+    -- Drain Life
+            if useDefensive() and isChecked(LC_DRAIN_LIFE) and php <= getOptionValue(LC_DRAIN_LIFE) then
+                if cast.drainLife() then return end
             end
     -- Life Tap
         -- life_tap,if=mana.pct<=30
@@ -791,8 +855,15 @@ local function runRotation()
 ---------------------
 --- Begin Profile ---
 ---------------------
+    -- Stop Demon Wrath
+        if isCastingSpell(spell.demonwrath) and not petPool.demonwrathPet and not moving then
+            SpellStopCasting()
+        end
+        if isCastingSpell(spell.healthFunnel) and getHP("pet") >= 98 then
+            SpellStopCasting()
+        end
     -- Profile Stop | Pause
-        if pause() or mode.rotation==4 then
+        if pause() or mode.rotation==4 or IsMounted() then
             if not pause() then
                 PetFollow()
             end
@@ -829,7 +900,7 @@ local function runRotation()
 --------------------------
 --- In Combat Rotation ---
 --------------------------
-            if inCombat and not IsMounted() and isValidUnit(units.dyn40) then
+            if inCombat and isValidUnit(units.dyn40) then
     -------------------------------
     --- In Combat - Auto Facing ---
     -------------------------------
