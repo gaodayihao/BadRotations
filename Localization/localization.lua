@@ -135,6 +135,12 @@ LC_JUDGMENT_IGNORE = "Judgment Ignore";
 LC_JUDGMENT_IGNORE_DESCRIPTION = "Ignore Judgment debuff when Judgment Cooldown is too long";
 
 -- Demonology Warlock
+LC_COOLDOWN_DOOMGUARD = "Doomguard ";
+LC_COOLDOWN_INFERNAL = "Infernal ";
+LC_DARK_PACT = "Dark Pact"
+LC_DARK_PACT_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
+LC_DRAIN_LIFE = "Drain Life"
+LC_DRAIN_LIFE_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
 LC_GRIMOIRE_OF_SERVICE = "Grimoire of Service";
 LC_GRIMOIRE_OF_SERVICE_DESCRIPTION = "|cffFFFFFFSelect pet to Grimoire.";
 LC_GRIMOIRE_OF_SERVICE_FELGUARD = "Felguard";
@@ -146,6 +152,12 @@ LC_GRIMOIRE_OF_SUPREMACY = "Grimoire of Supremacy";
 LC_GRIMOIRE_OF_SUPREMACY_DESCRIPTION = "|cffFFFFFFSelect pet to Grimoire.";
 LC_GRIMOIRE_OF_SUPREMACY_DOOMGUARD = "Doomguard";
 LC_GRIMOIRE_OF_SUPREMACY_INFERNAL = "Infernal";
+LC_HEALTH_FUNNEL = "Health Funnel"
+LC_HEALTH_FUNNEL_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
+LC_SHADOW_LOCK = "Shadow Lock";
+LC_SOUL_HARVEST = "Soul Harvest";
+LC_SOUL_HARVEST_DESCRIPTION = "Soul Harvest";
+LC_SPELL_LOCK = "Spell Lock";
 LC_SUMMON_PET = "Summon Pet";
 LC_SUMMON_PET_AUTO = "Auto";
 LC_SUMMON_PET_DESCRIPTION = "|cffFFFFFFSelect default pet to summon.";
@@ -154,18 +166,8 @@ LC_SUMMON_PET_FELHUNTER = "Felhunter"
 LC_SUMMON_PET_IMP = "Imp";
 LC_SUMMON_PET_SUCCUBUS = "Succubus"
 LC_SUMMON_PET_VOIDWALKER = "Voidwalker"
-LC_DARK_PACT = "Dark Pact"
-LC_DARK_PACT_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
-LC_DRAIN_LIFE = "Drain Life"
-LC_DRAIN_LIFE_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
-LC_HEALTH_FUNNEL = "Health Funnel"
-LC_HEALTH_FUNNEL_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
 LC_UNENDING_RESOLVE = "Unending Resolve"
 LC_UNENDING_RESOLVE_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At"
-LC_SOUL_HARVEST = "Soul Harvest";
-LC_SOUL_HARVEST_DESCRIPTION = "Soul Harvest";
-LC_COOLDOWN_DOOMGUARD = "Doomguard ";
-LC_COOLDOWN_INFERNAL = "Infernal ";
 
 -- Shaman
 LC_ANCESTRAL_SPIRIT = "Ancestral Spirit";

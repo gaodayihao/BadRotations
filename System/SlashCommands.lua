@@ -1,6 +1,12 @@
 -- Slash Commands
 ---------------------------------
+lastMsg = nil
 function Print(msg)
+	if msg == lastMsg and not br.timer:useTimer("msgInterval",5) then
+		return
+	end
+	br.timer:useTimer("msgInterval",0)
+	lastMsg = msg
 	print(br.classColor.."[BadRotations] |cffFFFFFF"..msg)
 end
 commandHelp = "|cffFF0000Slash Commands"

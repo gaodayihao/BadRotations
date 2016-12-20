@@ -102,6 +102,14 @@ local function createOptions()
         br.ui:checkSectionState(section)
     -- Interrupt Options
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
+        -- Shadow Lock
+            br.ui:createCheckbox(section,LC_SHADOW_LOCK)
+        -- Spell Lock
+            br.ui:createCheckbox(section,LC_SPELL_LOCK)
+        -- Arcane Torrent
+            br.ui:createCheckbox(section,LC_ARCANE_TORRENT)
+        -- Interrupt Percentage
+            br.ui:createSpinnerWithout(section, LC_INTERRUPTS_AT,  0,  0,  95,  5,  LC_INTERRUPTS_AT_DESCRIPTION)
         br.ui:checkSectionState(section)
     end
     optionTable = {{
@@ -149,23 +157,6 @@ local function runRotation()
                     }
             local function buildPetPool(...)
                 local self = br.player
-                if ... == nil then
-                    if UnitCreatureFamily("pet") then
-                        local pet = {
-                                        name = UnitName("pet"),
-                                        guid = UnitGUID("pet"),
-                                        id = GetObjectID("pet"), 
-                                        deBuff = false, 
-                                        numEnemies = 0,
-                                        duration = self.petDuration[GetObjectID("pet")] or -1,
-                                        remain = 999,
-                                        start = GetTime(),
-                                        unit = "pet",
-                                    }
-                        tinsert(self.petInfo,pet)
-                    end
-                    return
-                end
                 local _, combatEvent, _, _, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
                 if combatEvent == "SPELL_SUMMON" then
                     local _, _, _, _, _, _, _, unitID, _ = destGUID:find('(%S+)-(%d+)-(%d+)-(%d+)-(%d+)-(%d+)-(%S+)')
@@ -194,7 +185,7 @@ local function runRotation()
                 end
             end
 
-            buildPetPool()
+            -- buildPetPool()
             AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
                 local _, _, _, sourceGUID = ...
                 if sourceGUID ~= UnitGUID("player") then
@@ -206,7 +197,7 @@ local function runRotation()
 
         local function refreshPetPool()
             local self = br.player
-            self.petPool            = {
+            self.petPool                = {
                     count               = {},
                     remain              = {},
                     noDEcount           = {
@@ -220,6 +211,22 @@ local function runRotation()
                 self.petPool.count[v] = 0
                 self.petPool.remain[v] = 999
             end
+            
+            if #self.petInfo == 0 and self.pet ~= "None" then
+                tinsert(self.petInfo,
+                {
+                    name = UnitName("pet"),
+                    guid = UnitGUID("pet"),
+                    id = GetObjectID("pet"), 
+                    deBuff = false, 
+                    numEnemies = 0,
+                    duration = self.petDuration[GetObjectID("pet")] or -1,
+                    remain = 999,
+                    start = GetTime(),
+                    unit = "pet",
+                })
+            end
+
             for i,v in pairs(self.petInfo) do
                 local pet = v
 
@@ -266,7 +273,9 @@ local function runRotation()
                     end
                 end
             end
-            --Print("Felguard Count:"..tostring(self.petPool.count.felguard))
+            -- Print("Active Pet:"..self.petId)
+            -- Print("Pet Count:"..tostring(#self.petInfo))
+            -- Print("Felguard Count:"..tostring(self.petPool.count.felguard))
         end
         refreshPetPool()
     --if br.timer:useTimer("debugDemonology", math.random(0.15,0.3)) then
@@ -307,6 +316,7 @@ local function runRotation()
         local manaPercent                                   = br.player.power.mana.percent
         local mode                                          = br.player.mode
         local moving                                        = isMoving("player")
+        local petInfo                                       = br.player.petInfo
         local petPool                                       = br.player.petPool
         local php                                           = br.player.health
         local power, powmax, powgen, powerDeficit           = br.player.power.amount.mana, br.player.power.mana.max, br.player.power.regen, br.player.power.mana.deficit
@@ -344,7 +354,7 @@ local function runRotation()
                     doom.trick = doom.trick + doom.remain
                 end
             end
-            nextShard = math.max(0,doom.trick-GetTime())
+            nextShard = math.max(0,doom.trick-GetTime()+0.05)
         elseif doom ~= nil then
             doom.trick = 0
         end
@@ -573,8 +583,30 @@ local function runRotation()
         end -- End Action List - Defensive
     -- Action List - Interrupts
         local function actionList_Interrupts()
-            if useInterrupts() then
-               
+            if useInterrupts() and br.timer:useTimer("Interrupts",1.5) then
+                local dist = 8
+                local source = "player"
+                if petId == 78158 or petId == 417 then
+                    dist = 40
+                    source = "pet"
+                end
+                local theEnemies = getEnemies(source,dist)
+                for i=1, #theEnemies do
+                    thisUnit = theEnemies[i]
+                    if canInterrupt(thisUnit,getOptionValue(LC_INTERRUPTS_AT)) then
+                        if petId == 78158 and isChecked(LC_SHADOW_LOCK) then
+                    -- Shadow Lock
+                            if cast.shadowLock(thisUnit) then return true end
+                        elseif petId == 417 and isChecked(LC_SPELL_LOCK) then
+                    -- Spell Lock
+                            if cast.spellLock(thisUnit) then return true end
+                        end
+                    -- Arcane Torrent
+                        if isChecked(LC_ARCANE_TORRENT) and getDistance(thisUnit) <=8 and getSpellCD(racial) == 0 then
+                            if castSpell("player",racial,false,false,false) then return true end
+                        end
+                    end
+                end
             end -- End useInterrupts check
         end -- End Action List - Interrupts
     -- Action List - Cooldowns
@@ -732,6 +764,7 @@ local function runRotation()
             if (not (hasEquiped(132393) and buff.demonicCalling.exists and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard)))
                 and not talent.summonDarkglare 
                 and (not talent.implosion or #enemies.yards10t < 3)
+                and not (hasEquiped(132393) and (shards == 3 or shards == 2 and getCastTime(spell.demonbolt) > nextShard))
             then
                 if cast.callDreadstalkers() then return end
             end
@@ -835,7 +868,7 @@ local function runRotation()
     -- Demonwrath
         -- demonwrath,chain=1,interrupt=1,if=spell_targets.demonwrath>=3
         -- demonwrath,moving=1,chain=1,interrupt=1
-            if petPool.demonwrathPet or moving then
+            if petPool.demonwrathPet or moving and #petInfo > 0 then
                 if cast.demonwrath() then return end
             end
     -- Demonbolt/Shadow Bolt
