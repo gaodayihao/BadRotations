@@ -107,6 +107,8 @@ local function runRotation()
                         [416]                       = "Imp",
                         [417]                       = "felhunter",
                         [55659]                     = "wildImp",
+                        [78158]                     = "doomguard",
+                        [78217]                     = "infernal",
                         [89]                        = "infernal",
                         [98035]                     = "dreadStalkers",
                         [99737]                     = "wildImp",
@@ -237,7 +239,7 @@ local function runRotation()
                             end
                         end
                         
-                        if not self.petPool.useFelstorm and petType == "felguard" and (#getEnemies(pet.unit,8) or 0) > 0 then
+                        if not self.petPool.useFelstorm and petType == "felguard" and (#getEnemies(pet.unit,8) or 0) > 0 and pet.duration == -1 then
                             self.petPool.useFelstorm = true
                         end
 
@@ -667,8 +669,7 @@ local function runRotation()
         -- summon_infernal,if=talent.grimoire_of_supremacy.enabled&spell_targets.summon_infernal>=3&equipped.132379&!cooldown.sindorei_spite_icd.remains
     -- Call Dreadstalkers
         -- call_dreadstalkers,if=!talent.summon_darkglare.enabled&(spell_targets.implosion<3|!talent.implosion.enabled)
-            if ((not (hasEquiped(132393) and buff.demonicCalling.exists and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard))) 
-                    or (hasEquiped(132393) and not talent.demonicCalling and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard)))
+            if (not (hasEquiped(132393) and buff.demonicCalling.exists and (shards >= 4 or shards >= 3 and getCastTime(spell.callDreadstalkers) > nextShard)))
                 and not talent.summonDarkglare 
                 and (not talent.implosion or #enemies.yards10t < 3)
             then
