@@ -2232,6 +2232,7 @@ br.idList = {
                 mortalCoil                  = 6789,
                 shadowLock                  = 171138,
                 soulHarvest                 = 196098,
+                soulstone                   = 20707,
                 spellLock                   = 19647,
                 summonDoomguard             = 18540,
                 summonFelhunter             = 691,

@@ -99,6 +99,8 @@ local function createOptions()
             br.ui:createSpinner(section, LC_HEALTH_FUNNEL, 30, 0, 100, 5, LC_HEALTH_FUNNEL_DESCRIPTION)
         -- Unending Resolve
             br.ui:createSpinner(section, LC_UNENDING_RESOLVE, 40, 0, 100, 5, LC_UNENDING_RESOLVE_DESCRIPTION)
+        -- Soulstone
+            br.ui:createCheckbox(section, LC_SOULSTONE)
         br.ui:checkSectionState(section)
     -- Interrupt Options
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
@@ -213,14 +215,15 @@ local function runRotation()
             end
             
             if #self.petInfo == 0 and self.pet ~= "None" then
+                local objectId = GetObjectID("pet")
                 tinsert(self.petInfo,
                 {
                     name = UnitName("pet"),
                     guid = UnitGUID("pet"),
-                    id = GetObjectID("pet"), 
+                    id = objectId, 
                     deBuff = false, 
                     numEnemies = 0,
-                    duration = self.petDuration[GetObjectID("pet")] or -1,
+                    duration = self.petDuration[objectId] or -1,
                     remain = 999,
                     start = GetTime(),
                     unit = "pet",
@@ -237,7 +240,7 @@ local function runRotation()
                     end
                 end
 
-                if (pet.unit ~= nil and not ObjectExists(pet.unit)) or (pet.duration ~= -1 and GetTime() - pet.start >= pet.duration) then
+                if (pet.duration ~= -1 and GetTime() - pet.start >= pet.duration) or (pet.unit ~= nil and not ObjectExists(pet.unit)) then
                     self.petInfo[i] = nil
                 end
 
@@ -322,6 +325,7 @@ local function runRotation()
         local power, powmax, powgen, powerDeficit           = br.player.power.amount.mana, br.player.power.mana.max, br.player.power.regen, br.player.power.mana.deficit
         local pullTimer                                     = br.DBM:getPulltimer()
         local racial                                        = br.player.getRacial()
+        local resable                                       = UnitIsPlayer("target") and UnitIsDeadOrGhost("target") and UnitIsFriend("target","player")
         local shards                                        = br.player.power.amount.soulShards
         local spell                                         = br.player.spell
         local summonPet                                     = getOptionValue(LC_SUMMON_PET)
@@ -557,8 +561,8 @@ local function runRotation()
         local function actionList_Defensive()
             if useDefensive() then
         -- Pot/Stoned
-                if isChecked(LC_POT_STONED) and php <= getOptionValue(LC_POT_STONED) 
-                    and inCombat and (hasHealthPot() or hasItem(5512)) 
+                if inCombat and isChecked(LC_POT_STONED) and php <= getOptionValue(LC_POT_STONED) 
+                    and (hasHealthPot() or hasItem(5512)) 
                 then
                     if canUse(5512) and useItem(5512) then return true end
                     if canUse(healPot) and useItem(healPot) then return true end
@@ -578,6 +582,10 @@ local function runRotation()
         -- Health Funnel
                 if not inRaid and isChecked(LC_HEALTH_FUNNEL) and activePet ~= "None" and getHP("pet") <= getOptionValue(LC_HEALTH_FUNNEL) and php >= 30 then
                     if cast.healthFunnel() then return true end
+                end
+        -- Soulstone
+                if inCombat and isChecked(LC_SOULSTONE) and resable then
+                    if cast.soulstone("target") then return true end
                 end
             end -- End Defensive Toggle
         end -- End Action List - Defensive
@@ -602,7 +610,7 @@ local function runRotation()
                             if cast.spellLock(thisUnit) then return true end
                         end
                     -- Arcane Torrent
-                        if isChecked(LC_ARCANE_TORRENT) and getDistance(thisUnit) <=8 and getSpellCD(racial) == 0 then
+                        if isChecked(LC_ARCANE_TORRENT) and getSpellCD(racial) == 0 and getDistance(thisUnit) <=8 then
                             if castSpell("player",racial,false,false,false) then return true end
                         end
                     end
