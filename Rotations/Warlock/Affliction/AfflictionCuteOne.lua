@@ -602,7 +602,7 @@ local function runRotation()
                     end
         -- Phantom Singularity
                     -- phantom_singularity
-                    if castable.phantomSingularity then
+                    if cast.phantomSingularity(nil,"debug") then
                         
                         if cast.phantomSingularity() then return end
                     end
@@ -640,7 +640,7 @@ local function runRotation()
                     end
         -- Haunt
                     -- haunt
-                    if castable.haunt then
+                    if cast.haunt(nil,"debug") then
                         
                         if cast.haunt() then return end
                     end

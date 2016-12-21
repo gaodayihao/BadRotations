@@ -765,7 +765,7 @@ local function runRotation()
                     -- if (HasTalent(Prepared) or HasTalent(Momentum)) and 
                     -- ((CooldownSecRemaining(FelRush) <= GlobalCooldownSec or (CanUse(EyeBeam) and CooldownSecRemaining(FelRush) < SpellChannelTimeSec(EyeBeam))) or 
                     -- (HasTalent(Felblade) and CooldownSecRemaining(Felblade) <= GlobalCooldownSec or (CanUse(EyeBeam) and CooldownSecRemaining(Felblade) < SpellChannelTimeSec(EyeBeam))))
-                    if mode.mover == 1 and (talent.prepared or talent.momentum) and ((cd.felRush <= gcd or (castable.eyeBeam and cd.felRush < eyeBeamCastRemain())) or (talent.felblade and cd.felblade <= gcd or (castable.eyeBeam and cd.felblade < eyeBeamCastRemain()))) and getDistance("target") < 5 then
+                    if mode.mover == 1 and (talent.prepared or talent.momentum) and ((cd.felRush <= gcd or (cast.eyeBeam(nil,"debug") and cd.felRush < eyeBeamCastRemain())) or (talent.felblade and cd.felblade <= gcd or (cast.eyeBeam(nil,"debug") and cd.felblade < eyeBeamCastRemain()))) and getDistance("target") < 5 then
                         if mode.mover == 1 then
                             cancelRetreatAnimation()
                         elseif mode.mover == 2 then

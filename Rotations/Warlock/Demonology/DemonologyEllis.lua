@@ -280,7 +280,7 @@ local function runRotation()
             -- Print("Pet Count:"..tostring(#self.petInfo))
             -- Print("Felguard Count:"..tostring(self.petPool.count.felguard))
         end
-        refreshPetPool()
+        if br.timer:useTimer("refreshPetPool",1/5) then refreshPetPool() end
     --if br.timer:useTimer("debugDemonology", math.random(0.15,0.3)) then
         --print("Running: "..rotationName)
 ---------------
@@ -345,8 +345,9 @@ local function runRotation()
 
         -- Doom
         local doom              = debuff.doom[units.dyn40]
-        local nextShard         = 0
+        local nextShard         = 999
         local doomRemain        = 20 / (1+hasteAmount)
+        
         if doom ~= nil and doom.exists then
             if doom.trick == 0 or doom.trick == nil then
                 doom.trick = doom.start + doomRemain

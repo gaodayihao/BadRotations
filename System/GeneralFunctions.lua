@@ -920,7 +920,7 @@ function castSpellMacro(Unit,SpellID,FacingCheck,MovementCheck,SpamAllowed,Known
 end
 -- Used in openers
 function castOpener(spellIndex,flag,index)
-    if (not br.player.cast.debug[spellIndex] and (br.player.cd[spellIndex] == 0 or br.player.cd[spellIndex] > br.player.gcd)) then
+    if (not br.player.cast[spellIndex](nil,"debug") and (br.player.cd[spellIndex] == 0 or br.player.cd[spellIndex] > br.player.gcd)) then
         Print(index..": "..select(1,GetSpellInfo(br.player.spell[spellIndex])).." (Uncastable)");
         _G[flag] = true;
         return

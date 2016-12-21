@@ -538,7 +538,7 @@ local function runRotation()
             end
         -- Pistol Shot
             -- pistol_shot,if=combo_points.deficit>=1+buff.broadsides.up&buff.opportunity.up&(energy.time_to_max>2-talent.quick_draw.enabled|(buff.blunderbuss.up&buff.greenskins_waterlogged_wristcuffs.up))
-            if comboDeficit >= 1 + broadUp and buff.opportunity.exists and (ttm > 2 - qDraw or (castable.blunderbuss and buff.greenskinsWaterloggedWristcuffs.exists)) and not stealthing then
+            if comboDeficit >= 1 + broadUp and buff.opportunity.exists and (ttm > 2 - qDraw or (cast.blunderbuss(nil,"debug") and buff.greenskinsWaterloggedWristcuffs.exists)) and not stealthing then
                 if cast.pistolShot() then return end
             end
         -- Saber Slash

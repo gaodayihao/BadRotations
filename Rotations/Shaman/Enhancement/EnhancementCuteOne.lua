@@ -425,7 +425,7 @@ local function runRotation()
                     end
             -- Lightning Bolt
                     if getDistance("target") >= 10 and not talent.overcharge 
-                        and (not isChecked("Feral Lunge") or not talent.feralLunge or cd.feralLunge > gcd or not castable.feralLunge) 
+                        and (not isChecked("Feral Lunge") or not talent.feralLunge or cd.feralLunge > gcd or not cast.feralLunge(nil,"debug")) 
                     then
                         if cast.lightningBolt("target") then return end
                     end
