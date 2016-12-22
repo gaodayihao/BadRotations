@@ -55,7 +55,7 @@ function EnemiesEngine()
 				br.namePlateUnitCount = 0
 			end
 			local sucess,thisUnit = pcall(GetObjectWithGUID,UnitGUID(...))
-			if sucess then
+			if sucess and br.namePlateUnit[thisUnit] == nil then
 				br.namePlateUnit[thisUnit] = UnitGUID(...)
 				br.namePlateUnitCount = br.namePlateUnitCount + 1
 			end
