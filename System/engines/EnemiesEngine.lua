@@ -22,115 +22,151 @@ function EnemiesEngine()
 	--[[------------------------------------------------------------------------------------------------------------------]]
 	local varDir = br.data.settings[br.selectedSpec]
 	br.enemy = {}
-	brEnemyCount = 0
+	br.namePlateUnit = {}
+	br.namePlateUnitCount = 0
+	br.EventInited = false
+	-- brEnemyCount = 0
+	br.debug.cpu.enemiesEngine.sanityTargets = 0
+	br.debug.cpu.enemiesEngine.unitTargets = 0
+
+	function addEnemiesTableEvents()
+		if not FireHack or br.EventInited then
+			return
+		end
+
+		AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+    	    local _, _, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
+			local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
+			if sucess then
+				if br.enemy[thisUnit] == nil 
+					and UnitCanAttack("player", thisUnit)
+					and not UnitIsDeadOrGhost(thisUnit)
+					and isValidUnit(thisUnit)
+				then
+					br.enemy[thisUnit] = {}
+					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+				end
+			end
+
+			sucess,thisUnit = pcall(GetObjectWithGUID,destName)
+			if sucess then
+				if br.enemy[thisUnit] == nil 
+					and UnitCanAttack("player", thisUnit)
+					and not UnitIsDeadOrGhost(thisUnit)
+					and isValidUnit(thisUnit)
+				then
+					br.enemy[thisUnit] = {}
+					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+				end
+			end
+    	end)
+
+		AddEventCallback("NAME_PLATE_UNIT_ADDED",function(...)
+			if br.namePlateUnitCount >= 50 then
+				table.wipe(br.namePlateUnit)
+				br.namePlateUnitCount = 0
+			end
+			local sucess,thisUnit = pcall(GetObjectWithGUID,UnitGUID(...))
+			if sucess then
+				br.namePlateUnit[thisUnit] = UnitGUID(...)
+				br.namePlateUnitCount = br.namePlateUnitCount + 1
+			end
+		end)
+
+		br.EventInited = true
+	end
+
 	function makeEnemiesTable(maxDistance)
 		--local LibDraw = LibStub("LibDraw-1.0")
 		local  maxDistance = maxDistance or 40
-		if br.enemy then cleanupEngine() end
-		if true then
-            local startTime
-            if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
-                startTime = debugprofilestop()
-            end
-
-			-- -- create/empty table
-			-- if br.enemy == nil then
-			-- 	br.enemy = { }
-			-- else
-			-- 	table.wipe(br.enemy)
-			-- end
-			-- use objectmanager to build up table
-			-- DEBUG
-			br.debug.cpu.enemiesEngine.sanityTargets = 0
-			br.debug.cpu.enemiesEngine.unitTargets = 0
-			-- DEBUG --
-			--for i = 1, GetObjectCountBR() do
-			for i = 1, ObjectCount() do
-				-- define our unit
-				--local thisUnit = GetObjectIndex(i)
-				local thisUnit = GetObjectWithIndex(i)
-				-- check if it a unit first
-				if brEnemyCount < 50 
-					and UnitCanAttack("player", thisUnit)
-					and not UnitIsDeadOrGhost(thisUnit) 
-					and getDistance("player",thisUnit) <= 40 
-					-- and ObjectIsType(thisUnit, ObjectTypes.Unit)
-					-- and getLineOfSight("player",thisUnit)
-					-- and ObjectIsType(thisUnit, ObjectTypes.Unit) --and (GetDistanceBetweenObjects("player",thisUnit) - UnitCombatReach("player") - UnitCombatReach(thisUnit) <= 40) then
-				then
-					br.debug.cpu.enemiesEngine.unitTargets = br.debug.cpu.enemiesEngine.unitTargets + 1
-
-					-- Check if Enemy exists already and update info.
-					local addEnemy = true
-					if br.enemy ~= nil and br.enemy[thisUnit] ~= nil then
-						addEnemy = false
-					end
-
-					-- sanity checks
-					-- if getSanity(thisUnit) == true then --and isValidUnit(thisUnit) then
-					if addEnemy and isValidUnit(thisUnit) then			
-						br.enemy[thisUnit] 	= { }
-						brEnemyCount = brEnemyCount + 1
-					end
-				end
+		if br.enemy then cleanupEngine(maxDistance) end
+        local startTime
+        if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
+            startTime = debugprofilestop()
+        end
+		
+		if isValidUnit("target") then
+			local thisUnit = GetObjectWithGUID(UnitGUID("target"))
+			if UnitCanAttack("player", thisUnit)
+				and br.enemy[thisUnit] == nil
+				and not UnitIsDeadOrGhost(thisUnit)
+				and isValidUnit(thisUnit)
+			then
+				br.enemy[thisUnit] 	= { }
+				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
-			-- sort them by coeficient
-			-- table.sort(br.enemy, function(x,y)
-			-- 	return x.coeficient and y.coeficient and x.coeficient > y.coeficient or false
-			-- end)
-
-			-- update infos
-			if br.enemy ~= nil then
-				for k, v in pairs(br.enemy) do
-					local thisUnit 				= k
-					local burnValue 			= --[[isBurnTarget(thisUnit) or]] 0
-					local shieldValue 			= --[[isShieldedTarget(thisUnit) or]] 0
-					local unitThreat 			= UnitThreatSituation("player",thisUnit) or -1
-					br.enemy[k].name 			= UnitName(thisUnit)
-					br.enemy[k].guid 			= UnitGUID(thisUnit)
-					br.enemy[k].id 				= GetObjectID(thisUnit)
-					br.enemy[k].coeficient 		= --[[ getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or ]] 0
-					br.enemy[k].cc 				= false --isCrowdControlCandidates(thisUnit)
-					if getOptionCheck("Don't break CCs") then
-						br.enemy[k].isCC 		= isLongTimeCCed(thisUnit)
-					else
-						br.enemy[k].isCC 		= false
-					end
-					br.enemy[k].facing 			= getFacing("player",thisUnit)
-					br.enemy[k].threat 			= UnitThreatSituation("player",thisUnit) or -1
-					br.enemy[k].unit 			= thisUnit
-					-- distance = unitDistance,
-					br.enemy[k].hp 				= getHP(thisUnit)
-					br.enemy[k].hpabs 			= UnitHealth(thisUnit)
-					br.enemy[k].safe 			= true --isSafeToAttack(thisUnit)
-					br.enemy[k].burn 			= --[[isBurnTarget(thisUnit) or]] 0
-					br.enemy[k].offensiveBuff 	= false -- getOffensiveBuffs(thisUnit,unitGUID)
-				end
-			end
-
-            if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
-                br.debug.cpu.enemiesEngine.makeEnemiesTableCount = br.debug.cpu.enemiesEngine.makeEnemiesTableCount + 1
-                br.debug.cpu.enemiesEngine.makeEnemiesTableCurrent = debugprofilestop()-startTime
-                br.debug.cpu.enemiesEngine.makeEnemiesTable = br.debug.cpu.enemiesEngine.makeEnemiesTable + debugprofilestop()-startTime
-                br.debug.cpu.enemiesEngine.makeEnemiesTableAverage = br.debug.cpu.enemiesEngine.makeEnemiesTable / br.debug.cpu.enemiesEngine.makeEnemiesTableCount
-            end
 		end
+		
+		for k,v in pairs(br.namePlateUnit) do
+			local thisUnit = k
+			if UnitCanAttack("player", thisUnit)
+				and br.enemy[thisUnit] == nil
+				and not UnitIsDeadOrGhost(thisUnit)
+				and isValidUnit(thisUnit)
+			then
+				br.enemy[thisUnit] 	= { }
+				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+			end
+		end
+
+		-- update infos
+		if br.enemy ~= nil then
+			for k, v in pairs(br.enemy) do
+				local thisUnit 				= k
+				local burnValue 			= isBurnTarget(thisUnit) or 0
+				local shieldValue 			= isShieldedTarget(thisUnit) or 0
+				local unitThreat 			= UnitThreatSituation("player",thisUnit) or -1
+				br.enemy[k].name 			= UnitName(thisUnit)
+				br.enemy[k].guid 			= UnitGUID(thisUnit)
+				br.enemy[k].id 				= GetObjectID(thisUnit)
+				br.enemy[k].coeficient 		= getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or 0
+				br.enemy[k].cc 				= isCrowdControlCandidates(thisUnit)
+				if getOptionCheck("Don't break CCs") then
+					br.enemy[k].isCC 		= isLongTimeCCed(thisUnit)
+				else
+					br.enemy[k].isCC 		= false
+				end
+				br.enemy[k].facing 			= getFacing("player",thisUnit)
+				br.enemy[k].threat 			= UnitThreatSituation("player",thisUnit) or -1
+				br.enemy[k].unit 			= thisUnit
+				-- distance = unitDistance,
+				br.enemy[k].hp 				= getHP(thisUnit)
+				br.enemy[k].hpabs 			= UnitHealth(thisUnit)
+				br.enemy[k].safe 			= isSafeToAttack(thisUnit)
+				br.enemy[k].burn 			= isBurnTarget(thisUnit) or 0
+				br.enemy[k].offensiveBuff 	= getOffensiveBuffs(thisUnit,unitGUID)
+			end
+		end
+        if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
+            br.debug.cpu.enemiesEngine.makeEnemiesTableCount = br.debug.cpu.enemiesEngine.makeEnemiesTableCount + 1
+            br.debug.cpu.enemiesEngine.makeEnemiesTableCurrent = debugprofilestop()-startTime
+            br.debug.cpu.enemiesEngine.makeEnemiesTable = br.debug.cpu.enemiesEngine.makeEnemiesTable + debugprofilestop()-startTime
+            br.debug.cpu.enemiesEngine.makeEnemiesTableAverage = br.debug.cpu.enemiesEngine.makeEnemiesTable / br.debug.cpu.enemiesEngine.makeEnemiesTableCount
+        end
+		-- Print("EnemyCount:"..tostring(br.debug.cpu.enemiesEngine.sanityTargets))
 	end
+
 	-- remove invalid units on pulse
-	function cleanupEngine()
+	function cleanupEngine(maxDistance)
+		local  maxDistance = maxDistance or 40
 		for k, v in pairs(br.enemy) do
 			-- here i want to scan the enemies table and find any occurances of invalid units
-			if not GetObjectExists(br.enemy[k].unit) 
-				or UnitIsDeadOrGhost(br.enemy[k].unit) 
-				or not UnitCanAttack("player",br.enemy[k].unit) 
-				--or getDistance(br.enemy[k].unit) > 40
-			then
+			if br.enemy[k].unit ~= nil and not isValidUnit(br.enemy[k].unit) then
 				-- i will remove such units from table
 				br.enemy[k] = nil
-				brEnemyCount = brEnemyCount - 1
+				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets - 1
+			end
+		end
+
+		for k,v in pairs(br.namePlateUnit) do
+			local thisUnit = k
+			if thisUnit == nil or not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit) then
+				br.namePlateUnit[k] = nil
+				br.namePlateUnitCount = br.namePlateUnitCount - 1
 			end
 		end
 	end
+
 	-- returns prefered target for diferent spells
 	function dynamicTarget(range,facing)
 		if getOptionCheck("Dynamic Targetting") then
@@ -202,7 +238,7 @@ function EnemiesEngine()
 			for k, v in pairs(br.enemy) do
 				local thisUnit = br.enemy[k].unit
 				-- check if unit is valid
-				if GetObjectExists(thisUnit) and (not InCombat or br.enemy[k].inCombat) then
+				if GetObjectExists(thisUnit) and (not InCombat) then
                     if unit == "player" and not precise then
                         if getDistance("player",thisUnit) <= Radius then
                             tinsert(getEnemiesTable,thisUnit)

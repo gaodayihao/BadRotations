@@ -12,8 +12,6 @@ br.rotations = {}
 
 SetCVar("targetnearestuseold", 1)
 SetCVar("nameplateMaxDistance", 40)
-SetCVar("nameplateOtherTopInset", -1)
-SetCVar("nameplateOtherBottomInset", -1)
 SetCVar("alwaysCompareItems", "1")
 
 -- developers debug, use /run br.data.settings[br.selectedSpec].toggles["isDebugging"] = true
@@ -131,8 +129,9 @@ function br.pulse:dispDist()
     displayDistance = math.ceil(targetDistance)
 end
 function br.pulse:makeEnTable()
-	EnemiesEngine()
+	-- EnemiesEngine()
     if br.pulse.makeTable then
+		addEnemiesTableEvents()
         makeEnemiesTable(40)
     end
 end
