@@ -35,34 +35,22 @@ function EnemiesEngine()
 		end
 
 		AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
-    	    local _, _, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
+			local _, _, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
 			local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
-			if sucess then
-				if br.enemy[thisUnit] == nil 
-					and UnitCanAttack("player", thisUnit)
-					and not UnitIsDeadOrGhost(thisUnit)
-					and isValidUnit(thisUnit)
-				then
-					br.enemy[thisUnit] = {}
-					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
-				end
+			if sucess and br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
+				br.enemy[thisUnit] = {}
+				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
 
-			sucess,thisUnit = pcall(GetObjectWithGUID,destName)
-			if sucess then
-				if br.enemy[thisUnit] == nil 
-					and UnitCanAttack("player", thisUnit)
-					and not UnitIsDeadOrGhost(thisUnit)
-					and isValidUnit(thisUnit)
-				then
-					br.enemy[thisUnit] = {}
-					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
-				end
+			sucess,thisUnit = pcall(GetObjectWithGUID,destGUID)
+			if sucess and br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
+				br.enemy[thisUnit] = {}
+				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
-    	end)
+		end)
 
 		AddEventCallback("NAME_PLATE_UNIT_ADDED",function(...)
-			if br.namePlateUnitCount >= 50 then
+			if br.namePlateUnitCount >= 30 then
 				table.wipe(br.namePlateUnit)
 				br.namePlateUnitCount = 0
 			end
@@ -80,18 +68,14 @@ function EnemiesEngine()
 		--local LibDraw = LibStub("LibDraw-1.0")
 		local  maxDistance = maxDistance or 40
 		if br.enemy then cleanupEngine(maxDistance) end
-        local startTime
-        if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
-            startTime = debugprofilestop()
-        end
+		local startTime
+		if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
+			startTime = debugprofilestop()
+		end
 		
 		if isValidUnit("target") then
 			local thisUnit = GetObjectWithGUID(UnitGUID("target"))
-			if UnitCanAttack("player", thisUnit)
-				and br.enemy[thisUnit] == nil
-				and not UnitIsDeadOrGhost(thisUnit)
-				and isValidUnit(thisUnit)
-			then
+			if br.enemy[thisUnit] == nil then
 				br.enemy[thisUnit] 	= { }
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
@@ -99,11 +83,7 @@ function EnemiesEngine()
 		
 		for k,v in pairs(br.namePlateUnit) do
 			local thisUnit = k
-			if UnitCanAttack("player", thisUnit)
-				and br.enemy[thisUnit] == nil
-				and not UnitIsDeadOrGhost(thisUnit)
-				and isValidUnit(thisUnit)
-			then
+			if br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
 				br.enemy[thisUnit] 	= { }
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
@@ -137,12 +117,12 @@ function EnemiesEngine()
 				br.enemy[k].offensiveBuff 	= getOffensiveBuffs(thisUnit,unitGUID)
 			end
 		end
-        if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
-            br.debug.cpu.enemiesEngine.makeEnemiesTableCount = br.debug.cpu.enemiesEngine.makeEnemiesTableCount + 1
-            br.debug.cpu.enemiesEngine.makeEnemiesTableCurrent = debugprofilestop()-startTime
-            br.debug.cpu.enemiesEngine.makeEnemiesTable = br.debug.cpu.enemiesEngine.makeEnemiesTable + debugprofilestop()-startTime
-            br.debug.cpu.enemiesEngine.makeEnemiesTableAverage = br.debug.cpu.enemiesEngine.makeEnemiesTable / br.debug.cpu.enemiesEngine.makeEnemiesTableCount
-        end
+		if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
+			br.debug.cpu.enemiesEngine.makeEnemiesTableCount = br.debug.cpu.enemiesEngine.makeEnemiesTableCount + 1
+			br.debug.cpu.enemiesEngine.makeEnemiesTableCurrent = debugprofilestop()-startTime
+			br.debug.cpu.enemiesEngine.makeEnemiesTable = br.debug.cpu.enemiesEngine.makeEnemiesTable + debugprofilestop()-startTime
+			br.debug.cpu.enemiesEngine.makeEnemiesTableAverage = br.debug.cpu.enemiesEngine.makeEnemiesTable / br.debug.cpu.enemiesEngine.makeEnemiesTableCount
+		end
 		-- Print("EnemyCount:"..tostring(br.debug.cpu.enemiesEngine.sanityTargets))
 	end
 
@@ -239,15 +219,15 @@ function EnemiesEngine()
 				local thisUnit = br.enemy[k].unit
 				-- check if unit is valid
 				if GetObjectExists(thisUnit) and (not InCombat) then
-                    if unit == "player" and not precise then
-                        if getDistance("player",thisUnit) <= Radius then
-                            tinsert(getEnemiesTable,thisUnit)
-                        end
-                    else
-                        if getDistance(unit,thisUnit) <= Radius then
-                            tinsert(getEnemiesTable,thisUnit)
-                        end
-                    end
+					if unit == "player" and not precise then
+						if getDistance("player",thisUnit) <= Radius then
+							tinsert(getEnemiesTable,thisUnit)
+						end
+					else
+						if getDistance(unit,thisUnit) <= Radius then
+							tinsert(getEnemiesTable,thisUnit)
+						end
+					end
 				end
 			end
 			return getEnemiesTable
@@ -260,9 +240,9 @@ function EnemiesEngine()
 		if table == nil then return getTableEnemies end
 		for i = 1, #table do
 			local thisUnit = table[i]
-            if getDistance(unit,thisUnit) <= Range then
-                tinsert(getTableEnemies,thisUnit)
-            end
+			if getDistance(unit,thisUnit) <= Range then
+				tinsert(getTableEnemies,thisUnit)
+			end
 		end
 		return getTableEnemies
 	end
@@ -298,8 +278,8 @@ function EnemiesEngine()
 		local maxY = math.max(nrY,nlY,frY,flY)
 		local minY = math.min(nrY,nlY,frY,flY)
 		for i = 1, ObjectCount() do
-            local thisUnit = GetObjectWithIndex(i)
-            if ObjectIsType(thisUnit, ObjectTypes.Unit) and isDummy(thisUnit) then
+			local thisUnit = GetObjectWithIndex(i)
+			if ObjectIsType(thisUnit, ObjectTypes.Unit) and isDummy(thisUnit) then
 				local tX, tY, tZ = GetObjectPosition(thisUnit)
 				if tX < maxX and tX > minX and tY < maxY and tY > minY then
 					LibDraw.Circle(tX, tY, tZ, UnitBoundingRadius(thisUnit))
@@ -321,31 +301,31 @@ function EnemiesEngine()
 
 		-- local function intersects(circle, rect)
 		local function intersects(tX,tY,tR,aX,aY,cX,cY)
-		    -- if circle ~= nil then
-		        local circleDistance_x = math.abs(tX + tR - aX - (aX - cX)/2)
-    			local circleDistance_y = math.abs(tY + tR - aY - (aY - cY)/2)
+			-- if circle ~= nil then
+				local circleDistance_x = math.abs(tX + tR - aX - (aX - cX)/2)
+				local circleDistance_y = math.abs(tY + tR - aY - (aY - cY)/2)
 
-		        if (circleDistance_x > ((aX - cX)/2 + tR)) then 
-		            return false
-		        end
-		        if (circleDistance_y > ((aY - cY)/2 + tR)) then  
-		            return false
-		        end
+				if (circleDistance_x > ((aX - cX)/2 + tR)) then 
+					return false
+				end
+				if (circleDistance_y > ((aY - cY)/2 + tR)) then  
+					return false
+				end
 
-		        if (circleDistance_x <= ((aX - cX)/2)) then
-		            return true
-		        end
+				if (circleDistance_x <= ((aX - cX)/2)) then
+					return true
+				end
 
-		        if (circleDistance_y <= ((aY - cY)/2)) then
-		            return true
-		        end
+				if (circleDistance_y <= ((aY - cY)/2)) then
+					return true
+				end
 
-		        cornerDistance_sq = (circleDistance_x - (aX - cX)/2)^2 + (circleDistance_y - (aY - cY)/2)^2
+				cornerDistance_sq = (circleDistance_x - (aX - cX)/2)^2 + (circleDistance_y - (aY - cY)/2)^2
 
-		        return (cornerDistance_sq <= (tR^2));
-		        -- else
-		        --     return false
-		    -- end
+				return (cornerDistance_sq <= (tR^2));
+				-- else
+				--	 return false
+			-- end
 		end
 
 	-- returns true if unit have an Offensive Buff that we should dispel
