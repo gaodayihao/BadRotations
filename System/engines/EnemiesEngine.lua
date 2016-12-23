@@ -22,6 +22,7 @@ function EnemiesEngine()
 	--[[------------------------------------------------------------------------------------------------------------------]]
 	local varDir = br.data.settings[br.selectedSpec]
 	br.enemy = {}
+	br.enemyGUID = {}
 	br.namePlateUnit = {}
 	br.namePlateUnitCount = 0
 	br.EventInited = false
@@ -36,16 +37,23 @@ function EnemiesEngine()
 
 		AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
 			local _, _, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
-			local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
-			if sucess and br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
-				br.enemy[thisUnit] = {}
-				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+
+			if br.enemyGUID[sourceGUID] == nil then
+				local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
+				if sucess and isValidUnit(thisUnit) then
+					br.enemy[thisUnit] = {}
+					br.enemyGUID[sourceGUID] = thisUnit
+					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+				end
 			end
 
-			sucess,thisUnit = pcall(GetObjectWithGUID,destGUID)
-			if sucess and br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
-				br.enemy[thisUnit] = {}
-				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+			if br.enemyGUID[destGUID] == nil then
+				local sucess,thisUnit = pcall(GetObjectWithGUID,destGUID)
+				if sucess and isValidUnit(thisUnit) then
+					br.enemy[thisUnit] = {}
+					br.enemyGUID[destGUID] = thisUnit
+					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+				end
 			end
 		end)
 
@@ -74,17 +82,21 @@ function EnemiesEngine()
 		end
 		
 		if isValidUnit("target") then
-			local thisUnit = GetObjectWithGUID(UnitGUID("target"))
-			if br.enemy[thisUnit] == nil then
+			local targetGUID = UnitGUID("target")
+			if br.enemyGUID[targetGUID] == nil then
+				local thisUnit = GetObjectWithGUID(UnitGUID("target"))
 				br.enemy[thisUnit] 	= { }
+				br.enemyGUID[targetGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
 		end
 		
 		for k,v in pairs(br.namePlateUnit) do
 			local thisUnit = k
-			if br.enemy[thisUnit] == nil and isValidUnit(thisUnit) then
+			local unitGUID = v
+			if br.enemyGUID[unitGUID] == nil and isValidUnit(thisUnit) then
 				br.enemy[thisUnit] 	= { }
+				br.enemyGUID[unitGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
 		end
@@ -133,6 +145,7 @@ function EnemiesEngine()
 			-- here i want to scan the enemies table and find any occurances of invalid units
 			if br.enemy[k].unit ~= nil and not isValidUnit(br.enemy[k].unit) then
 				-- i will remove such units from table
+				br.enemyGUID[br.enemy[k].guid] = nil
 				br.enemy[k] = nil
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets - 1
 			end
