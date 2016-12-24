@@ -141,20 +141,19 @@ function EnemiesEngine()
 	-- remove invalid units on pulse
 	function cleanupEngine(maxDistance)
 		local  maxDistance = maxDistance or 40
-		for k, v in pairs(br.enemy) do
+		for thisUnit,_ in pairs(br.enemy) do
 			-- here i want to scan the enemies table and find any occurances of invalid units
-			if br.enemy[k].unit ~= nil and not isValidUnit(br.enemy[k].unit) then
+			if not ObjectExists(thisUnit) or not isValidUnit(thisUnit) then
 				-- i will remove such units from table
-				br.enemyGUID[br.enemy[k].guid] = nil
-				br.enemy[k] = nil
+				br.enemyGUID[UnitGUID(thisUnit)] = nil
+				br.enemy[thisUnit] = nil
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets - 1
 			end
 		end
 
-		for k,v in pairs(br.namePlateUnit) do
-			local thisUnit = k
+		for thisUnit,_ in pairs(br.namePlateUnit) do
 			if thisUnit == nil or not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit) then
-				br.namePlateUnit[k] = nil
+				br.namePlateUnit[thisUnit] = nil
 				br.namePlateUnitCount = br.namePlateUnitCount - 1
 			end
 		end
