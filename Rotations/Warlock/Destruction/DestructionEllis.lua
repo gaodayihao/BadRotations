@@ -155,9 +155,9 @@ local function runRotation()
         local debuff                                        = br.player.debuff
         local enemies                                       = br.player.enemies
         local flaskBuff                                     = getBuffRemain("player",br.player.flask.wod.buff.agilityBig)
-        local friendly                                      = friendly or UnitIsFriend("target", "player")
         local forceAOE                                      = br.player.mode.rotation == 2
         local forceSingle                                   = br.player.mode.rotation == 3
+        local friendly                                      = friendly or UnitIsFriend("target", "player")
         local gcd                                           = br.player.gcd
         local hasteAmount                                   = GetHaste()/100
         local healPot                                       = getHealthPot()
@@ -176,6 +176,7 @@ local function runRotation()
         local recharge                                      = br.player.recharge
         local resable                                       = UnitIsPlayer("target") and UnitIsDeadOrGhost("target") and UnitIsFriend("target","player")
         local shards                                        = br.player.power.amount.soulShards
+        local solo                                          = GetNumGroupMembers() == 0
         local spell                                         = br.player.spell
         local summonPet                                     = getOptionValue(LC_SUMMON_PET)
         local talent                                        = br.player.talent
@@ -520,11 +521,15 @@ local function runRotation()
                 
                 if summonPet == 1 then
                     if talent.grimoireOfSupremacy then
-                        if getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 1 then
+                        if solo then
+                            if cast.summonInfernal() then return true end
+                        elseif getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 1 then
                             if cast.summonDoomguard() then return true end
                         elseif getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 2 then
                             if cast.summonInfernal() then return true end
                         end
+                    elseif solo then
+                        if cast.summonVoidwalker() then return true end
                     else
                         if isKnown(spell.summonFelImp) then
                             if cast.summonFelImp() then return true end

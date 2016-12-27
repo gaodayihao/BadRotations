@@ -335,6 +335,7 @@ local function runRotation()
         local racial                                        = br.player.getRacial()
         local resable                                       = UnitIsPlayer("target") and UnitIsDeadOrGhost("target") and UnitIsFriend("target","player")
         local shards                                        = br.player.power.amount.soulShards
+        local solo                                          = GetNumGroupMembers() == 0
         local spell                                         = br.player.spell
         local summonPet                                     = getOptionValue(LC_SUMMON_PET)
         local talent                                        = br.player.talent
@@ -663,7 +664,9 @@ local function runRotation()
                 summonPetDelay = 0
                 if summonPet == 1 then
                     if talent.grimoireOfSupremacy then
-                        if getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 1 then
+                        if solo then
+                            if cast.summonInfernal() then return true end
+                        elseif getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 1 then
                             if cast.summonDoomguard() then return true end
                         elseif getOptionValue(LC_GRIMOIRE_OF_SUPREMACY) == 2 then
                             if cast.summonInfernal() then return true end
