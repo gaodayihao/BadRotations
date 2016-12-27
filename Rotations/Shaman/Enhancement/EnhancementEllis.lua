@@ -88,7 +88,8 @@ local function createOptions()
         --- INTERRUPT OPTIONS ---
         -------------------------
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
-        br.ui:createCheckbox(section,LC_WIND_SHEAR)
+        -- Wind Shear
+            br.ui:createCheckbox(section,LC_WIND_SHEAR)
         -- War Stomp
             if br.player.race == "Tauren" then
                 br.ui:createCheckbox(section,LC_WAR_STOMP)
@@ -253,6 +254,15 @@ local function runRotation()
                     -- wind_shear
                         if isChecked(LC_WIND_SHEAR) then
                             if cast.windShear(thisUnit) then return true end
+                        end
+                    -- War Stomp
+                        if isChecked(LC_WAR_STOMP) 
+                            and race == "Tauren" 
+                            and getDistance("target") < 8 
+                            and not isBoss() 
+                            and getSpellCD(racial)==0 
+                            and not isMoving("player") then
+                            if castSpell("player",racial,false,false,false) then return true end
                         end
                     end
                 end

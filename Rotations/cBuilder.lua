@@ -383,7 +383,7 @@ function br.loader:new(spec,specName)
                             self.debuff[k][thisUnit].refresh        = true
                             self.debuff[k][thisUnit].stack          = 0
                             self.debuff[k][thisUnit].calc           = 0
-                            self.debuff[k][thisUnit].count          = 0
+                            self.debuff[k][thisUnit].count          = debufCount
                             self.debuff[k][thisUnit].start          = 0
                         end
                         if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
@@ -395,7 +395,7 @@ function br.loader:new(spec,specName)
                             self.debuff[k]["target"].refresh        = true
                             self.debuff[k]["target"].stack          = 0
                             self.debuff[k]["target"].calc           = 0
-                            self.debuff[k]["target"].count          = 0
+                            self.debuff[k]["target"].count          = debufCount
                             self.debuff[k]["target"].start          = 0
                         end
                     end
@@ -408,7 +408,7 @@ function br.loader:new(spec,specName)
                     self.debuff[k]["target"].refresh        = true
                     self.debuff[k]["target"].stack          = 0
                     self.debuff[k]["target"].calc           = 0
-                    self.debuff[k]["target"].count          = 0
+                    self.debuff[k]["target"].count          = debufCount
                     self.debuff[k]["target"].start          = 0
                 end
             -- Remove non-valid entries

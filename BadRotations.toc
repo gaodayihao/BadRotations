@@ -14,6 +14,7 @@ Localization\localization_tw.lua
 Localization\localization_cn.lua
 
 ## System
+System\Event.lua
 System\Core.lua
 System\Debugging.lua
 System\GeneralFunctions.lua
@@ -153,6 +154,7 @@ Rotations\Rogue\Subtlety\SubtletyCuteOne.lua
 
 ## Shaman  ---------------------------------------------------
 
+Rotations\Shaman\Elemental\ElementalEllis.lua
 Rotations\Shaman\Elemental\ElementalCuteOne.lua
 
 Rotations\Shaman\Enhancement\EnhancementEllis.lua
@@ -167,6 +169,7 @@ Rotations\Warlock\Affliction\AfflictionCuteOne.lua
 Rotations\Warlock\Demonology\DemonologyCuteOne.lua
 Rotations\Warlock\Demonology\DemonologyEllis.lua
 
+Rotations\Warlock\Destruction\DestructionEllis.lua
 Rotations\Warlock\Destruction\DestructionCuteOne.lua
 
 ## Warrior ---------------------------------------------------

@@ -170,6 +170,12 @@ LC_SUMMON_PET_VOIDWALKER = "Voidwalker";
 LC_UNENDING_RESOLVE = "Unending Resolve";
 LC_UNENDING_RESOLVE_DESCRIPTION = "|cffFFFFFFHealth Percent to Cast At";
 
+-- Destruction Warlock
+LC_HAVOC = "Havoc";
+LC_HAVOC_DESCRIPTION = "Havoc";
+LC_CATACLYSM = "Cataclysm";
+LC_CATACLYSM_DESCRIPTION = "Cataclysm";
+
 -- Shaman
 LC_ANCESTRAL_SPIRIT = "Ancestral Spirit";
 LC_ASTRAL_SHIFT = "Astral Shift";
@@ -186,3 +192,11 @@ LC_WATER_WALKING = "Water Walking";
 LC_WIND_SHEAR = "Wind Shear";
 LC_DOOM_WINDS_DELAY = "Doom Winds Delay";
 LC_DOOM_WINDS_DELAY_DESCRIPTION = "Doom Winds wait to have buff Wind Strikes";
+
+-- Elemental Shaman
+LC_ASCENDANCE = "Ascendance";
+LC_ASCENDANCE_DESCRIPTION = "|cffFFFFFFAscendance";
+LC_ELEMENTAL_MASTERY = "Elemental Mastery";
+LC_ELEMENTAL_MASTERY_DESCRIPTION = "|cffFFFFFFElemental Mastery";
+LC_FIRE_ELEMENTAL = "Fire Elemental";
+LC_FIRE_ELEMENTAL_DESCRIPTION = "|cffFFFFFFFire Elemental";

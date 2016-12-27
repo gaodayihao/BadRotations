@@ -2137,8 +2137,6 @@ br.idList = {
             },
             talents                         = {
                 demonbolt                   = 157695,
-                grimoireOfService           = 108501,
-                grimoireOfSupremacy         = 152107,
                 grimoireOfSynergy           = 171975,
                 handOfDoom                  = 196283,
                 implosion                   = 196277,
@@ -2196,6 +2194,7 @@ br.idList = {
             debuffs                         = {
                 immolate                    = 157736,
                 havoc                       = 80240,
+                lordOfFlames                = 226802,
                 roaringBlaze                = 205184,
             },
             glyphs                          = {
@@ -2229,6 +2228,7 @@ br.idList = {
                 grimoireVoidwalker          = 111895,
                 healthFunnel                = 755,
                 lifeTap                     = 1454,
+                meteorStrike                = 171017,
                 mortalCoil                  = 6789,
                 shadowLock                  = 171138,
                 soulHarvest                 = 196098,

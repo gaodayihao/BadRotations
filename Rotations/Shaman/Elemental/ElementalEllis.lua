@@ -57,16 +57,46 @@ local function createOptions()
         --- COOLDOWN OPTIONS ---
         ------------------------
         section = br.ui:createSection(br.ui.window.profile, LC_COOLDOWNS)
+        -- Racial
+            br.ui:createCheckbox(section,LC_RACIAL,LC_RACIAL_DESCRIPTION)
+        -- Trinkets
+            br.ui:createCheckbox(section,LC_TRINKETS,LC_TRINKETS_DESCRIPTION)
+        -- Ascendance
+            br.ui:createCheckbox(section,LC_ASCENDANCE,LC_ASCENDANCE_DESCRIPTION)
+        -- Elemental Mastery
+            br.ui:createCheckbox(section,LC_ELEMENTAL_MASTERY,LC_ELEMENTAL_MASTERY_DESCRIPTION)
+        -- Fire Elemental
+            br.ui:createCheckbox(section,LC_FIRE_ELEMENTAL,LC_FIRE_ELEMENTAL_DESCRIPTION)
         br.ui:checkSectionState(section)
         -------------------------
         --- DEFENSIVE OPTIONS ---
         -------------------------
         section = br.ui:createSection(br.ui.window.profile, LC_DEFENSIVE)
+        -- Healthstone
+            br.ui:createSpinner(section, LC_POT_STONED,  60,  0,  100,  5,  LC_POT_STONED_DESCRIPTION)
+        -- Gift of The Naaru
+            if br.player.race == "Draenei" then
+                br.ui:createSpinner(section, LC_GIFT_OF_THE_NAARU,  50,  0,  100,  5,  LC_GIFT_OF_THE_NAARU_DESCRIPTION)
+            end
+        -- Ancestral Spirit
+            br.ui:createCheckbox(section,LC_ANCESTRAL_SPIRIT)
+        -- Astral Shift
+            br.ui:createSpinner(section, LC_ASTRAL_SHIFT,  50,  0,  100,  5,  LC_ASTRAL_SHIFT_DESCRIPTION)
+        -- Healing Surge
+            br.ui:createSpinner(section, LC_HEALING_SURGE,  80,  0,  100,  5,  LC_HEALING_SURGE_DESCRIPTION)
         br.ui:checkSectionState(section)
         -------------------------
         --- INTERRUPT OPTIONS ---
         -------------------------
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
+        -- Wind Shear
+            br.ui:createCheckbox(section,LC_WIND_SHEAR)
+        -- War Stomp
+            if br.player.race == "Tauren" then
+                br.ui:createCheckbox(section,LC_WAR_STOMP)
+            end
+        -- Interrupt Percentage
+            br.ui:createSpinnerWithout(section, LC_INTERRUPTS_AT,  0,  0,  95,  5,  LC_INTERRUPTS_AT_DESCRIPTION)
         br.ui:checkSectionState(section)
     end
     optionTable = {{
@@ -129,6 +159,7 @@ local function runRotation()
         local totemRemain                                                   = -1
         local units                                                         = br.player.units
         local useArtifact                                                   = false
+        local useAscendance                                                 = false
 
         if movingStart == nil then movingStart = 0 end
         if totemStart == nil then totemStart = 0 end
@@ -140,6 +171,8 @@ local function runRotation()
         hasAllTotemBuffs = buff.emberTotem.exists and buff.stormTotem.exists and buff.tailwindTotem.exists and buff.resonanceTotem.exists
         if totemStart > 0 then totemRemain =  totemDuration - (GetTime() - totemStart) end
         if totemRemain <= 0 then totemStart = 0 totemRemain = 0 end
+
+        useAscendance = isChecked(LC_ASCENDANCE) and useCDs()
 -----------------------
 --- Custom Function ---
 -----------------------
@@ -151,21 +184,25 @@ local function runRotation()
             return activeEnemiesCache
         end
 
-        local function createFrame()
-            if totemFrame == nil then
-                totemFrame = CreateFrame("FRAME")
-                totemFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED","player")
+        if not br.player.handlerEvent then
+            local frame = CreateFrame("FRAME")
+            frame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED","player")
+            frame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
 
-                function totemFrame:OnEvent(event,...)
+            function frame:OnEvent(event,...)
+                if event == "UNIT_SPELLCAST_SUCCEEDED" then
                     local _,_,_,_,spellId = ...
                     if spellId == spell.totemMastery then
                         totemStart = GetTime()
                     end
+                elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+                    frame:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+                    frame:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
                 end
-                totemFrame:SetScript("OnEvent", totemFrame.OnEvent)
-                return true
             end
-            return false
+            
+            frame:SetScript("OnEvent",frame.OnEvent)
+            br.player.handlerEvent = true
         end
 --------------------
 --- Action Lists ---
@@ -173,7 +210,7 @@ local function runRotation()
     -- Action List - Auto Target
         local function actionList_AutoTarget()
             if autoTarget == false then return end
-            if isValidUnit("target") then return end
+            if isValidUnit("target") or UnitIsFriend("player","target") then return end
             local theEnemies = enemies.yards40
             local targetUnit = nil
             for i = 1, #theEnemies do
@@ -227,19 +264,84 @@ local function runRotation()
     -- Action List - Defensive
         local function actionList_Defensive()
             if useDefensive() then
-
+        -- Pot/Stoned
+                if isChecked(LC_POT_STONED) and php <= getOptionValue(LC_POT_STONED) 
+                    and inCombat and (hasHealthPot() or hasItem(5512)) 
+                then
+                    if canUse(5512) and useItem(5512) then return true end
+                    if canUse(healPot) and useItem(healPot) then return true end
+                end
+        -- Gift of the Naaru
+                if isChecked(LC_GIFT_OF_THE_NAARU) and getSpellCD(racial)==0 and php <= getOptionValue(LC_GIFT_OF_THE_NAARU) and php > 0 and race == "Draenei" then
+                    if castSpell("player",racial,false,false,false) then return true end
+                end
+        -- Ancestral Spirit
+                if isChecked(LC_ANCESTRAL_SPIRIT) then
+                    if resable and not isMoving("player") then
+                        if cast.ancestralSpirit("target","dead") then return true end
+                    end
+                end
+        -- Astral Shift
+                if isChecked(LC_ASTRAL_SHIFT) and php <= getOptionValue(LC_ASTRAL_SHIFT) and inCombat then
+                    if cast.astralShift() then return true end
+                end
+        -- Healing Surge
+                if isChecked(LC_HEALING_SURGE) 
+                    and ((inCombat and php <= getOptionValue(LC_HEALING_SURGE) / 2) 
+                    or (not inCombat and php <= getOptionValue(LC_HEALING_SURGE) and not moving))
+                then
+                    if cast.healingSurge() then return true end
+                end
             end -- End Defensive Toggle
         end -- End Action List - Defensive
     -- Action List - Interrupts
         local function actionList_Interrupts()
-            if useInterrupts() then
-
+            if useInterrupts() and br.timer:useTimer("Interrupts",1.5) then
+                for i=1, #enemies.yards30 do
+                    thisUnit = enemies.yards30[i]
+                    if canInterrupt(thisUnit,getOptionValue(LC_INTERRUPTS_AT)) then
+                    -- wind_shear
+                        if isChecked(LC_WIND_SHEAR) then
+                            if cast.windShear(thisUnit) then return true end
+                        end
+                    -- War Stomp
+                        if isChecked(LC_WAR_STOMP) 
+                            and race == "Tauren" 
+                            and getDistance("target") < 8 
+                            and not isBoss() 
+                            and getSpellCD(racial)==0 
+                            and not isMoving("player") then
+                            if castSpell("player",racial,false,false,false) then return true end
+                        end
+                    end
+                end
             end -- End useInterrupts check
         end -- End Action List - Interrupts
     -- Action List - Cooldowns
         local function actionList_Cooldowns()
-            if useCDs() then
-            
+            if useCDs() and getDistance("target") <= 40 then
+            -- Trinkets
+                if isChecked(LC_TRINKETS) then
+                    if canUse(13) and useItem(13) then return true end
+                    if canUse(14) and useItem(14) then return true end
+                end
+            -- Racial: Orc Blood Fury | Troll Berserking | Blood Elf Arcane Torrent
+                -- berserking,if=buff.ascendance.up|!talent.ascendance.enabled|level<100
+                -- blood_fury
+                if isChecked(LC_RACIAL) 
+                    and (br.player.race == "Orc" or (br.player.race == "Troll" and (buff.ascendance.exists or not talent.ascendance or level < 100 or not useAscendance)))
+                    and getSpellCD(racial) == 0
+                then
+                    if castSpell("player",racial,false,false,false) then return true end
+                end
+            -- Elemental Mastery
+                if isChecked(LC_ELEMENTAL_MASTERY) then
+                    if cast.elementalMastery() then return true end
+                end
+            -- Fire Elemental
+                if isChecked(LC_FIRE_ELEMENTAL) then
+                    if cast.fireElemental() then return true end
+                end
             end -- End useCDs check
         end -- End Action List - Cooldowns
     -- Action List - PreCombat
@@ -255,7 +357,7 @@ local function runRotation()
             if cast.stormkeeper() then return true end
     -- Ascendance
         -- ascendance
-            if talent.ascendance and cast.ascendance() then return true end
+            if talent.ascendance and useAscendance and cast.ascendance() then return true end
     -- Liquid Magma Totem
         -- liquid_magma_totem
             if cast.liquidMagmaTotem() then return true end
@@ -308,8 +410,9 @@ local function runRotation()
     -- Ascendance
         -- ascendance,if=dot.flame_shock.remains>buff.ascendance.duration&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&!buff.stormkeeper.up
             if talent.ascendance 
+                and useAscendance
                 and debuff.flameShock[units.dyn40].remain > 16
-                and (combatTime >= 60 or buff.bloodlust.exists)
+                and (combatTime >= 60 or hasBloodLust())
                 and cd.lavaBurst > 0
                 and not buff.stormkeeper.exists
             then
@@ -319,7 +422,7 @@ local function runRotation()
         -- flame_shock,if=!ticking
         -- flame_shock,if=maelstrom>=20&remains<=buff.ascendance.duration&cooldown.ascendance.remains+buff.ascendance.duration<=duration
             if not debuff.flameShock[units.dyn40].exists 
-                or (talent.ascendance and power >= 20 and debuff.flameShock[units.dyn40].remain <= 16 and cd.ascendance + 16 <= debuff.flameShock[units.dyn40].duration)
+                or (talent.ascendance and useAscendance and power >= 20 and debuff.flameShock[units.dyn40].remain <= 16 and cd.ascendance + 16 <= debuff.flameShock[units.dyn40].duration)
             then
                 if cast.flameShock() then return end
             end
@@ -371,7 +474,7 @@ local function runRotation()
             end
     -- Icefury
         -- icefury,if=maelstrom<=70&raid_event.movement.in>30&((talent.ascendance.enabled&cooldown.ascendance.remains>buff.icefury.duration)|!talent.ascendance.enabled)
-            if talent.icefury and power <= 70 and ((talent.ascendance and cd.ascendance > 15) or not talent.ascendance) then
+            if talent.icefury and power <= 70 and ((talent.ascendance and cd.ascendance > 15) or not talent.ascendance or not useAscendance) then
                 if cast.icefury() then return end
             end
     -- Liquid Magma Totem
@@ -381,12 +484,12 @@ local function runRotation()
             end
     -- Stormkeeper
         -- stormkeeper,if=(talent.ascendance.enabled&cooldown.ascendance.remains>10)|!talent.ascendance.enabled
-            if talent.ascendance and cd.ascendance > 10 or not talent.ascendance then
+            if talent.ascendance and cd.ascendance > 10 or not talent.ascendance or not useAscendance then
                 if cast.stormkeeper() then return end
             end
     -- Totem Mastery
         -- totem_mastery,if=buff.resonance_totem.remains<10|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15)
-            if totemRemain < 10 or (talent.ascendance and totemRemain < (16 + cd.ascendance) and cd.ascendance < 15) then
+            if totemRemain < 10 or (talent.ascendance and useAscendance and totemRemain < (16 + cd.ascendance) and cd.ascendance < 15) then
                 if cast.totemMastery() then return end
             end
     -- Lava Beam
@@ -457,10 +560,6 @@ local function runRotation()
         if pause() or mode.rotation==4 or IsMounted() then
             return true
         else
---------------------------
---- Create Totem Frame ---
---------------------------
-            if createFrame() then return end
 -----------------------
 --- Extras Rotation ---
 -----------------------
