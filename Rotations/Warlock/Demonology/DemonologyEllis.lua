@@ -199,7 +199,10 @@ local function runRotation()
                 buildPetPool(...)
             end, "Demonology")
 
-            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(...)
+            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(source)
+                if source ~= "player" then
+                    return
+                end
                 RemoveEventCallback("COMBAT_LOG_EVENT_UNFILTERED","Demonology")
                 RemoveEventCallback("PLAYER_SPECIALIZATION_CHANGED","Demonology")
             end,"Demonology")
@@ -288,7 +291,7 @@ local function runRotation()
             -- Print("Pet Count:"..tostring(#self.petInfo))
             -- Print("Felguard Count:"..tostring(self.petPool.count.felguard))
         end
-        if br.timer:useTimer("refreshPetPool",1/5) then refreshPetPool() end
+        refreshPetPool()
     --if br.timer:useTimer("debugDemonology", math.random(0.15,0.3)) then
         --print("Running: "..rotationName)
 ---------------

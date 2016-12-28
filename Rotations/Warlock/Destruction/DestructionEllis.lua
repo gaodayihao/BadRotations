@@ -221,7 +221,10 @@ local function runRotation()
                 end
             end,"Destruction")
 
-            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(...)
+            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(source)
+                if source ~= "player" then
+                    return
+                end
                 RemoveEventCallback("COMBAT_LOG_EVENT_UNFILTERED","Destruction")
                 RemoveEventCallback("PLAYER_SPECIALIZATION_CHANGED","Destruction")
                 -- Print("Event remove.")
@@ -650,7 +653,7 @@ local function runRotation()
                         or (charges.conflagrate >= 1 and recharge.conflagrate < getCastTime(spell.immolate) + gcd) 
                         or ttd(units.dyn40) < 24)
             then
-                if cast.immolate() then immolateHack = 1 return end
+                if cast.immolate() then immolateHack = 2 return end
             end
     -- Racial: Orc Blood Fury | Troll Berserking | Blood Elf Arcane Torrent
             -- blood_fury | berserking | arcane_torrent

@@ -2647,7 +2647,12 @@ function isValidUnit(Unit)
     local creatureType = UnitCreatureType(Unit)
 	local trivial = creatureType == "Critter" or creatureType == "Non-combat Pet" or creatureType == "Gas Cloud" or creatureType == "Wild Pet"
 	if UnitCanAttack("player",Unit) and not UnitIsDeadOrGhost(Unit) and ObjectExists(Unit) and not trivial and (creatureType ~= "Totem" or myTarget) then
-	    local inAggroRange = getDistance(Unit) <= 20
+        local range = 20
+        local inRaid = select(2,IsInInstance()) == "raid"
+        if inRaid then
+            range = 40
+        end
+	    local inAggroRange = getDistance(Unit) <= range
         local inCombat = UnitAffectingCombat("player")
 		-- Only consider Units that are in 20yrs or I have targeted when not in Combat and not in an Instance.
 		if not inCombat and not IsInInstance() and (inAggroRange or myTarget) then return true end
