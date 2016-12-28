@@ -127,6 +127,7 @@ Raidable means if its good to raid with.
 ||||
 | **Shaman** |||
 |Elemental|100%|CuteOne|7.0|:interrobang:
+|Elemental|100%(SimC)|Ellis|7.1|:white_check_mark:
 |Enhancement|100%|CuteOne|7.1|:white_check_mark:
 |Enhancement|100%(SimC)|Ellis|7.1|:white_check_mark:
 |Restoration|0%||7.0|
@@ -136,6 +137,7 @@ Raidable means if its good to raid with.
 |Demonology|100%|CuteOne|7.1|:interrobang:
 |Demonology|100%|Ellis|7.1|:white_check_mark:
 |Destruction|100%|CuteOne|7.1|:white_check_mark:
+|Destruction|100%|Ellis|7.1|:white_check_mark:
 ||||
 | **Warrior** |||
 |Arms|100%|CuteOne|7.1|:white_check_mark:
