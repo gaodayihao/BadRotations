@@ -170,6 +170,12 @@ LC_SUMMON_PET_VOIDWALKER = "虚空行者";
 LC_UNENDING_RESOLVE = "心志坚定";
 LC_UNENDING_RESOLVE_DESCRIPTION = "|cffFFFFFF血量低于设定百分比时使用";
 
+-- Destruction Warlock
+LC_HAVOC = "浩劫";
+LC_HAVOC_DESCRIPTION = "敌人血量高于设定值时，施放浩劫（百万）";
+LC_CATACLYSM = "灾变";
+LC_CATACLYSM_DESCRIPTION = "|cffFFFFFF灾变";
+
 -- Shaman
 LC_ANCESTRAL_SPIRIT = "先祖之魂";
 LC_ASTRAL_SHIFT = "星界转移";
@@ -186,5 +192,13 @@ LC_WATER_WALKING = "水上行走";
 LC_WIND_SHEAR = "削风术";
 LC_DOOM_WINDS_DELAY = "末日之风延迟";
 LC_DOOM_WINDS_DELAY_DESCRIPTION = "末日之风等待疾风打击最大时间";
+
+-- Elemental Shaman
+LC_ASCENDANCE = "卓越术";
+LC_ASCENDANCE_DESCRIPTION = "|cffFFFFFF卓越术";
+LC_ELEMENTAL_MASTERY = "精通元素";
+LC_ELEMENTAL_MASTERY_DESCRIPTION = "|cffFFFFFF精通元素";
+LC_FIRE_ELEMENTAL = "火元素";
+LC_FIRE_ELEMENTAL_DESCRIPTION = "|cffFFFFFF火元素";
 
 end

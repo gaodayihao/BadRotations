@@ -185,6 +185,8 @@ local function runRotation()
         local units                                         = br.player.units
         local useArtifact                                   = false
 
+        if immolateHack == nil then immolateHack = 0 end
+
         if isChecked(LC_ARTIFACT) then
             if getOptionValue(LC_ARTIFACT) == 1 then
                 useArtifact = artifact.dimensionalRift
@@ -564,7 +566,7 @@ local function runRotation()
                     targetUnit = thisUnit
                 elseif targetUnit ~= nil then
                     local health = UnitHealth(thisUnit)
-                    if health > UnitHealth(targetUnit) and UnitGUID(thisUnit) ~= lastTarget then
+                    if (health > UnitHealth(targetUnit) or debuff.havoc[targetUnit].exists) and UnitGUID(thisUnit) ~= lastTarget then
                         targetUnit = thisUnit
                     end
                 end
@@ -634,21 +636,21 @@ local function runRotation()
                 for i = 1, #enemies.yards40 do
                     local thisUnit = enemies.yards40[i]
                     local guid = UnitGUID(thisUnit)
-                    if debuff.immolate[thisUnit].remain <= 3 and br.player.roaringBlazeUnits[guid] == nil and (lastSpell ~= spell.immolate or lastTarget ~= guid) then
+                    if debuff.immolate[thisUnit].remain <= 3 and br.player.roaringBlazeUnits[guid] == nil and (lastSpell ~= spell.immolate or lastTarget ~= UnitGUID(thisUnit)) then
                         if cast.immolate(thisUnit) then return end
                     end
                 end
             end
             -- immolate,if=talent.roaring_blaze.enabled&remains<=duration&!debuff.roaring_blaze.remains&target.time_to_die>10&(action.conflagrate.charges=2|(action.conflagrate.charges>=1&action.conflagrate.recharge_time<cast_time+gcd)|target.time_to_die<24)
             if talent.roaringBlaze 
-                and debuff.immolate[units.dyn40].remain <= 18 
+                and debuff.immolate[units.dyn40].remain < 18
                 and br.player.roaringBlazeUnits[UnitGUID(units.dyn40)] == nil
                 and ttd(units.dyn40) > 10
                 and (charges.conflagrate == 2 
                         or (charges.conflagrate >= 1 and recharge.conflagrate < getCastTime(spell.immolate) + gcd) 
                         or ttd(units.dyn40) < 24)
             then
-                if cast.immolate() then return end
+                if cast.immolate() then immolateHack = 1 return end
             end
     -- Racial: Orc Blood Fury | Troll Berserking | Blood Elf Arcane Torrent
             -- blood_fury | berserking | arcane_torrent
@@ -813,9 +815,13 @@ local function runRotation()
             SpellStopCasting()
         end
     -- Profile Stop | Pause
-        if pause() or mode.rotation==4 or IsMounted() then
-            if not pause() and activePet ~= "None" then
+        local isPause = pause()
+        if isPause or mode.rotation==4 or IsMounted() or immolateHack > 0 then
+            if not isPause and activePet ~= "None" then
                 PetFollow()
+            end
+            if not isPause and immolateHack > 0 then
+                immolateHack = immolateHack - 1
             end
             return true
         else
