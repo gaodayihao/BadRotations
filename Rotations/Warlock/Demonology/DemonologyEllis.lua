@@ -375,6 +375,8 @@ local function runRotation()
         elseif doom ~= nil then
             doom.trick = 0
         end
+
+        if demonboltHack == nil then demonboltHack = 0 end
 -----------------------
 --- Custom Function ---
 -----------------------
@@ -898,9 +900,9 @@ local function runRotation()
         -- demonbolt
         -- shadow_bolt
             if talent.demonbolt then
-                if cast.demonbolt() then return end
+                if cast.demonbolt() then demonboltHack = 1 return end
             else 
-                if cast.shadowbolt() then return end
+                if cast.shadowbolt() then demonboltHack = 1 return end
             end
     -- Life Tap
         -- life_tap
@@ -919,9 +921,13 @@ local function runRotation()
             SpellStopCasting()
         end
     -- Profile Stop | Pause
-        if pause() or mode.rotation==4 or IsMounted() then
-            if not pause() and activePet ~= "None" then
+        local isPause = pause()
+        if isPause or mode.rotation==4 or IsMounted() or demonboltHack > 0 then
+            if (mode.rotation==4 or IsMounted()) and activePet ~= "None" then
                 PetFollow()
+            end
+            if not isPause and demonboltHack > 0 then
+                demonboltHack = demonboltHack - 1
             end
             return true
         else

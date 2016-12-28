@@ -820,7 +820,7 @@ local function runRotation()
     -- Profile Stop | Pause
         local isPause = pause()
         if isPause or mode.rotation==4 or IsMounted() or immolateHack > 0 then
-            if not isPause and activePet ~= "None" then
+            if (mode.rotation==4 or IsMounted()) and activePet ~= "None" then
                 PetFollow()
             end
             if not isPause and immolateHack > 0 then
