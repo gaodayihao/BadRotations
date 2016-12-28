@@ -2655,7 +2655,7 @@ function isValidUnit(Unit)
 		-- Only consider Units that I have threat with or I am alone and have targeted when not in Combat and in an Instance.
 		if not inCombat and IsInInstance() and (threat or (#br.friend == 1 and myTarget)) then return true end 
 		-- Only consider Units that I have threat with or I can attack and have targeted or are dummies within 20yrds when in Combat.
-		if inCombat and (threat or myTarget or (isDummy(Unit) and inAggroRange)) then return true end
+		if inCombat and (threat or myTarget or (isDummy(Unit) and inAggroRange) or ObjectID(Unit) == 103679) then return true end  -- Unit is Soul Effigy
 	end
 	return false
 end

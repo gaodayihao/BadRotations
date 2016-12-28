@@ -1,4 +1,4 @@
-local rotationName = "Cpoworks"
+local rotationName = "Cpoworks" -- Change to name of profile listed in options drop down
 
 ---------------
 --- Toggles ---
@@ -6,19 +6,19 @@ local rotationName = "Cpoworks"
 local function createToggles()
 -- Rotation Button
     RotationModes = {
-        [1] = { mode = "Auto", value = 1 , overlay = "Automatic Rotation", tip = "Swaps between Single and Multiple based on number of targets in range.", highlight = 1, icon = br.player.spell.cobraShot },
-        [2] = { mode = "Mult", value = 2 , overlay = "Multiple Target Rotation", tip = "Multiple target rotation used.", highlight = 0, icon = br.player.spell.volley },
-        [3] = { mode = "Sing", value = 3 , overlay = "Single Target Rotation", tip = "Single target rotation used.", highlight = 0, icon = br.player.spell.killCommand },
-        [4] = { mode = "Off", value = 4 , overlay = "DPS Rotation Disabled", tip = "Disable DPS Rotation", highlight = 0, icon = br.player.spell.aspectOfTheWild}
+        [1] = { mode = "Auto", value = 1 , overlay = "Automatic Rotation", tip = "Swaps between Single and Multiple based on number of targets in range.", highlight = 1, icon = br.player.spell.furyOfTheEagle },
+        [2] = { mode = "Mult", value = 2 , overlay = "Multiple Target Rotation", tip = "Multiple target rotation used.", highlight = 0, icon = br.player.spell.carve },
+        [3] = { mode = "Sing", value = 3 , overlay = "Single Target Rotation", tip = "Single target rotation used.", highlight = 0, icon = br.player.spell.mongooseBite },
+        [4] = { mode = "Off", value = 4 , overlay = "DPS Rotation Disabled", tip = "Disable DPS Rotation", highlight = 0, icon = br.player.spell.throwingAxes}
     };
     CreateButton("Rotation",1,0)
 -- Cooldown Button
     CooldownModes = {
-        [1] = { mode = "Auto", value = 1 , overlay = "Cooldowns Automated", tip = "Automatic Cooldowns - Boss Detection.", highlight = 1, icon = br.player.spell.bestialWrath },
-        [2] = { mode = "On", value = 1 , overlay = "Cooldowns Enabled", tip = "Cooldowns used regardless of target.", highlight = 0, icon = br.player.spell.bestialWrath },
-        [3] = { mode = "Off", value = 3 , overlay = "Cooldowns Disabled", tip = "No Cooldowns will be used.", highlight = 0, icon = br.player.spell.bestialWrath }
+        [1] = { mode = "Auto", value = 1 , overlay = "Cooldowns Automated", tip = "Automatic Cooldowns - Boss Detection.", highlight = 1, icon = br.player.spell.aspectOfTheEagle },
+        [2] = { mode = "On", value = 1 , overlay = "Cooldowns Enabled", tip = "Cooldowns used regardless of target.", highlight = 0, icon = br.player.spell.aspectOfTheEagle },
+        [3] = { mode = "Off", value = 3 , overlay = "Cooldowns Disabled", tip = "No Cooldowns will be used.", highlight = 0, icon = br.player.spell.aspectOfTheEagle }
     };
-   	CreateButton("Cooldown",2,0)
+    CreateButton("Cooldown",2,0)
 -- Defensive Button
     DefensiveModes = {
         [1] = { mode = "On", value = 1 , overlay = "Defensive Enabled", tip = "Includes Defensive Cooldowns.", highlight = 1, icon = br.player.spell.aspectOfTheTurtle },
@@ -27,8 +27,8 @@ local function createToggles()
     CreateButton("Defensive",3,0)
 -- Interrupt Button
     InterruptModes = {
-        [1] = { mode = "On", value = 1 , overlay = "Interrupts Enabled", tip = "Includes Basic Interrupts.", highlight = 1, icon = br.player.spell.counterShot },
-        [2] = { mode = "Off", value = 2 , overlay = "Interrupts Disabled", tip = "No Interrupts will be used.", highlight = 0, icon = br.player.spell.counterShot }
+        [1] = { mode = "On", value = 1 , overlay = "Interrupts Enabled", tip = "Includes Basic Interrupts.", highlight = 1, icon = br.player.spell.muzzle },
+        [2] = { mode = "Off", value = 2 , overlay = "Interrupts Disabled", tip = "No Interrupts will be used.", highlight = 0, icon = br.player.spell.muzzle }
     };
     CreateButton("Interrupt",4,0)
 end
@@ -65,10 +65,8 @@ local function createOptions()
             br.ui:createCheckbox(section,"Racial")
         -- Trinkets
             br.ui:createCheckbox(section,"Trinkets")
-        -- Bestial Wrath
-            br.ui:createCheckbox(section,"Bestial Wrath")
-        -- Trueshot
-            br.ui:createCheckbox(section,"Aspect of the Wild")
+        -- Aspect of the Eagle
+            br.ui:createCheckbox(section,"Aspect of the Eagle")
         br.ui:checkSectionState(section)
     -- Defensive Options
         section = br.ui:createSection(br.ui.window.profile, "Defensive")
@@ -86,7 +84,7 @@ local function createOptions()
     -- Interrupt Options
         section = br.ui:createSection(br.ui.window.profile, "Interrupts")
         -- Counter Shot
-            br.ui:createCheckbox(section,"Counter Shot")
+            br.ui:createCheckbox(section,"Muzzle")
         -- Interrupt Percentage
             br.ui:createSpinner(section, "Interrupts",  0,  0,  95,  5,  "|cffFFFFFFCast Percent to Cast At")
         br.ui:checkSectionState(section)
@@ -115,17 +113,16 @@ end
 --- ROTATION ---
 ----------------
 local function runRotation()
-    if br.timer:useTimer("debugBeastmaster", math.random(0.15,0.3)) then
+    if br.timer:useTimer("debugSurvival", 0.1) then --change "debugFury" to "debugSpec" (IE: debugFire)
         --Print("Running: "..rotationName)
 
 ---------------
---- Toggles ---
+--- Toggles --- -- List toggles here in order to update when pressed
 ---------------
         UpdateToggle("Rotation",0.25)
         UpdateToggle("Cooldown",0.25)
         UpdateToggle("Defensive",0.25)
         UpdateToggle("Interrupt",0.25)
-
 --------------
 --- Locals ---
 --------------
@@ -180,13 +177,13 @@ local function runRotation()
         -- BeastCleave 118445
         local beastCleaveTimer                              = getBuffDuration("pet", 118445)
 
-   		if leftCombat == nil then leftCombat = GetTime() end
-		if profileStop == nil then profileStop = false end
+        if leftCombat == nil then leftCombat = GetTime() end
+        if profileStop == nil then profileStop = false end
 
 --------------------
 --- Action Lists ---
 --------------------
-	-- Action List - Pet Management
+    -- Action List - Pet Management
         local function actionList_PetManagement()
             if not IsMounted() then
                 if isChecked("Auto Summon") and not UnitExists("pet") and (UnitIsDead("pet") ~= nil or UnitIsDead("pet") == false) then
@@ -251,19 +248,6 @@ local function runRotation()
                     end
                 end
             end -- End Dummy Test
-
-            --Misdirection
-            -- if getSpellCD(34477) <= 0.1 then
-            --     if UnitThreatSituation("player", "target") ~= nil and UnitAffectingCombat("player") then
-            --         for i = 1, #br.friend do        
-            --             if (br.friend[i].role == "TANK" or UnitGroupRolesAssigned(br.friend[i].unit) == "TANK") and UnitAffectingCombat(br.friend[i].unit) then 
-            --                 if UnitChecks(br.friend[i].unit) then
-            --                     CastSpellByName(GetSpellInfo(34477),br.friend[i].unit)
-            --                 end
-            --             end
-            --         end
-            --     end
-            -- end
         end -- End Action List - Extras
     -- Action List - Defensive
         local function actionList_Defensive()
@@ -311,184 +295,187 @@ local function runRotation()
     -- Action List - Cooldowns
         local function actionList_Cooldowns()
             if useCDs() then
-                if buff.bestialWrath.exists then
-                    -- Trinkets
-                    if isChecked("Trinkets") then
-                        if canUse(13) then
-                            useItem(13)
-                        end
-                        if canUse(14) then
-                            useItem(14)
-                        end
+                -- Trinkets
+                if isChecked("Trinkets") then
+                    if canUse(13) then
+                        useItem(13)
                     end
-                    -- Agi-Pot
-                    if isChecked("Agi-Pot") and canUse(agiPot) and inRaid then
-                        useItem(agiPot);
-                        return true
-                    end
-                    -- Racial: Orc Blood Fury | Troll Berserking | Blood Elf Arcane Torrent
-                    if isChecked("Racial") and (br.player.race == "Orc" or br.player.race == "Troll" or br.player.race == "BloodElf") then
-                         if castSpell("player",racial,false,false,false) then return end
+                    if canUse(14) then
+                        useItem(14)
                     end
                 end
-                -- Bestial Wrath
-                if isChecked("Bestial Wrath") then
-                    if cast.bestialWrath(units.dyn40) then return end
+                -- Agi-Pot
+                if isChecked("Agi-Pot") and canUse(agiPot) and inRaid then
+                    useItem(agiPot);
+                    return true
                 end
-                -- Aspect of the Wild
-                -- if PowerToMax >= 30
-                if isChecked("Aspect of the Wild") and powerDeficit >= 30 then
-                    if cast.aspectOfTheWild(units.dyn40) then return end
+                -- Racial: Orc Blood Fury | Troll Berserking | Blood Elf Arcane Torrent
+                if isChecked("Racial") and (br.player.race == "Orc" or br.player.race == "Troll" or br.player.race == "BloodElf") then
+                     if castSpell("player",racial,false,false,false) then return end
+                end
+                -- Aspect of the Eagle
+                if isChecked("Aspect of the Eagle") then
+                    if cast.aspectOfTheEagle(units.dyn40) then return end
                 end
             end -- End useCooldowns check
         end -- End Action List - Cooldowns
-    -- Action List - Single Target
-        local function actionList_SingleTarget()
-            -- Titan's Thunder
-            -- if PetCount(DireBeast) > 0 or HasTalent(DireFrenzy)
-            if buff.direBeast.exists or talent.direfrenzy then
-                if cast.titansThunder(units.dyn40) then return end
-            end
-            -- Stampede
-            -- if HasBuff(BestialWrath)
-            if buff.bestialWrath.exists then
-                if cast.stampede(units.dyn40) then return end
-            end
-            -- A Murder of Crows
-            -- if HasBuff(BestialWrath)
-            if buff.bestialWrath.exists then
-                if cast.aMurderOfCrows(units.dyn40) then return end
-            end
-            -- Dire Frenzy
-            -- if CooldownSecRemaining(BestialWrath) > 7.5
-            -- You get a very slight damage increase by holding onto this until Bestial Wrath if it will cool down soon.
-            if cd.bestialWrath > 7.5 then
-                if cast.direfrenzy(units.dyn40) then return end
-            end
-            -- Dire Beast
-            if cast.direBeast(units.dyn40) then return end
-            -- Kill Command
-            if cast.killCommand(units.dyn40) then return end
-            -- Chimaera Shot
-            if cast.chimaeraShot(units.dyn40) then return end
-            -- Multi-Shot
-            -- if BuffRemainingSec(BeastCleaveTracker) <= GlobalCooldownSec and TargetsInRadius(MultiShot) > 1 and Power > 70 - PowerRegen * CooldownSecRemaining(KillCommand)
-            if beastCleaveTimer <= gcd and #multishotTargets > 1 and power > 70 - powerRegen * cd.killCommand then
-                if cast.multiShot(units.dyn40) then return end
-            end
-            -- Cobra Shot
-            -- if Power > 70 - PowerRegen * CooldownSecRemaining(KillCommand) and TargetsInRadius(MultiShot) < 2
-            -- Use Cobra Shot if it won't end up delaying a Kill Command.
-            if power > 70 - powerRegen * cd.killCommand and #multishotTargets < 2 then
-                if cast.cobraShot(units.dyn40) then return end
-            end
-        end -- End Action List - Single Target
     -- Action List - Multi Target
         local function actionList_MultiTarget()
-            -- Multi-Shot
-            -- if BuffRemainingSec(BeastCleaveTracker) <= GlobalCooldownSec
-            if beastCleaveTimer <= gcd then
-                if cast.multiShot(units.dyn40) then return end
+            -- Dragonsfire Grenade
+            if talent.dragonsfireGrenade then
+                if cast.dragonsfireGrenade(units.dyn5) then return end
             end
-            -- Stampede
-            if cast.stampede(units.dyn40) then return end
-            -- Titan's Thunder
-            -- if PetCount(DireBeast) > 0 or HasTalent(DireFrenzy)
-            if buff.direBeast.exists or talent.direfrenzy then
-                    if cast.titansThunder(units.dyn40) then return end
-                end
-            -- Barrage
-            if cast.barrage(units.dyn40) then return end
-            -- A Murder of Crows
-            -- The targeting logic is in the Target Priorities section.
-            if cast.aMurderOfCrows(units.dyn40) then return end
-            -- Dire Frenzy
-            -- if CooldownSecRemaining(BestialWrath) > 7.5
-            if cd.bestialWrath > 7.5 then
-                if cast.direfrenzy(units.dyn40) then return end
+            -- Explosive Trap
+            if cast.explosiveTrap(units.dyn5) then return end
+            -- Caltrops
+            -- if DotCount(Caltrops) < TargetsInRadius(Caltrops)
+            if talent.caltrops then
+
             end
-            -- Dire Beast
-            if cast.direBeast(units.dyn40) then return end
-            -- Multi-Shot
-            -- if (BuffRemainingSec(BeastCleaveTracker) <= GlobalCooldownSec or TargetsInRadius(MultiShot) > 6) and (not HasTalent(Barrage) or CooldownSecRemaining(Barrage) > 3)
-            if (beastCleaveTimer <= gcd or multishotTargets > 6) and (not talent.barrage or cd.barrage > 3) then
-                if cast.multiShot(units.dyn40) then return end
+            -- Butchery / Carve
+            if talent.butchery then
+                if cast.butchery(units.dyn5) then return end
+            else
+                if cast.carve(units.dyn5) then return end
             end
-            -- Kill Command
-            if cast.killCommand(units.dyn40) then return end
-            -- Chimaera Shot
-            if cast.chimaeraShot(units.dyn40) then return end
-            -- Cobra Shot
-            -- if PowerToMax <= GlobalCooldownSec * 2 * PowerRegen
-            -- Pool Focus for Multi-Shot when in AoE. Only use Cobra Shot if you will cap Focus.
-            if powerDeficit <= gcd * 2 * powerRegen then
-                if cast.cobraShot(units.dyn40) then return end
-            end
+
         end -- End Action List - Multi Target
----------------------
---- Begin Profile ---
----------------------
-    -- Profile Stop | Pause
-        if not inCombat and not hastar and profileStop==true then
-            profileStop = false
-        elseif (inCombat and profileStop==true) or pause() or mode.rotation==4 then
+
+        
+-----------------
+--- Rotations ---
+-----------------
+        -- Pause
+        if pause() or (UnitExists("target") and (UnitIsDeadOrGhost("target") or not UnitCanAttack("target", "player"))) or mode.rotation == 4 then
             return true
         else
------------------------
---- Extras Rotation ---
------------------------
-            if actionList_Extras() then return end
---------------------------
---- Defensive Rotation ---
---------------------------
-            if actionList_Defensive() then return end
------------------
---- Pet Logic ---
------------------             
+---------------------------------
+--- Out Of Combat - Rotations ---
+---------------------------------
+            if not inCombat and ObjectExists("target") and not UnitIsDeadOrGhost("target") and UnitCanAttack("target", "player") then
+        -----------------
+    --- Pet Logic ---
+    -----------------             
             if actionList_PetManagement() then return end
---------------------------
---- In Combat Rotation ---
---------------------------
-            if inCombat and isValidUnit(units.dyn40) and getDistance(units.dyn40) < 40 then
-    ------------------------------
-    --- In Combat - Interrupts ---
-    ------------------------------
-                    if actionList_Interrupts() then return end
+
+
+            end -- End Out of Combat Rotation
+-----------------------------
+--- In Combat - Rotations --- 
+-----------------------------
+            if inCombat and isValidUnit(units.dyn40) and getDistance(units.dyn5) < 5 then
+    -----------------
+    --- Pet Logic ---
+    -----------------             
+            if actionList_PetManagement() then return end
+
     ---------------------------
     --- SimulationCraft APL ---
     ---------------------------
                     if getOptionValue("APL Mode") == 1 then
-
+    ------------------------------
+    --- In Combat - Interrupts ---
+    ------------------------------
+                    if actionList_Interrupts() then return end
                     end -- End SimC APL
     ------------------------
     --- Ask Mr Robot APL ---
     ------------------------
                     if getOptionValue("APL Mode") == 2 then
-                        -- Volley
-                        -- If you take Volley, you do more damage by leaving it on all the time.
-                        -- if talent.volley then
-                        --     if cast.volley(units.dyn40) then return end
-                        -- end
+                        -- Harpoon
+                        -- if not HasDot(OnTheTrail) and ArtifactTraitRank(EaglesBite) > 0
+                        
                         -- Cooldowns
-                        -- if HasBuff(BestialWrath)
-                        -- Bestial Wrath
-                        -- Aspect of the Wild
-                        -- if PowerToMax >= 30
-                        if actionList_Cooldowns() then return end
+                        -- if TargetsInRadius(Carve) > 2 or HasBuff(MongooseFury) or ChargesRemaining(MongooseBite) = SpellCharges(MongooseBite)
+                        -- Use your cooldowns during or just before Mongoose Fury or an AoE phase.
+                        if #enemies.yards5 > 2 or buff.mongooseFury.exists or charges.mongooseBite == charges.max.mongooseBite then
+                            if actionList_Cooldowns() then return end
+                        end
                         -- MultiTarget
-                        -- if TargetsInRadius(MultiShot) > 2
-                        if (#multishotTargets > 2 and mode.rotation == 1) or mode.rotation == 2 then
+                        -- if TargetsInRadius(Carve) > 2
+                        if (#enemies.yards5 > 2 and mode.rotation == 1) or mode.rotation == 2 then
                             if actionList_MultiTarget() then return end
                         end
-                        -- SingleTarget
-                        -- if TargetsInRadius(MultiShot) <= 2
-                        if actionList_SingleTarget() then return end
+                        -- Explosive Trap
+                        if cast.explosiveTrap(units.dyn5) then return end
+                        -- Dragonsfire Grenade
+                        if talent.dragonsfireGrenade then
+                            if cast.dragonsfireGrenade(units.dyn5) then return end
+                        end
+                        -- Raptor Strike
+                        -- if HasTalent(WayOfTheMokNathal) and BuffRemainingSec(MokNathalTactics) <= GlobalCooldownSec
+                        if talent.wayOfTheMokNathal and buff.mokNathalTactics.remain <= gcd then
+                            if cast.raptorStrike(units.dyn5) then return end
+                        end
+                        -- Snake Hunter
+                        -- if ChargesRemaining(MongooseBite) = 0 and BuffRemainingSec(MongooseFury) > GlobalCooldownSec * 4
+                        if talent.snakeHunter and charges.mongooseBite == 0 and buff.mongooseFury.remain > gcd * 4 then
+                            if cast.snakeHunter(units.dyn5) then return end
+                        end
+                        -- Fury of the Eagle
+                        -- if HasBuff(MongooseFury) and BuffRemainingSec(MongooseFury) <= GlobalCooldownSec * 2
+                        -- You want to use this near the end of Mongoose Fury, but leave time to use one or two Mongoose Bite charges you might gain during the channel.
+                        if buff.mongooseFury.exists and buff.mongooseFury.remain <= gcd * 2 then
+                            if cast.furyOfTheEagle(units.dyn5) then return end
+                        end
+                        -- Mongoose Bite
+                        -- if HasBuff(MongooseFury) or ChargesRemaining(MongooseBite) = SpellCharges(MongooseBite)
+                        -- Once you hit max charges of Mongoose Bite, use it.
+                        if buff.mongooseFury or charges.mongooseBite == charges.max.mongooseBite then
+                            if cast.mongooseBite(units.dyn5) then return end
+                        end
+                        -- Steel Trap
+                        if talent.steelTrap then
+                            if cast.steelTrap(units.dyn5) then return end
+                        end
+                        -- Caltrops
+                        -- if not HasDot(Caltrops) or DotCount(Caltrops) < TargetsInRadius(Caltrops)
+                        if talent.caltrops and not not UnitDebuffID(units.dyn5,spell.debuffs.caltrops,"player") then
+                            if cast.caltrops(units.dyn5) then return end
+                        end
+                        -- A Murder of Crows
+                        if talent.aMurderOfCrows then
+                            if cast.aMurderOfCrows(units.dyn5) then return end
+                        end
+                        -- Lacerate
+                        -- if CanRefreshDot(Lacerate)
+                        if debuff.lacerate[units.dyn5].refresh then
+                            if cast.lacerate(units.dyn5) then return end
+                        end
+                        -- Spitting Cobra
+                        if cast.splittingCobra(units.dyn5) then return end
+                        -- Raptor Strike
+                        -- if (HasTalent(SerpentSting) and CanRefreshDot(SerpentSting))
+                        if talent.serpentSting and not UnitDebuffID(units.dyn5,spell.debuffs.serpentSting,"player") then
+                            if cast.raptorStrike(units.dyn5) then return end
+                        end
+                        -- Flanking Strike
+                        if cast.flankingStrike(units.dyn5) then return end
+                        -- Butchery
+                        -- if TargetsInRadius(Butchery) > 1
+                        if talent.butchery and #enemies.yards5 > 1 then
+                            if cast.butchery(units.dyn5) then return end
+                        end
+                        -- Carve
+                        -- if TargetsInRadius(Carve) > 1
+                        if not talent.butchery and #enemies.yards5 > 1 then
+                            if cast.carve(units.dyn5) then return end
+                        end
+                        -- Throwing Axes
+                        if cast.throwingAxes(units.dyn5) then return end
+                        -- Raptor Strike
+                        -- if Power > 75 - CooldownSecRemaining(FlankingStrike) * PowerRegen and not HasTalent(ThrowingAxes)
+                        -- If using Raptor Strike could possibly delay a Flanking Strike by using up your Focus, it is better to just wait for Flanking Strike to come off GCD. It is also not worth using if you have Throwing Axes talented.
+                        if power > 75 - cd.flankingStrike * powerRegen and not talent.throwingAxes then
+                            if cast.raptorStrike(units.dyn5) then return end
+                        end
+
                     end
-			end --End In Combat
-		end --End Rotation Logic
+            end -- End In Combat Rotation
+        end -- Pause
     end -- End Timer
-end -- End runRotation
-local id = 253
+end -- End runRotation 
+local id = 255 -- Change to the spec id profile is for.
 if br.rotations[id] == nil then br.rotations[id] = {} end
 tinsert(br.rotations[id],{
     name = rotationName,
