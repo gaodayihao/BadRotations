@@ -145,13 +145,13 @@ function EnemiesEngine()
 			-- here i want to scan the enemies table and find any occurances of invalid units
 			if not ObjectExists(thisUnit) or not isValidUnit(thisUnit) then
 				-- i will remove such units from table
-				local sucess,guid = pcall(UnitGUID,thisUnit)
-				if sucess then
-					br.enemyGUID[guid] = nil
-				end
 				br.enemy[thisUnit] = nil
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets - 1
 			end
+		end
+
+		if br.debug.cpu.enemiesEngine.sanityTargets == 0 then
+			br.enemyGUID = {}
 		end
 
 		for thisUnit,_ in pairs(br.namePlateUnit) do
