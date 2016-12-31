@@ -2643,10 +2643,16 @@ function isValidTarget(Unit)
     end
 end
 function isValidUnit(Unit)
+    if not ObjectExists(Unit) then
+        return false
+    end
+    if specialUnitVerify[GetObjectID(Unit)] ~= nil then
+        return specialUnitVerify[GetObjectID(Unit)].func(Unit)
+    end
 	local myTarget = UnitIsUnit(Unit,"target")
     local creatureType = UnitCreatureType(Unit)
 	local trivial = creatureType == "Critter" or creatureType == "Non-combat Pet" or creatureType == "Gas Cloud" or creatureType == "Wild Pet"
-	if UnitCanAttack("player",Unit) and not UnitIsDeadOrGhost(Unit) and ObjectExists(Unit) and not trivial and (creatureType ~= "Totem" or myTarget) then
+	if UnitCanAttack("player",Unit) and not UnitIsDeadOrGhost(Unit) and not trivial and (creatureType ~= "Totem" or myTarget) then
         local range = 20
         local inRaid = select(2,IsInInstance()) == "raid"
         if inRaid then

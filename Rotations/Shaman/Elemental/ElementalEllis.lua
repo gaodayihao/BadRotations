@@ -180,7 +180,7 @@ local function runRotation()
             if forceSingle then return 1 end
             if forceAOE then return 99 end
             if activeEnemiesCache > -1 then return activeEnemiesCache end
-            activeEnemiesCache = #getEnemies(units.dyn40,8)
+            activeEnemiesCache = #getEnemies(units.dyn40,10)
             return activeEnemiesCache
         end
 
@@ -363,7 +363,7 @@ local function runRotation()
             if cast.liquidMagmaTotem() then return true end
     -- Flame Shock
         -- flame_shock,if=spell_targets.chain_lightning=3&maelstrom>=20,target_if=refreshable
-            local targets = getEnemies(units.dyn40,8)
+            local targets = getEnemies(units.dyn40,10)
             if power >= 20 and #targets == 3 then
                 for i = 1, #targets do
                     local thisUnit = targets[i]
@@ -429,7 +429,7 @@ local function runRotation()
     -- Earthquake
         -- earthquake,if=buff.echoes_of_the_great_sundering.up
             if (hasEquiped(137074) and buff.echoesOfTheGreatSundering.exists) 
-                or (#getEnemies(units.dyn40,8) == 2 and (hasBloodLust() or buff.elementalMastery.exist))
+                or (#getEnemies(units.dyn40,10) == 2 and (hasBloodLust() or buff.elementalMastery.exist))
             then
                 if cast.earthquake() then return end
             end
@@ -451,7 +451,7 @@ local function runRotation()
     -- Flame Shock
         -- flame_shock,if=maelstrom>=20&buff.elemental_focus.up,target_if=refreshable
             if power >= 20 and buff.elementalFocus.exists then
-                local targets = getEnemies(units.dyn40,8)
+                local targets = getEnemies(units.dyn40,10)
                 for i = 1, #targets do
                     local thisUnit = targets[i]
                     if debuff.flameShock[thisUnit].refresh and cast.flameShock(thisUnit) then return end
@@ -479,7 +479,7 @@ local function runRotation()
             end
     -- Liquid Magma Totem
         -- liquid_magma_totem,if=raid_event.adds.count<3|raid_event.adds.in>50
-            if talent.liquidMagmaTotem and #getEnemies(units.dyn40,8) == 2 then
+            if talent.liquidMagmaTotem and #getEnemies(units.dyn40,10) == 2 then
                 if cast.liquidMagmaTotem() then return end
             end
     -- Stormkeeper
@@ -494,14 +494,14 @@ local function runRotation()
             end
     -- Lava Beam
         -- lava_beam,if=active_enemies>1&spell_targets.lava_beam>1
-            if talent.ascendance and buff.ascendance.exist and #getEnemies(units.dyn40,8) == 2 then
+            if talent.ascendance and buff.ascendance.exist and #getEnemies(units.dyn40,10) == 2 then
                 if cast.lavaBeam() then return end
             end
     -- Lightning Bolt
         -- lightning_bolt,if=buff.power_of_the_maelstrom.up,target_if=debuff.lightning_rod.down
         -- lightning_bolt,if=buff.power_of_the_maelstrom.up
             if artifact.powerOfTheMaelstrom and buff.powerOfTheMaelstrom.exist then
-                local targets = getEnemies(units.dyn40,8)
+                local targets = getEnemies(units.dyn40,10)
                 for i = 1, #targets do
                     local thisUnit = targets[i]
                     if not debuff.lightningRod[thisUnit].exist and cast.lightningBolt(thisUnit) then return end
@@ -515,7 +515,7 @@ local function runRotation()
     -- Chain Lightning
         -- chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1,target_if=debuff.lightning_rod.down
         -- chain_lightning,if=active_enemies>1&spell_targets.chain_lightning>1
-            local targets = getEnemies(units.dyn40,8)
+            local targets = getEnemies(units.dyn40,10)
             if #targets == 2 then
                 for i = 1, #targets do
                     local thisUnit = targets[i]

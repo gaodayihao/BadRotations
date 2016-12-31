@@ -343,7 +343,7 @@ local function runRotation()
         local summonPet                                     = getOptionValue(LC_SUMMON_PET)
         local talent                                        = br.player.talent
         local travelTime                                    = getDistance("target")/16
-        local ttd                                           = getTimeToDie
+        local ttd                                           = getTTD
         local units                                         = br.player.units
         local useArtifact                                   = false
 

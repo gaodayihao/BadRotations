@@ -79,15 +79,16 @@ function getTTD(unit)
 		end
 	end
 	
-	if enemyTable then
-		if enemyTable.ttd[thisUnit] ~= nil then
-			return enemyTable.ttd[thisUnit]
-		end
-	end
 	if isDummy() then
 		return 999
 	else
 		return -1
+	end
+	
+	if enemyTable then
+		if enemyTable.ttd[thisUnit] ~= nil then
+			return enemyTable.ttd[thisUnit]
+		end
 	end
 end
 

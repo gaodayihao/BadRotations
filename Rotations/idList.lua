@@ -2119,6 +2119,7 @@ br.idList = {
             debuffs                         = {
                 agony                       = 980,
                 corruption                  = 146739,
+                seedOfCorruption            = 27243,
                 siphonLife                  = 63106,
                 unstableAffliction          = 233490,
             },

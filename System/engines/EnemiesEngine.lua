@@ -30,6 +30,19 @@ function EnemiesEngine()
 	br.debug.cpu.enemiesEngine.sanityTargets = 0
 	br.debug.cpu.enemiesEngine.unitTargets = 0
 
+	function insertUnitIntoEnemiesTable(thisUnit,unitGUID)
+		local guid = unitGUID
+		if unitGUID == nil then
+			guid = UnitGUID(thisUnit)
+		end
+		if guid and br.enemyGUID[guid] == nil and isValidUnit(thisUnit) then
+			thisUnit = GetObjectWithGUID(guid)
+			br.enemy[thisUnit] = {}
+			br.enemyGUID[guid] = thisUnit
+			br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+		end
+	end
+
 	function addEnemiesTableEvents()
 		if not FireHack or br.EventInited then
 			return

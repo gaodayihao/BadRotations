@@ -122,6 +122,9 @@ function br.loader:new(spec,specName)
                         elseif debug == "dead" then
                             if thisUnit == nil then thisUnit = "player" end
                             return castSpell(thisUnit,spellCast,false,false,false,true,true,true,true,false)
+                        elseif debug == "face" then
+                            if thisUnit == nil then thisUnit = "player" end
+                            return castSpell(thisUnit,spellCast,true,false,false,true,false,true,true,false)
                         else
                             if thisUnit == nil then thisUnit = "player" end
                             return castSpell(thisUnit,spellCast,false,false,false,true,false,true,true,false)

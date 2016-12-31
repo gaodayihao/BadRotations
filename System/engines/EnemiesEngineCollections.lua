@@ -81,6 +81,9 @@ doNotTouchUnitCandidates = {
 	{ unitID = 87451, buff = 164504, spell = 164426 }, --Fleshrender Nok'gar, do not attack during defensive stance buff, Todo: Should stop when he cast 164504
 	{ unitID = 1, buff = 163689 } -- Never attack Sanguine Sphere
 }
+specialUnitVerify = {
+	[103679] = { func = function(theUnit) return not UnitIsFriend(theUnit,"player") end }, -- Soul Effigy
+}
 -- list of units to stun, either always or udner certain condition such as having a buff or wirldwinding etc
 crowdControlCandidates = {
 	-- Shadowmoon Burial Grounds
