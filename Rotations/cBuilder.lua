@@ -351,74 +351,59 @@ function br.loader:new(spec,specName)
             local debufCount = getDebuffCount(v)
             local debuffCalc = self.getSnapshotValue(v)
             -- Setup debuff table per valid unit and per debuff
-                if #br.friend > 0 then
-                    for i = 1, #br.friend do
-                        local thisUnit = br.friend[i].unit
-                        if self.debuff[k][thisUnit]             == nil then self.debuff[k][thisUnit]            = {} end
-                        if self.debuff[k][thisUnit].applied     == nil then self.debuff[k][thisUnit].applied    = 0 end
-                        self.debuff[k][thisUnit].exists         = UnitDebuffID(thisUnit,v,"player") ~= nil
+            if #br.friend > 0 then
+                for i = 1, #br.friend do
+                    local thisUnit = br.friend[i].unit
+                    if self.debuff[k][thisUnit]         == nil then self.debuff[k][thisUnit]            = {} end
+                    if self.debuff[k][thisUnit].applied == nil then self.debuff[k][thisUnit].applied    = 0 end
+                    self.debuff[k][thisUnit].exists         = UnitDebuffID(thisUnit,v,"player") ~= nil
+                    self.debuff[k][thisUnit].duration       = getDebuffDuration(thisUnit,v,"player")
+                    self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
+                    self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
+                    self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
+                    self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
+                    self.debuff[k][thisUnit].count          = debufCount
+                end
+            end
+            if self.debuff[k]["target"] == nil then self.debuff[k]["target"] = {} end
+            self.debuff[k]["target"].exists = UnitDebuffID("target",v,"player") ~= nil
+            if not self.debuff[k]["target"].exists then
+                self.debuff[k]["target"].duration       = 0
+                self.debuff[k]["target"].remain         = 0
+                self.debuff[k]["target"].refresh        = true
+                self.debuff[k]["target"].stack          = 0
+                self.debuff[k]["target"].calc           = debuffCalc
+                self.debuff[k]["target"].count          = debufCount
+            end
+            if #self.enemies.yards40 > 0 then
+                for i = 1, #self.enemies.yards40 do
+                    local thisUnit = self.enemies.yards40[i]
+                    if self.debuff[k][thisUnit]         == nil then self.debuff[k][thisUnit]            = {} end
+                    if self.debuff[k][thisUnit].applied == nil then self.debuff[k][thisUnit].applied    = 0 end
+                    self.debuff[k][thisUnit].exists = UnitDebuffID(thisUnit,v,"player") ~= nil
+                    if self.debuff[k][thisUnit].exists then
                         self.debuff[k][thisUnit].duration       = getDebuffDuration(thisUnit,v,"player")
                         self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
                         self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
                         self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
+                        self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
+                        self.debuff[k][thisUnit].count          = getDebuffCount(v)
+                    else
+                        self.debuff[k][thisUnit].duration       = 0
+                        self.debuff[k][thisUnit].remain         = 0
+                        self.debuff[k][thisUnit].refresh        = true
+                        self.debuff[k][thisUnit].stack          = 0
                         self.debuff[k][thisUnit].calc           = debuffCalc
                         self.debuff[k][thisUnit].count          = debufCount
-                        self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
                     end
+                    if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
                 end
-                if #self.enemies.yards40 > 0 then
-                    for i = 1, #self.enemies.yards40 do
-                        local thisUnit = self.enemies.yards40[i]
-                        if self.debuff[k][thisUnit]                 == nil then self.debuff[k][thisUnit]            = {} end
-                        if self.debuff[k][thisUnit].applied         == nil then self.debuff[k][thisUnit].applied    = 0 end
-                        self.debuff[k][thisUnit].exists             = UnitDebuffID(thisUnit,v,"player") ~= nil
-                        if self.debuff[k][thisUnit].exists then
-                            self.debuff[k][thisUnit].duration       = getDebuffDuration(thisUnit,v,"player")
-                            self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
-                            self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
-                            self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
-                            self.debuff[k][thisUnit].calc           = debuffCalc
-                            self.debuff[k][thisUnit].count          = debufCount
-                            self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
-                        else
-                            self.debuff[k][thisUnit].duration       = 0
-                            self.debuff[k][thisUnit].remain         = 0
-                            self.debuff[k][thisUnit].refresh        = true
-                            self.debuff[k][thisUnit].stack          = 0
-                            self.debuff[k][thisUnit].calc           = 0
-                            self.debuff[k][thisUnit].count          = debufCount
-                            self.debuff[k][thisUnit].start          = 0
-                        end
-                        if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
-                        if self.debuff[k]["target"] == nil then 
-                            self.debuff[k]["target"]                = {} 
-                            self.debuff[k]["target"].exists         = false
-                            self.debuff[k]["target"].duration       = 0
-                            self.debuff[k]["target"].remain         = 0
-                            self.debuff[k]["target"].refresh        = true
-                            self.debuff[k]["target"].stack          = 0
-                            self.debuff[k]["target"].calc           = 0
-                            self.debuff[k]["target"].count          = debufCount
-                            self.debuff[k]["target"].start          = 0
-                        end
-                    end
-                else
-                    if self.debuff[k]["target"]             == nil then self.debuff[k]["target"]            = {} end
-                    if self.debuff[k]["target"].applied     == nil then self.debuff[k]["target"].applied    = 0 end
-                    self.debuff[k]["target"].exists         = false
-                    self.debuff[k]["target"].duration       = 0
-                    self.debuff[k]["target"].remain         = 0
-                    self.debuff[k]["target"].refresh        = true
-                    self.debuff[k]["target"].stack          = 0
-                    self.debuff[k]["target"].calc           = 0
-                    self.debuff[k]["target"].count          = debufCount
-                    self.debuff[k]["target"].start          = 0
-                end
+            end
             -- Remove non-valid entries
-            -- for c,v in pairs(self.debuff[k]) do
-            --     local thisUnit = c
-            --     if (not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit)) and not UnitIsUnit(thisUnit,"target") then self.debuff[k][c] = nil end
-            -- end 
+            for c,v in pairs(self.debuff[k]) do
+                local thisUnit = c
+                if (not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit)) and not UnitIsUnit(thisUnit,"target") then self.debuff[k][thisUnit] = nil end
+            end 
         end
         
         -- Cycle through Abilities List

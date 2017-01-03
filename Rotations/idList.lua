@@ -728,7 +728,8 @@ br.idList = {
             },
             buffs                           = {
                 bestialWrath                = 19574,
-                direBeast                   = 120694
+                direBeast                   = 120694,
+                volley                      = 194386
             },
             debuffs                         = {
 
@@ -779,6 +780,7 @@ br.idList = {
                 lockAndLoad                 = 194594,
                 markingTargets              = 223138,
                 trueshot                    = 193526,
+                volley                      = 194386
             },
             debuffs                         = {
                 huntersMark                 = 185365,
@@ -861,7 +863,7 @@ br.idList = {
                 butchery                    = 212436,
                 dragonsfireGrenade          = 194855,
                 serpentSting                = 87935,
-                
+
             },
         },
         -- All
@@ -890,21 +892,39 @@ br.idList = {
         -- Arcane
         [62] = {
             abilities                       = {
+                arcaneBarage                = 44425,
+                arcaneBlast                 = 30451,
+                arcaneExplosion             = 1449,
+                arcaneMissles               = 5143,
+                arcanePower                 = 12042,
+                evocation                   = 12051,
+                arcaneFamiliar              = 205022,
+                arcaneCharge                = 36032,
+
 
             },
             artifacts                       = {
+                markOfAluneth               = 224968,
 
             },
             buffs                           = {
+              arcaneFamiliar                = 210126,
+              arcanePower                   = 12042,
+              arcaneCharge                  = 36032,
+              arcaneMissles                 = 79683,
 
             },
             debuffs                         = {
+              arcaneCharge                  = 36032,
+              netherTempest                 = 114923,
 
             },
             glyphs                          = {
 
             },
             talents                         = {
+                netherTempest               = 114923,
+                arcaneFamiliar              = 205022,
 
             },
         },
@@ -985,6 +1005,9 @@ br.idList = {
                 icyVeins                    = 12472,
                 chainReaction               = 195418,
                 zannesuJourney              = 226852,
+                timeWarp                    = 80353,
+                iceFloes                    = 108839,
+                iceBarrier                  = 11426,
             },
             debuffs                         = {
                 frostBomb                   = 112948,
@@ -1989,7 +2012,7 @@ br.idList = {
             },
             debuffs                         = {
                 frostbrand                  = 147732,
-                stormTempests               = 214265,
+                stormTempest                = 214265,
             },
             glyphs                          = {
 

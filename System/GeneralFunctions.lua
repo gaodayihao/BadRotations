@@ -739,35 +739,36 @@ Tenth         noCast            True to return True/False instead of casting spe
 -- castSpell("target",12345,true)
 --                ( 1  ,    2  ,     3     ,     4       ,      5    ,   6     ,   7     ,    8       ,   9      ,  10  )
 function castSpell(Unit,SpellID,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip,noCast)
-    if GetObjectExists(Unit) and betterStopCasting(SpellID) ~= true
-        and (not UnitIsDeadOrGhost(Unit) or DeadCheck) then
-        -- we create an usableSkip for some specific spells like hammer of wrath aoe mode
-        if usableSkip == nil then usableSkip = false end
-        -- stop if not enough power for that spell
-        if usableSkip ~= true and IsUsableSpell(SpellID) ~= true then return false end
-        -- Table used to prevent refiring too quick
-        if timersTable == nil then timersTable = {}    end
-        -- default noCast to false
-        if noCast == nil then nocast = false end
-        -- make sure it is a known spell
-        if not (KnownSkip == true or isKnown(SpellID)) then return false end
-        -- gather our spell range information
-        local spellRange = select(6,GetSpellInfo(SpellID))
-        if DistanceSkip == nil then DistanceSkip = false end
-        if spellRange == nil or (spellRange < 4 and DistanceSkip==false) then spellRange = 4 end
-        if DistanceSkip == true then spellRange = 40 end
-        -- Check unit,if it's player then we can skip facing
-        if (Unit == nil or UnitIsUnit("player",Unit)) or -- Player
-            (Unit ~= nil and UnitIsFriend("player",Unit)) then  -- Ally
-            FacingCheck = true
-        elseif isSafeToAttack(Unit) ~= true then -- enemy
-            return false
-        end
-        -- if MovementCheck is nil or false then we dont check it
-        if MovementCheck == false or isMoving("player") ~= true
-            -- skip movement check during spiritwalkers grace and aspect of the fox
-            or UnitBuffID("player",79206) ~= nil then
-            -- if ability is ready and in range
+	if GetObjectExists(Unit) and betterStopCasting(SpellID) ~= true
+		and (not UnitIsDeadOrGhost(Unit) or DeadCheck) then
+		-- we create an usableSkip for some specific spells like hammer of wrath aoe mode
+		if usableSkip == nil then usableSkip = false end
+		-- stop if not enough power for that spell
+		if usableSkip ~= true and IsUsableSpell(SpellID) ~= true then return false end
+		-- Table used to prevent refiring too quick
+		if timersTable == nil then timersTable = {}	end
+		-- default noCast to false
+		if noCast == nil then nocast = false end
+		-- make sure it is a known spell
+		if not (KnownSkip == true or isKnown(SpellID)) then return false end
+		-- gather our spell range information
+		local spellRange = select(6,GetSpellInfo(SpellID))
+		if DistanceSkip == nil then DistanceSkip = false end
+		if spellRange == nil or (spellRange < 4 and DistanceSkip==false) then spellRange = 4 end
+		if DistanceSkip == true then spellRange = 40 end
+		-- Check unit,if it's player then we can skip facing
+		if (Unit == nil or UnitIsUnit("player",Unit)) or -- Player
+			(Unit ~= nil and UnitIsFriend("player",Unit)) or
+			IsHackEnabled("AlwaysFacing") then  -- Ally
+			FacingCheck = true
+		elseif isSafeToAttack(Unit) ~= true then -- enemy
+			return false
+		end
+		-- if MovementCheck is nil or false then we dont check it
+		if MovementCheck == false or isMoving("player") ~= true
+			-- skip movement check during spiritwalkers grace and aspect of the fox
+			or UnitBuffID("player",79206) ~= nil then
+			-- if ability is ready and in range
             -- if getSpellCD(SpellID) < select(4,GetNetStats()) / 1000
 			if (getSpellCD(SpellID) < select(4,GetNetStats()) / 1000) and (getOptionCheck("Skip Distance Check") or getDistance("player",Unit) <= spellRange or DistanceSkip == true or inRange(SpellID,Unit)) then
 				-- if spam is not allowed
@@ -1312,10 +1313,10 @@ function getDistance(Unit1,Unit2,option)
         if dist > 13 then
             br.distanceCache[unit1GUID][unit2GUID] = dist
             return dist
-        elseif dist2 > 8 then
+        elseif dist2 > 8 and dist3 > 8 then
             br.distanceCache[unit1GUID][unit2GUID] = dist2
             return dist2
-        elseif dist3 > 5 then
+        elseif dist3 > 5 and dist4 > 5 then
             br.distanceCache[unit1GUID][unit2GUID] = dist3
             return dist3
         elseif dist4 > meleeRange then -- Thanks Ssateneth
@@ -2666,7 +2667,7 @@ function isValidUnit(Unit)
 		-- Only consider Units that I have threat with or I am alone and have targeted when not in Combat and in an Instance.
 		if not inCombat and IsInInstance() and (threat or (#br.friend == 1 and myTarget)) then return true end 
 		-- Only consider Units that I have threat with or I can attack and have targeted or are dummies within 20yrds when in Combat.
-		if inCombat and (threat or myTarget or (isDummy(Unit) and inAggroRange) or ObjectID(Unit) == 103679) then return true end  -- Unit is Soul Effigy
+		if inCombat and (threat or myTarget or (isDummy(Unit) and inAggroRange)) then return true end  -- Unit is Soul Effigy
 	end
 	return false
 end

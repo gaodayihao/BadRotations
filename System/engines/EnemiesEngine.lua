@@ -1,4 +1,5 @@
 -- Function to create and populate table of enemies within a distance from player.
+br.enemy = {}
 function EnemiesEngine()
 	-- Todo: So i think the prioritisation should be large by determined by threat or burn prio and then hp.
 	-- So design should be,
