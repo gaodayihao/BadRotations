@@ -176,6 +176,10 @@ LC_HAVOC_DESCRIPTION = "敌人血量高于设定值时，施放浩劫（百万�
 LC_CATACLYSM = "灾变";
 LC_CATACLYSM_DESCRIPTION = "|cffFFFFFF灾变";
 
+-- Affliction Warlock
+LC_SOC_MODE_ENABLE = "开启低血量ADD击杀模式，提高腐蚀之种优先级";
+LC_SOC_MODE_DISABLE = "闭关低血量ADD击杀模式";
+
 -- Shaman
 LC_ANCESTRAL_SPIRIT = "先祖之魂";
 LC_ASTRAL_SHIFT = "星界转移";

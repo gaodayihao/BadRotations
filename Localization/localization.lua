@@ -176,6 +176,10 @@ LC_HAVOC_DESCRIPTION = "Havoc";
 LC_CATACLYSM = "Cataclysm";
 LC_CATACLYSM_DESCRIPTION = "Cataclysm";
 
+-- Affliction Warlock
+LC_SOC_MODE_ENABLE = "Enable SOC mode, Seed of Corruption has higher priority";
+LC_SOC_MODE_DISABLE = "Enable SOC mode, Seed of Corruption has higher priority";
+
 -- Shaman
 LC_ANCESTRAL_SPIRIT = "Ancestral Spirit";
 LC_ASTRAL_SHIFT = "Astral Shift";

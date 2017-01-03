@@ -308,7 +308,7 @@ local function runRotation()
                 if cast.feralLunge() then return true end
             end
         -- Lightning Bolt
-            if getDistance("target") >= 12 and not talent.overcharge and (not isChecked(LC_FERAL_LUNGE) or not talent.feralLunge or cd.feralLunge > gcd) then
+            if getDistance("target") >= 12 and not talent.overcharge and (not talent.feralLunge or cd.feralLunge > gcd) then
                 if cast.lightningBolt() then return true end
             end
         end -- End Action List - Opener

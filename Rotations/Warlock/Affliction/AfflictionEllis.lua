@@ -31,6 +31,12 @@ local function createToggles()
         [2] = { mode = "Off", value = 2 , overlay = "Interrupts Disabled", tip = "No Interrupts will be used.", highlight = 0, icon = br.player.spell.fear}
     };
     CreateButton("Interrupt",4,0)
+-- Seed of Corruption
+    SeedOfCorruptionModes = {
+        [1] = { mode = "On", value = 1 , overlay = "SOC Enabled", tip = LC_SOC_MODE_ENABLE, highlight = 1, icon = br.player.spell.seedOfCorruption},
+        [2] = { mode = "Off", value = 2 , overlay = "SOC Disabled", tip = LC_SOC_MODE_DISABLE, highlight = 0, icon = br.player.spell.seedOfCorruption}
+    };
+    CreateButton("SeedOfCorruption",5,0)
 end
 ---------------
 --- OPTIONS ---
@@ -132,6 +138,7 @@ local function runRotation()
         UpdateToggle("Cooldown",0.25)
         UpdateToggle("Defensive",0.25)
         UpdateToggle("Interrupt",0.25)
+        UpdateToggle("SeedOfCorruption",0.25)
 --------------
 --- Locals ---
 --------------
@@ -178,6 +185,10 @@ local function runRotation()
         local ttd                                           = getTTD
         local units                                         = br.player.units
         local useArtifact                                   = false
+
+		mode.soc = br.data.settings[br.selectedSpec].toggles["SeedOfCorruption"]
+
+        local socMode = mode.soc == 1
 
         if myTarget == nil then myTarget = "" end
         if delayHack == nil then delayHack = 0 end
@@ -640,7 +651,7 @@ local function runRotation()
                 local thisUnit = enemies.yards40[i]
                 local agony = debuff.agony[thisUnit]
                 if agony ~= nil then
-                    if agony.refresh and (agony.exists or debuff.agony["target"].count < 10) then
+                    if agony.refresh and (agony.exists or debuff.agony["target"].count < 3) then
                         if cast.agony(thisUnit,"face") then return end
                     end
                 end
