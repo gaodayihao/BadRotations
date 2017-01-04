@@ -145,7 +145,7 @@ function br.loader:new(spec,specName)
         getTalentInfo()
         buildSpellRange()
         buildCastFuncitons()
-    end)
+    end,"cBuilder")
 
 ------------------
 --- OOC UPDATE ---
@@ -361,8 +361,9 @@ function br.loader:new(spec,specName)
                     self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
                     self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
                     self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
-                    self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
+                    self.debuff[k][thisUnit].calc           = debuffCalc
                     self.debuff[k][thisUnit].count          = debufCount
+                    self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
                 end
             end
             if self.debuff[k]["target"] == nil then self.debuff[k]["target"] = {} end
@@ -374,6 +375,7 @@ function br.loader:new(spec,specName)
                 self.debuff[k]["target"].stack          = 0
                 self.debuff[k]["target"].calc           = debuffCalc
                 self.debuff[k]["target"].count          = debufCount
+                self.debuff[k]["target"].start          = 0
             end
             if #self.enemies.yards40 > 0 then
                 for i = 1, #self.enemies.yards40 do
@@ -386,8 +388,9 @@ function br.loader:new(spec,specName)
                         self.debuff[k][thisUnit].remain         = getDebuffRemain(thisUnit,v,"player")
                         self.debuff[k][thisUnit].refresh        = self.debuff[k][thisUnit].remain <= self.debuff[k][thisUnit].duration * 0.3
                         self.debuff[k][thisUnit].stack          = getDebuffStacks(thisUnit,v,"player")
-                        self.debuff[k][thisUnit].calc           = self.getSnapshotValue(v)
-                        self.debuff[k][thisUnit].count          = getDebuffCount(v)
+                        self.debuff[k][thisUnit].calc           = debuffCalc
+                        self.debuff[k][thisUnit].count          = debufCount
+                        self.debuff[k][thisUnit].start          = getDebuffStart(thisUnit,v,"player")
                     else
                         self.debuff[k][thisUnit].duration       = 0
                         self.debuff[k][thisUnit].remain         = 0
@@ -395,6 +398,7 @@ function br.loader:new(spec,specName)
                         self.debuff[k][thisUnit].stack          = 0
                         self.debuff[k][thisUnit].calc           = debuffCalc
                         self.debuff[k][thisUnit].count          = debufCount
+                        self.debuff[k][thisUnit].start          = 0
                     end
                     if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
                 end

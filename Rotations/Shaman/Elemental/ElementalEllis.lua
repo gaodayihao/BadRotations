@@ -196,6 +196,10 @@ local function runRotation()
                         totemStart = GetTime()
                     end
                 elseif event == "PLAYER_SPECIALIZATION_CHANGED" then
+                    local source = ...
+                    if source ~= "player" then
+                        return
+                    end
                     frame:UnregisterEvent("UNIT_SPELLCAST_SUCCEEDED")
                     frame:UnregisterEvent("PLAYER_SPECIALIZATION_CHANGED")
                 end
