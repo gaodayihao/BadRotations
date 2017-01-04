@@ -38,10 +38,38 @@ function EnemiesEngine()
 		end
 		if guid and br.enemyGUID[guid] == nil and isValidUnit(thisUnit) then
 			thisUnit = GetObjectWithGUID(guid)
-			br.enemy[thisUnit] = {}
+			buidEnemyInfo(thisUnit)
 			br.enemyGUID[guid] = thisUnit
 			br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 		end
+	end
+
+	local function buidEnemyInfo(enemyUnit)
+		local thisUnit 				= enemyUnit
+		local burnValue 			= isBurnTarget(thisUnit) or 0
+		local shieldValue 			= isShieldedTarget(thisUnit) or 0
+		local unitThreat 			= UnitThreatSituation("player",thisUnit) or -1
+		br.enemy[enemyUnit]					= { }
+		br.enemy[enemyUnit].name 			= UnitName(thisUnit)
+		br.enemy[enemyUnit].guid 			= UnitGUID(thisUnit)
+		br.enemy[enemyUnit].id 				= GetObjectID(thisUnit)
+		br.enemy[enemyUnit].coeficient 		= getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or 0
+		br.enemy[enemyUnit].cc 				= isCrowdControlCandidates(thisUnit)
+		if getOptionCheck("Don't break CCs") then
+			br.enemy[enemyUnit].isCC 		= isLongTimeCCed(thisUnit)
+		else
+			br.enemy[enemyUnit].isCC 		= false
+		end
+		br.enemy[enemyUnit].facing 			= getFacing("player",thisUnit)
+		br.enemy[enemyUnit].threat 			= UnitThreatSituation("player",thisUnit) or -1
+		br.enemy[enemyUnit].unit 			= thisUnit
+		-- distance = unitDistance,
+		br.enemy[enemyUnit].hp 				= getHP(thisUnit)
+		br.enemy[enemyUnit].hpabs 			= UnitHealth(thisUnit)
+		br.enemy[enemyUnit].safe 			= isSafeToAttack(thisUnit)
+		br.enemy[enemyUnit].burn 			= isBurnTarget(thisUnit) or 0
+		br.enemy[enemyUnit].offensiveBuff 	= getOffensiveBuffs(thisUnit,unitGUID)
+		br.enemy[enemyUnit].updated			= true
 	end
 
 	function addEnemiesTableEvents()
@@ -55,7 +83,7 @@ function EnemiesEngine()
 			if br.enemyGUID[sourceGUID] == nil then
 				local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
 				if sucess and isValidUnit(thisUnit) then
-					br.enemy[thisUnit] = {}
+					buidEnemyInfo(thisUnit)
 					br.enemyGUID[sourceGUID] = thisUnit
 					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 				end
@@ -64,7 +92,7 @@ function EnemiesEngine()
 			if br.enemyGUID[destGUID] == nil then
 				local sucess,thisUnit = pcall(GetObjectWithGUID,destGUID)
 				if sucess and isValidUnit(thisUnit) then
-					br.enemy[thisUnit] = {}
+					buidEnemyInfo(thisUnit)
 					br.enemyGUID[destGUID] = thisUnit
 					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 				end
@@ -99,7 +127,7 @@ function EnemiesEngine()
 			local targetGUID = UnitGUID("target")
 			if br.enemyGUID[targetGUID] == nil then
 				local thisUnit = GetObjectWithGUID(UnitGUID("target"))
-				br.enemy[thisUnit] 	= { }
+				buidEnemyInfo(thisUnit)
 				br.enemyGUID[targetGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
@@ -109,38 +137,21 @@ function EnemiesEngine()
 			local thisUnit = k
 			local unitGUID = v
 			if br.enemyGUID[unitGUID] == nil and isValidUnit(thisUnit) then
-				br.enemy[thisUnit] 	= { }
+				buidEnemyInfo(thisUnit)
 				br.enemyGUID[unitGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
+			else
+				br.namePlateUnit[k] = nil
 			end
 		end
 
 		-- update infos
 		if br.enemy ~= nil then
 			for k, v in pairs(br.enemy) do
-				local thisUnit 				= k
-				local burnValue 			= isBurnTarget(thisUnit) or 0
-				local shieldValue 			= isShieldedTarget(thisUnit) or 0
-				local unitThreat 			= UnitThreatSituation("player",thisUnit) or -1
-				br.enemy[k].name 			= UnitName(thisUnit)
-				br.enemy[k].guid 			= UnitGUID(thisUnit)
-				br.enemy[k].id 				= GetObjectID(thisUnit)
-				br.enemy[k].coeficient 		= getUnitCoeficient(thisUnit,unitDistance,unitThreat,burnValue,shieldValue) or 0
-				br.enemy[k].cc 				= isCrowdControlCandidates(thisUnit)
-				if getOptionCheck("Don't break CCs") then
-					br.enemy[k].isCC 		= isLongTimeCCed(thisUnit)
-				else
-					br.enemy[k].isCC 		= false
+				if br.enemy[k].updated == false then
+					buidEnemyInfo(k)
 				end
-				br.enemy[k].facing 			= getFacing("player",thisUnit)
-				br.enemy[k].threat 			= UnitThreatSituation("player",thisUnit) or -1
-				br.enemy[k].unit 			= thisUnit
-				-- distance = unitDistance,
-				br.enemy[k].hp 				= getHP(thisUnit)
-				br.enemy[k].hpabs 			= UnitHealth(thisUnit)
-				br.enemy[k].safe 			= isSafeToAttack(thisUnit)
-				br.enemy[k].burn 			= isBurnTarget(thisUnit) or 0
-				br.enemy[k].offensiveBuff 	= getOffensiveBuffs(thisUnit,unitGUID)
+				br.enemy[k].updated = false
 			end
 		end
 		if br.data.settings[br.selectedSpec].toggles["isDebugging"] == true then
@@ -169,7 +180,7 @@ function EnemiesEngine()
 		end
 
 		for thisUnit,_ in pairs(br.namePlateUnit) do
-			if thisUnit == nil or not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit) then
+			if not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit) then
 				br.namePlateUnit[thisUnit] = nil
 				br.namePlateUnitCount = br.namePlateUnitCount - 1
 			end
