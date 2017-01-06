@@ -221,6 +221,10 @@ local function runRotation()
             br.player.eventRegisted = true
         end
 
+        if debuff.rupture["target"].count == 0 and debuff.garrote["target"].count == 0 and debuff.internalBleeding["target"].count == 0 then
+            table.wipe(br.player.exsanguinateList)
+        end
+
         for k,v in pairs(br.enemy) do
             if br.player.exsanguinateList[v.guid] == nil then
                 br.player.exsanguinateList[v.guid] = {}
@@ -231,16 +235,17 @@ local function runRotation()
             end
         end
 
-        for k,v in pairs(br.player.exsanguinateList) do
-            if (not ObjectExists(v.unit) 
-                or UnitIsDeadOrGhost(v.unit) 
-                or debuff.rupture[v.unit] == nil
-                or debuff.garrote[v.unit] == nil
-                or debuff.internalBleeding[v.unit] == nil)
-                and not UnitIsUnit(v.unit,"target")
-            then
+        if ObjectExists("target") and br.player.exsanguinateList[UnitGUID("target")] == nil then
+            local guid = UnitGUID("target")
+            br.player.exsanguinateList[guid] = {}
+            br.player.exsanguinateList[guid].unit = "target"
+            br.player.exsanguinateList[guid].exRupture = false
+            br.player.exsanguinateList[guid].exGarrote = false
+            br.player.exsanguinateList[guid].exInternalBleeding = false
+        end
 
-            elseif UnitIsUnit(v.unit,"target") then
+        for k,v in pairs(br.player.exsanguinateList) do
+            if UnitIsUnit(v.unit,"target") then
                 if not debuff.rupture["target"].exists then
                     br.player.exsanguinateList[k].exRupture = false
                 end
@@ -251,13 +256,13 @@ local function runRotation()
                     br.player.exsanguinateList[k].exInternalBleeding = false
                 end
             else
-                if not debuff.rupture[v.unit].exists then
+                if debuff.rupture[v.unit] and not debuff.rupture[v.unit].exists then
                     br.player.exsanguinateList[k].exRupture = false
                 end
-                if not debuff.garrote[v.unit].exists then
+                if debuff.garrote[v.unit] and not debuff.garrote[v.unit].exists then
                     br.player.exsanguinateList[k].exGarrote = false
                 end
-                if not debuff.internalBleeding[v.unit].exists then
+                if debuff.internalBleeding[v.unit] and not debuff.internalBleeding[v.unit].exists then
                     br.player.exsanguinateList[k].exInternalBleeding = false
                 end
             end
@@ -596,18 +601,6 @@ local function runRotation()
                end
             end -- End In Combat
         end -- End Profile
-
-        for k,v in pairs(br.player.exsanguinateList) do
-            if (not ObjectExists(v.unit) 
-                or UnitIsDeadOrGhost(v.unit) 
-                or debuff.rupture[v.unit] == nil
-                or debuff.garrote[v.unit] == nil
-                or debuff.internalBleeding[v.unit] == nil)
-                and not UnitIsUnit(v.unit,"target")
-            then
-                br.player.exsanguinateList[k] = nil
-            end
-        end
     --end -- Timer
 end -- runRotation
 local id = 259

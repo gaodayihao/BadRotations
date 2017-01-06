@@ -367,7 +367,7 @@ function br.loader:new(spec,specName)
                 end
             end
             if self.debuff[k]["target"] == nil then self.debuff[k]["target"] = {} end
-            self.debuff[k]["target"].exists = UnitDebuffID("target",v,"player") ~= nil
+            self.debuff[k]["target"].exists = ObjectExists("target") and UnitDebuffID("target",v,"player") ~= nil
             if self.debuff[k]["target"].exists then
                 self.debuff[k]["target"].duration       = getDebuffDuration("target",v,"player")
                 self.debuff[k]["target"].remain         = getDebuffRemain("target",v,"player")

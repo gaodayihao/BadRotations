@@ -104,7 +104,7 @@ function BadRotationsUpdate(self)
 		return false
 	end
 	local rd = math.random(80,120)
-	if br.timer:useTimer("RotationUpdate", 1/(getOptionValue(LC_ROTATION_TPS) or 15) * (rd/100)) then
+	if br.timer:useTimer("UnitUpdate", 1/(getOptionValue(LC_UNITS_TPS) or 5) * (rd/100)) then
 		-- clear distance cache
 		br.distanceCache = {}
 
@@ -124,7 +124,9 @@ function BadRotationsUpdate(self)
 
 		-- Accept dungeon queues
 		br:AcceptQueues()
+	end
 	
+	if br.timer:useTimer("RotationUpdate", 1/(getOptionValue(LC_ROTATION_TPS) or 15) * (rd/100)) then
 		--[[Class/Spec Selector]]
 		br.selectedProfile = br.data.settings[br.selectedSpec]["Rotation".."Drop"] or 1
 		local playerSpec = GetSpecializationInfo(GetSpecialization())
