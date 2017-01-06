@@ -148,6 +148,7 @@ Rotations\Priest\Shadow\ShadowCpoworks.lua
 
 ## Rogue ---------------------------------------------------
 
+Rotations\Rogue\Assassination\AssassinationEllis.lua
 Rotations\Rogue\Assassination\AssassinationCuteOne.lua
 
 Rotations\Rogue\Outlaw\OutlawCuteOne.lua
