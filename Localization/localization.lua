@@ -204,3 +204,15 @@ LC_ELEMENTAL_MASTERY = "Elemental Mastery";
 LC_ELEMENTAL_MASTERY_DESCRIPTION = "|cffFFFFFFElemental Mastery";
 LC_FIRE_ELEMENTAL = "Fire Elemental";
 LC_FIRE_ELEMENTAL_DESCRIPTION = "|cffFFFFFFFire Elemental";
+
+-- Assassination Rogue
+LC_STEALTH = "Stealth";
+LC_STEALTH_ALWAYS = "|cffFFBB00Always";
+LC_STEALTH_HAS_TARGET = "|cffFF0000Has Target";
+LC_POISON = "Poison";
+LC_MARKED_FOR_DEATH = "Marked For Death";
+LC_VENDETTA = "Vendetta";
+LC_VANISH = "Vanish";
+LC_EXSANGUINATE = "Exsanguinate";
+LC_CRIMSON_VIAL = "Crimson Vial";
+LC_EVASION = "Evasion";

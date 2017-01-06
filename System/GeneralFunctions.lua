@@ -489,7 +489,7 @@ function canInterrupt(unit,percentint)
             castPercent = 0
         end
         if castType == "spellcast" then
-            if math.ceil((castTimeRemain/castDuration)*100) <= castPercent and interruptable == true and getTimeToDie(unit)>castTimeRemain then
+            if math.ceil((castTimeRemain/castDuration)*100) <= castPercent and interruptable == true and getTTD(unit)>castTimeRemain then
                 return true
             end
         end

@@ -368,7 +368,15 @@ function br.loader:new(spec,specName)
             end
             if self.debuff[k]["target"] == nil then self.debuff[k]["target"] = {} end
             self.debuff[k]["target"].exists = UnitDebuffID("target",v,"player") ~= nil
-            if not self.debuff[k]["target"].exists then
+            if self.debuff[k]["target"].exists then
+                self.debuff[k]["target"].duration       = getDebuffDuration("target",v,"player")
+                self.debuff[k]["target"].remain         = getDebuffRemain("target",v,"player")
+                self.debuff[k]["target"].refresh        = self.debuff[k]["target"].remain <= self.debuff[k]["target"].duration * 0.3
+                self.debuff[k]["target"].stack          = getDebuffStacks("target",v,"player")
+                self.debuff[k]["target"].calc           = debuffCalc
+                self.debuff[k]["target"].count          = debufCount
+                self.debuff[k]["target"].start          = getDebuffStart("target",v,"player")
+            else
                 self.debuff[k]["target"].duration       = 0
                 self.debuff[k]["target"].remain         = 0
                 self.debuff[k]["target"].refresh        = true
@@ -400,14 +408,13 @@ function br.loader:new(spec,specName)
                         self.debuff[k][thisUnit].count          = debufCount
                         self.debuff[k][thisUnit].start          = 0
                     end
-                    if UnitIsUnit(thisUnit,"target") then self.debuff[k]["target"] = self.debuff[k][thisUnit] end
                 end
             end
-            -- Remove non-valid entries
-            for c,v in pairs(self.debuff[k]) do
-                local thisUnit = c
-                if (not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit)) and not UnitIsUnit(thisUnit,"target") then self.debuff[k][thisUnit] = nil end
-            end 
+            -- -- Remove non-valid entries
+            -- for c,v in pairs(self.debuff[k]) do
+            --     local thisUnit = c
+            --     if (not ObjectExists(thisUnit) or UnitIsDeadOrGhost(thisUnit)) and not UnitIsUnit(thisUnit,"target") then self.debuff[k][thisUnit] = nil end
+            -- end 
         end
         
         -- Cycle through Abilities List

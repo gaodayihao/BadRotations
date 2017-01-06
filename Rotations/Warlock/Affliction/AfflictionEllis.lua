@@ -208,7 +208,6 @@ local function runRotation()
         end
 
         if not br.player.eventRegisted then
-            br.player.roaringBlazeUnits = {}
             AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
                 local _, combatEvent, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
                 if sourceGUID == UnitGUID("player") and combatEvent == "SPELL_SUMMON" then

@@ -38,13 +38,13 @@ function EnemiesEngine()
 		end
 		if guid and br.enemyGUID[guid] == nil and isValidUnit(thisUnit) then
 			thisUnit = GetObjectWithGUID(guid)
-			buidEnemyInfo(thisUnit)
+			buildEnemyInfo(thisUnit)
 			br.enemyGUID[guid] = thisUnit
 			br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 		end
 	end
 
-	local function buidEnemyInfo(enemyUnit)
+	local function buildEnemyInfo(enemyUnit)
 		local thisUnit 				= enemyUnit
 		local burnValue 			= isBurnTarget(thisUnit) or 0
 		local shieldValue 			= isShieldedTarget(thisUnit) or 0
@@ -83,7 +83,7 @@ function EnemiesEngine()
 			if br.enemyGUID[sourceGUID] == nil then
 				local sucess,thisUnit = pcall(GetObjectWithGUID,sourceGUID)
 				if sucess and isValidUnit(thisUnit) then
-					buidEnemyInfo(thisUnit)
+					buildEnemyInfo(thisUnit)
 					br.enemyGUID[sourceGUID] = thisUnit
 					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 				end
@@ -92,7 +92,7 @@ function EnemiesEngine()
 			if br.enemyGUID[destGUID] == nil then
 				local sucess,thisUnit = pcall(GetObjectWithGUID,destGUID)
 				if sucess and isValidUnit(thisUnit) then
-					buidEnemyInfo(thisUnit)
+					buildEnemyInfo(thisUnit)
 					br.enemyGUID[destGUID] = thisUnit
 					br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 				end
@@ -127,7 +127,7 @@ function EnemiesEngine()
 			local targetGUID = UnitGUID("target")
 			if br.enemyGUID[targetGUID] == nil then
 				local thisUnit = GetObjectWithGUID(UnitGUID("target"))
-				buidEnemyInfo(thisUnit)
+				buildEnemyInfo(thisUnit)
 				br.enemyGUID[targetGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			end
@@ -137,7 +137,7 @@ function EnemiesEngine()
 			local thisUnit = k
 			local unitGUID = v
 			if br.enemyGUID[unitGUID] == nil and isValidUnit(thisUnit) then
-				buidEnemyInfo(thisUnit)
+				buildEnemyInfo(thisUnit)
 				br.enemyGUID[unitGUID] = thisUnit
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets + 1
 			else
@@ -149,7 +149,7 @@ function EnemiesEngine()
 		if br.enemy ~= nil then
 			for k, v in pairs(br.enemy) do
 				if br.enemy[k].updated == false then
-					buidEnemyInfo(k)
+					buildEnemyInfo(k)
 				end
 				br.enemy[k].updated = false
 			end
@@ -166,11 +166,12 @@ function EnemiesEngine()
 	-- remove invalid units on pulse
 	function cleanupEngine(maxDistance)
 		local  maxDistance = maxDistance or 40
-		for thisUnit,_ in pairs(br.enemy) do
+		for thisUnit,v in pairs(br.enemy) do
 			-- here i want to scan the enemies table and find any occurances of invalid units
 			if not ObjectExists(thisUnit) or not isValidUnit(thisUnit) then
 				-- i will remove such units from table
 				br.enemy[thisUnit] = nil
+				br.enemyGUID[v.guid] = nil
 				br.debug.cpu.enemiesEngine.sanityTargets = br.debug.cpu.enemiesEngine.sanityTargets - 1
 			end
 		end
