@@ -1398,6 +1398,33 @@ function getFacingUnits(Unit1,Units,Degrees)
     end
     return result
 end
+function hasFacingUnits(Unit1,Units,Degrees,Count)
+    if Units == nil and br.player.enemies and br.player.enemies.yards5 then
+        Units = br.player.enemies.yards5
+    end
+    if Units == nil then
+        return {}
+    end
+    if Degrees == nil then
+        Degrees = 90
+    end
+    if Unit1 == nil then
+        Unit1 = "player"
+    end
+    if Count == nil then
+        Count = 1
+    end
+    local num = 0
+    for i = 1,#Units do
+        if getFacing(Unit1,Units[i],Degrees) then
+            num = num + 1
+        end
+        if num >= Count then
+            return true
+        end
+    end
+    return false
+end
 -- if getFacing("target","player") == false then
 function getFacing(Unit1,Unit2,Degrees)
     if Degrees == nil then

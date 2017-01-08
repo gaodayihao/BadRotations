@@ -217,4 +217,9 @@ LC_EXSANGUINATE = "放血";
 LC_CRIMSON_VIAL = "赤红药瓶";
 LC_EVASION = "闪避";
 
+-- Outlaw Rogue
+LC_KICK = "脚踢";
+LC_BLIND = "致盲";
+LC_GOUGE = "凿击";
+
 end

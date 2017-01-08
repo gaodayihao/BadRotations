@@ -216,3 +216,8 @@ LC_VANISH = "Vanish";
 LC_EXSANGUINATE = "Exsanguinate";
 LC_CRIMSON_VIAL = "Crimson Vial";
 LC_EVASION = "Evasion";
+
+-- Outlaw Rogue
+LC_KICK = "Kick";
+LC_BLIND = "Blind";
+LC_GOUGE = "Gouge";

@@ -1763,6 +1763,7 @@ br.idList = {
             talents                         = {
                 acrobaticStikes             = 196924,
                 cannonballBarrage           = 185767,
+                deeperStratagem             = 193531,
                 dirtyTricks                 = 108216,
                 ghostlyStrike               = 196937,
                 grapplingHook               = 195457,
@@ -1770,9 +1771,9 @@ br.idList = {
                 ironStomach                 = 193546,
                 killingSpree                = 51690,
                 parley                      = 199743,
+                quickDraw                   = 196938,
                 sliceAndDice                = 5171,
                 swordmaster                 = 200733,
-                quickDraw                   = 196938,
             },
         },
         -- Subtlety
