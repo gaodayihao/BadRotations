@@ -563,7 +563,7 @@ local function runRotation()
 ---------------------
     -- Pause
         local isPause = pause()
-        if isPause or mode.rotation==4 or IsMounted() or delayHack > 0 then
+        if isPause or mode.rotation==4 or IsMounted() or delayHack >= 1 then
             if not isPause and delayHack >= 1 then
                 -- Print("delayHack:"..tostring(delayHack))
                 delayHack = delayHack - 1
