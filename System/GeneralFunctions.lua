@@ -3147,3 +3147,15 @@ function convertName(name)
 	end
 	return "None"
 end
+
+function hasOffensiveBuffs(Unit)
+    if not ObjectExists(Unit) then
+        return false
+    end
+    for i = 1 ,#offensiveBuffs do
+        if UnitBuffID(Unit,offensiveBuffs[i]) ~= nil then
+            return true
+        end
+    end
+    return false
+end

@@ -100,6 +100,12 @@ local function createOptions()
         --- INTERRUPT OPTIONS ---
         -------------------------
         section = br.ui:createSection(br.ui.window.profile, LC_INTERRUPTS)
+        -- Kick
+            br.ui:createCheckbox(section,LC_KICK)
+        -- Arcane Torrent
+            if br.player.race == "BloodElf" then
+                br.ui:createCheckbox(section,LC_ARCANE_TORRENT)
+            end
         -- Interrupt Percentage
             br.ui:createSpinnerWithout(section, LC_INTERRUPTS_AT,  0,  0,  95,  5,  LC_INTERRUPTS_AT_DESCRIPTION)
         br.ui:checkSectionState(section)
@@ -147,7 +153,7 @@ local function runRotation()
         local gcd                                                           = br.player.gcd
         local hastar                                                        = ObjectExists("target")
         local healPot                                                       = getHealthPot()
-        local inCombat                                                      = br.player.inCombat
+        local inCombat                                                      = br.player.inCombat or lastSpellCast == br.player.spell.vanish 
         local lastSpell                                                     = lastSpellCast
         local lastTarget                                                    = lastSpellTarget
         local level                                                         = br.player.level
@@ -166,6 +172,10 @@ local function runRotation()
         local useVendetta                                                   = isChecked(LC_VENDETTA) and useCDs
         local useVanish                                                     = isChecked(LC_VANISH) and useCDs
         local useExsanguinate                                               = isChecked(LC_EXSANGUINATE) and useCDs
+        
+        local playerStealth                                                 = buff.stealth.exists or buff.vanish.exists
+        
+        if delayHack == nil then delayHack = 0 end
 
         if isChecked(LC_ARTIFACT) then
             if getOptionValue(LC_ARTIFACT) == 1 then
@@ -272,8 +282,8 @@ local function runRotation()
 --------------------
     -- Action List - Extras
         local function actionList_Extras()
-            if isChecked(LC_STEALTH) and not inCombat and not buff.stealth.exists then
-                if getOptionValue(LC_STEALTH) == 1 or isValidUnit("target") then
+            if isChecked(LC_STEALTH) and not inCombat and not playerStealth then
+                if getOptionValue(LC_STEALTH) == 1 or (UnitCanAttack("player","target") and not UnitIsDeadOrGhost("target")) then
                     if cast.stealth() then return true end
                 end
             end
@@ -322,7 +332,14 @@ local function runRotation()
                     local thisUnit = enemies.yards10[i]
                     local distance = getDistance(thisUnit)
                     if canInterrupt(thisUnit,interruptAt) then
-                    
+                    -- Arcane Torrent
+                        if isChecked(LC_ARCANE_TORRENT) and race == "BloodElf" and getSpellCD(racial) == 0 and distance <=8 then
+                            if castSpell("player",racial,false,false,false) then return true end
+                        end
+                    -- Kick
+                        if isChecked(LC_KICK) and distance <=5 and getFacing("player",thisUnit) then
+                            if cast.kick(thisUnit) then return true end
+                        end
                     end
                 end
             end
@@ -360,8 +377,9 @@ local function runRotation()
             -- vanish,if=talent.subterfuge.enabled&dot.garrote.refreshable&((spell_targets.fan_of_knives<=3&combo_points.deficit>=1+spell_targets.fan_of_knives)(spell_targets.fan_of_knives>=4&combo_points.deficit>=4))
             -- vanish,if=talent.shadow_focus.enabled&energy.time_to_max>=2&combo_points.deficit>=4
             if useVanish 
-                and not solo 
+                and (not solo or isDummy(units.dyn5))
                 and isBoss()
+                and not hasOffensiveBuffs("player")
                 and 
                 ((talent.nightstalker 
                 and comboPoints.amount >= cpMaxSpend 
@@ -391,7 +409,7 @@ local function runRotation()
     -- Action List - Opener
         local function actionList_Opener()
         -- Start Attack
-            if getDistance(units.dyn5) <= 5 then StartAttack() end
+            if not playerStealth and getDistance(units.dyn5) <= 5 then StartAttack() end
         end -- End Action List - Opener
     -- Action List - Auto Target
         local function actionList_AutoTarget()
@@ -429,7 +447,7 @@ local function runRotation()
             -- rupture,if=(talent.nightstalker.enabled&stealthed.rogue)|(talent.exsanguinate.enabled&((combo_points>=cp_max_spend&cooldown.exsanguinate.remains<1)|(!ticking&(time>10|combo_points>=2+artifact.urge_to_kill.enabled))))
             local urgeToKillPoint = 0
             if artifact.urgeToKill then urgeToKillPoint = 1 end
-            if (talent.nightstalker and buff.stealth.exists)
+            if (talent.nightstalker and playerStealth)
                 or (talent.exsanguinate and useExsanguinate
                     and ((comboPoints.amount >= cpMaxSpend and cd.exsanguinate < 1) 
                             or (not debuff.rupture[units.dyn5].exists and (combatTime > 10 
@@ -544,7 +562,12 @@ local function runRotation()
 --- Begin Profile ---
 ---------------------
     -- Pause
-        if pause() or mode.rotation == 4 or IsMounted() then
+        local isPause = pause()
+        if isPause or mode.rotation==4 or IsMounted() or delayHack > 0 then
+            if not isPause and delayHack >= 1 then
+                -- Print("delayHack:"..tostring(delayHack))
+                delayHack = delayHack - 1
+            end
             return true
         else
 -----------------------

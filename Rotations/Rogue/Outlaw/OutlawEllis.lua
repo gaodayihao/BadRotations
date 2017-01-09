@@ -167,8 +167,6 @@ local function runRotation()
         local useVanish                                                     = isChecked(LC_VANISH) and useCDs
         local playerStealth                                                 = buff.stealth.exists or buff.vanish.exists
 
-        if delayHack == nil then delayHack = 0 end
-
         local debuff_curseOfTheDreadblades_exists                           = UnitDebuffID("player",spell.debuffs.curseOfTheDreadblades,"player") ~= nil
         local shivarranSymmetry                                             = 141321
         local thraxisTricksyTreads                                          = 137031
@@ -177,6 +175,8 @@ local function runRotation()
         local broadsidesPoint = 0 if buff.broadsides.exists then broadsidesPoint = 1 end
         local quickDrawPoint = 0 if talent.quickDraw then quickDrawPoint = 1 end
         local anticipationPoint = 0 if talent.anticipation then anticipationPoint = 1 end
+
+        if delayHack == nil then delayHack = 0 end
 
         if isChecked(LC_ARTIFACT) then
             if getOptionValue(LC_ARTIFACT) == 1 then
@@ -387,12 +387,12 @@ local function runRotation()
                 or (not hasBladeFlurryEnemies and buff.bladeFlurry.exists)
             then
                 CancelUnitBuffID("player", spell.bladeFlurry)
-                delayHack = 2
+                delayHack = getOptionValue(LC_ROTATION_TPS) / 4
                 return true
             end
             -- actions.bf+=/blade_flurry,if=spell_targets.blade_flurry>=2&!buff.blade_flurry.up
             if hasBladeFlurryEnemies and not buff.bladeFlurry.exists then
-                if cast.bladeFlurry() then delayHack = 2 return true end
+                if cast.bladeFlurry() then delayHack = getOptionValue(LC_ROTATION_TPS) / 4 return true end
             end
         end -- End Action List - Blade Flurry
     -- Action List - Builders
@@ -441,7 +441,7 @@ local function runRotation()
                 otherPoint = 1
             end
             local stealthCondition = false
-            if comboPoints.deficit >=2 + 2* ghostlyStrikePoint + otherPoint and UnitBuffID("player",227869) == nil then  -- Six-Feather Fan
+            if comboPoints.deficit >=2 + 2* ghostlyStrikePoint + otherPoint and not hasOffensiveBuffs("player") then
                 stealthCondition = true
             end
         -- Ambush
@@ -478,9 +478,9 @@ local function runRotation()
 --- Begin Profile ---
 ---------------------
     -- Pause
-        local isPause = pause(true)
+        local isPause = pause()
         if isPause or mode.rotation==4 or IsMounted() or delayHack > 0 then
-            if not isPause and delayHack > 0 then
+            if not isPause and delayHack >= 1 then
                 -- Print("delayHack:"..tostring(delayHack))
                 delayHack = delayHack - 1
             end

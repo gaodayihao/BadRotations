@@ -82,7 +82,19 @@ doNotTouchUnitCandidates = {
 	{ unitID = 1, buff = 163689 } -- Never attack Sanguine Sphere
 }
 specialUnitVerify = {
-	[103679] = { func = function(theUnit) return not UnitIsFriend(theUnit,"player") end }, -- Soul Effigy
+	[103679] = { func = function(theUnit) return not UnitIsFriend(theUnit,"player") end }, 	-- Soul Effigy
+	[95887] = { func = function(theUnit)
+		return not UnitIsDeadOrGhost(theUnit) and UnitCanAttack("player",theUnit) and UnitBuffID(theUnit,194323) == nil
+	end }, 	-- Glazer
+	[95888] = { func = function(theUnit)
+		return not UnitIsDeadOrGhost(theUnit) and UnitCanAttack("player",theUnit) and UnitBuffID(theUnit,197422) == nil and UnitBuffID(theUnit,205004) == nil 
+	end }, 	-- Cordana Felsong
+	[105906] = { func = function(theUnit)
+		return not UnitIsDeadOrGhost(theUnit) and UnitCanAttack("player",theUnit) and UnitBuffID(theUnit,209915) == nil
+	end }, 	-- Eye of Il'gynoth
+}
+offensiveBuffs = {
+	227869,		-- Six-Feather Fan
 }
 -- list of units to stun, either always or udner certain condition such as having a buff or wirldwinding etc
 crowdControlCandidates = {
