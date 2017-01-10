@@ -150,7 +150,7 @@ local function runRotation()
         local buff                                          = br.player.buff
         local canFlask                                      = canUse(br.player.flask.wod.agilityBig)
         local cast                                          = br.player.cast
-        local castable                                      = br.player.cast.debug
+        -- local castable                                      = br.player.cast.debug
         local combatTime                                    = getCombatTime()
         local cd                                            = br.player.cd
         local charges                                       = br.player.charges
@@ -221,7 +221,7 @@ local function runRotation()
         end
     -- Custom Functions
         local function cancelRushAnimation()
-            if castable.felRush then 
+            if cast.felRush(nil,"debug") then 
                 MoveBackwardStart()
                 JumpOrAscendStart()
                 cast.felRush()
