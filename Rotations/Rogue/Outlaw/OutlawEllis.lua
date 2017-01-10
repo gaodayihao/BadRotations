@@ -274,20 +274,20 @@ local function runRotation()
                     local thisUnit = enemies.yards15[i]
                     local distance = getDistance(thisUnit)
                     if canInterrupt(thisUnit,interruptAt) then
+                    -- Kick
+                        if isChecked(LC_KICK) and distance <=5 and getFacing("player",thisUnit,120) then
+                            if cast.kick(thisUnit) then return true end
+                        end
                     -- Arcane Torrent
                         if isChecked(LC_ARCANE_TORRENT) and race == "BloodElf" and getSpellCD(racial) == 0 and distance <=8 then
                             if castSpell("player",racial,false,false,false) then return true end
                         end
-                    -- Kick
-                        if isChecked(LC_KICK) and distance <=5 and getFacing("player",thisUnit) then
-                            if cast.kick(thisUnit) then return true end
-                        end
                     -- Blind
-                        if isChecked(LC_BLIND) and distance <=15 and getFacing("player",thisUnit) and not isBoss(thisUnit) then
+                        if isChecked(LC_BLIND) and distance <=15 and getFacing("player",thisUnit,120) and not isBoss(thisUnit) then
                             if cast.blind(thisUnit) then return true end
                         end
                     -- Gouge
-                        if isChecked(LC_GOUGE) and distance <=5 and getFacing("player",thisUnit) and not isBoss(thisUnit) then
+                        if isChecked(LC_GOUGE) and distance <=5 and getFacing("player",thisUnit,120) and not isBoss(thisUnit) then
                             if cast.gouge(thisUnit) then return true end
                         end
                     end
