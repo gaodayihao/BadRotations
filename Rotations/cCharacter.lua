@@ -306,29 +306,32 @@ function cCharacter:new(class)
 	function self.baseGetEquip()
         if br.equipHasChanged == nil or br.equipHasChanged then
 		-- Checks T17 Set
-			local t17 = TierScan("T17")
+			local t17 = 0 --[[TierScan("T17")]]
 			self.eq.t17_2pc = t17>=2 or false
 			self.eq.t17_4pc = t17>=4 or false
 		-- Checks T18 Set
-			local t18 = TierScan("T18")
+			local t18 = 0 --[[TierScan("T18")]]
 			self.eq.t18_2pc = t18>=2 or false
 			self.eq.t18_4pc = t18>=4 or false
 		-- Checks class trinket
-			local classTrinket = {
-				deathknight = 124513, -- Reaper's Harvest
-				druid       = 124514, -- Seed of Creation
-				hunter      = 124515, -- Talisman of the Master Tracker
-				mage        = 124516, -- Tome of Shifting Words
-				monk        = 124517, -- Sacred Draenic Incense
-				paladin     = 124518, -- Libram of Vindication
-				priest      = 124519, -- Repudiation of War
-				rogue       = 124520, -- Bleeding Hollow Toxin Vessel
-				shaman      = 124521, -- Core of the Primal Elements
-				warlock     = 124522, -- Fragment of the Dark Star
-				warrior     = 124523, -- Worldbreaker's Resolve
-			}
-			self.eq.t18_classTrinket = isTrinketEquipped(classTrinket[string.lower(self.class)])
-
+			-- local classTrinket = {
+			-- 	deathknight = 124513, -- Reaper's Harvest
+			-- 	druid       = 124514, -- Seed of Creation
+			-- 	hunter      = 124515, -- Talisman of the Master Tracker
+			-- 	mage        = 124516, -- Tome of Shifting Words
+			-- 	monk        = 124517, -- Sacred Draenic Incense
+			-- 	paladin     = 124518, -- Libram of Vindication
+			-- 	priest      = 124519, -- Repudiation of War
+			-- 	rogue       = 124520, -- Bleeding Hollow Toxin Vessel
+			-- 	shaman      = 124521, -- Core of the Primal Elements
+			-- 	warlock     = 124522, -- Fragment of the Dark Star
+			-- 	warrior     = 124523, -- Worldbreaker's Resolve
+			-- }
+			self.eq.t18_classTrinket = false --[[isTrinketEquipped(classTrinket[string.lower(self.class)])]]
+		-- Checks T19 Set
+			local t19 = TierScan("T19")
+			self.eq.t19_2pc = t19>=2 or false
+			self.eq.t19_4pc = t19>=4 or false
             br.equipHasChanged = false
         end
 	end

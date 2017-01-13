@@ -47,8 +47,6 @@ local function createOptions()
             br.ui:createCheckbox(section, LC_AUTO_FACING, LC_AUTO_FACING_DESCRIPTION)
         -- Artifact
             br.ui:createDropdown(section, LC_ARTIFACT, {LC_ARTIFACT_EVERY_TIME,LC_ARTIFACT_CD}, 1)
-        -- Doom Winds Delay
-            br.ui:createSpinner(section, LC_DOOM_WINDS_DELAY,  3,  1,  10,  1, LC_DOOM_WINDS_DELAY_DESCRIPTION)
         -- Ghost Wolf
             br.ui:createSpinner(section, LC_GHOST_WOLF,  1.5,  0,  5,  0.5, LC_GHOST_WOLF_DESCRIPTION)
         -- Water Walking
@@ -132,7 +130,6 @@ local function runRotation()
         local charges                                                       = br.player.charges
         local combatTime                                                    = getCombatTime()
         local debuff                                                        = br.player.debuff
-        local doomWindsDelay                                                = getOptionValue(LC_DOOM_WINDS_DELAY)
         local enemies                                                       = br.player.enemies
         local forceAOE                                                      = br.player.mode.rotation == 2
         local forceSingle                                                   = br.player.mode.rotation == 3
@@ -155,24 +152,13 @@ local function runRotation()
         local talent                                                        = br.player.talent
         local units                                                         = br.player.units
         local useArtifact                                                   = false
-        local useDoomWinds                                                  = false
+        local eq                                                            = br.player.eq
 
         if movingStart == nil then movingStart = 0 end
         if feralSpiritCastTime == nil then feralSpiritCastTime = 0 end
         if feralSpiritRemain == nil then feralSpiritRemain = 0 end
         if lastSpell == spell.feralSpirit then feralSpiritCastTime = GetTime() + 15 end
         if feralSpiritCastTime > GetTime() then feralSpiritRemain = feralSpiritCastTime - GetTime() else feralSpiritCastTime = 0; feralSpiritRemain = 0 end
-        if doomWindsDelayStart == nil then doomWindsDelayStart = 0 end
-
-        if not isChecked(LC_DOOM_WINDS_DELAY) then
-            doomWindsDelay = 0
-        elseif cd.doomWinds == 0 and doomWindsDelayStart == 0 then
-            doomWindsDelayStart = GetTime()
-        elseif cd.doomWinds > 0 then
-            doomWindsDelayStart = 0
-        end
-
-        useDoomWinds = doomWindsDelay == 0 or GetTime() - doomWindsDelayStart >= doomWindsDelay or buff.windStrikes.exists
         
         if isChecked(LC_GHOST_WOLF) then
             ghostWolfTimer = getOptionValue(LC_GHOST_WOLF)
@@ -277,11 +263,12 @@ local function runRotation()
                     if canUse(14) and useItem(14) then return true end
                 end
             -- Feral Spirit
-                if isChecked(LC_FERAL_SPIRIT) then
+                -- 	feral_spirit,if=!artifact.alpha_wolf.rank|(maelstrom>=20&cooldown.crash_lightning.remains<=gcd)
+                if isChecked(LC_FERAL_SPIRIT) and (not artifact.alphaWolf or (power >= 20 and cd.crashLightning <= gcd)) then
                     if cast.feralSpirit() then return true end
                 end
             -- Crash Lightning
-                -- crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.feral_spirit
+                -- crash_lightning,if=artifact.alpha_wolf.rank&prev_gcd.1.feral_spirit
                 if artifact.alphaWolf and lastSpell == spell.feralSpirit and #enemies.yards5 > 0 and getFacing("player",units.dyn5,120) then
                     if cast.crashLightning() then return true end
                 end
@@ -344,114 +331,123 @@ local function runRotation()
         end -- End Action List - Auto Facing
     -- Action List - Default
         local function actionList_Default()
-        -- Fury of Air - Off
-            -- if TargetsInRadius(FuryOfAir) = 1
-            if buff.furyOfAir.exists and #enemies.yards8 < 2 then
+        -- Boulderfist
+            -- boulderfist,if=buff.boulderfist.remains<gcd|(maelstrom<=50&active_enemies>=3)
+            if talent.boulderfist 
+                and (buff.boulderfist.remain < gcd or (power <= 50 and activeEnemies() >= 3))
+            then
+                if cast.boulderfist() then return end
+            end
+        -- Rockbiter
+            -- rockbiter,if=talent.landslide.enabled&buff.landslide.remains<gcd
+            if talent.landslide and buff.landslide.remain < gcd then
+                if cast.rockbiter() then return true end
+            end
+        -- Fury Of Air
+            -- fury_of_air,if=!ticking&maelstrom>22
+            if talent.furyOfAir and not buff.furyOfAir.exists and power > 22 then
                 if cast.furyOfAir() then return end
-            end
-        -- Crash Lightning
-            -- crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3
-            if talent.crashingStorm and activeEnemies() >= 3 then
-                if cast.crashLightning() then return end
-            end
-        -- Crash Lightning
-            -- crash_lightning,if=buff.crash_lightning.remains<gcd&active_enemies>=2
-            if buff.crashLightning.remain < gcd and activeEnemies() >= 2 then
-                if cast.crashLightning() then return end
             end
         -- Frostbrand
             -- frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<gcd
             if talent.hailstorm and buff.frostbrand.remain < gcd then
                 if cast.frostbrand() then return end
             end
-        -- Boulderfist
-            -- boulderfist,if=buff.boulderfist.remains<gcd&maelstrom>=50&active_enemies>=3
-            -- boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=80&active_enemies<=2)
-            if (buff.boulderfist.remain < gcd and power >= 50 and activeEnemies() >= 3)
-                or
-                (buff.boulderfist.remain < gcd or (charges.frac.boulderfist > 1.75 and power <= 80 and activeEnemies() <= 2))
-            then
-                if cast.boulderfist() then return end
+        -- Flametongue
+            -- flametongue,if=buff.flametongue.remains<gcd|(cooldown.doom_winds.remains<6&buff.flametongue.remains<4)
+            if buff.flametongue.remain < gcd or (cd.doomWinds < 6 and buff.flametongue.remain < 4) then
+                if cast.flametongue() then return end
             end
         -- Doom Winds
-            -- doom_winds,if=buff.stormbringer.react
-            if buff.stormbringer.exists then
-                if cast.doomWinds() then doomWindsDelayStart = 0 return end
+            -- doom_winds
+            if useArtifact and cast.doomWinds() then return end
+        -- Crash Lightning
+            -- crash_lightning,if=talent.crashing_storm.enabled&active_enemies>=3&(!talent.hailstorm.enabled|buff.frostbrand.remains>gcd)
+            if talent.crashingStorm and activeEnemies() >= 3 and (not talent.hailstorm or buff.frostbrand.remain > gcd) then
+                if cast.crashLightning() then return end
+            end
+        -- Earthen Spike
+            -- earthen_spike
+            if talent.earthenSpike and cast.earthenSpike() then return end
+        -- Lightning Bolt
+            -- lightning_bolt,if=(talent.overcharge.enabled&maelstrom>=40&!talent.fury_of_air.enabled)|(talent.overcharge.enabled&talent.fury_of_air.enabled&maelstrom>46)
+            if (talent.overcharge and power >= 40 and not talent.furyOfAir) or (talent.overcharge and talent.furyOfAir and power > 46) then
+                if cast.lightningBolt() then return end
+            end
+        -- Crash Lightning
+            -- crash_lightning,if=buff.crash_lightning.remains<gcd&active_enemies>=2
+            if buff.crashLightning.remain < gcd and activeEnemies() >= 2 then
+                if cast.crashLightning() then return end
+            end
+        -- Windsong
+            -- windsong
+            if talent.windsong and cast.windsong() then return end
+        -- Ascendance
+            -- ascendance,if=buff.stormbringer.react
+            if talent.ascendance and useCDs() and buff.stormbringer.existss then
+                if cast.ascendance() then return end
             end
         -- Stormstrike/Windstrike
-            -- windstrike,if=active_enemies>=3&!talent.hailstorm.enabled
-            -- stormstrike,if=active_enemies>=3&!talent.hailstorm.enabled
-            -- stormstrike,if=buff.stormbringer.react 
-            -- windstrike,if=buff.stormbringer.react
-            if buff.stormbringer.exists or not talent.hailstorm and activeEnemies() >= 3 then
+            -- windstrike,if=buff.stormbringer.react&((talent.fury_of_air.enabled&maelstrom>=26)|(!talent.fury_of_air.enabled))
+            -- stormstrike,if=buff.stormbringer.react&((talent.fury_of_air.enabled&maelstrom>=26)|(!talent.fury_of_air.enabled))
+            if buff.stormbringer.exists and ((talent.furyOfAir and power >= 26) or not talent.furyOfAir) then
                 if buff.ascendance.exists then
                     if cast.windstrike() then return end
                 else
                     if cast.stormstrike() then return end
                 end
             end
-        -- Flametongue
-            -- flametongue,if=buff.flametongue.remains<gcd
-            if buff.flametongue.remain < gcd then
-                if cast.flametongue() then return end
-            end
-        -- Windsong
-            -- windsong
-            if talent.windsong and cast.windsong() then return end
-        -- Ascendance
-            -- ascendance
-            if talent.ascendance and useCDs() then
-                if cast.ascendance() then return end
-            end
-        -- Fury of Air
-            -- fury_of_air,if=!ticking
-            if talent.furyOfAir and not buff.furyOfAir.exists and #enemies.yards8 >= 2 then
-                if cast.furyOfAir() then return end
-            end
-        -- Doom Winds
-            -- doom_winds
-            if (getOptionValue(LC_ARTIFACT) == 1 or (getOptionValue(LC_ARTIFACT) == 2 and useCDs()))
-                and cd.doomWinds == 0 
-                and getDistance(units.dyn5) <= 5
-                and useDoomWinds
-            then
-                if cast.doomWinds() then doomWindsDelayStart = 0 return end
-            end
-        -- Crash Lightning
-            -- crash_lightning,if=active_enemies>=3
-            if activeEnemies() >=3 then
-                if cast.crashLightning() then return end
-            end
-        -- Stormstrike/Windstrike
-            -- windstrike
-            -- stormstrike
-            if buff.ascendance.exists then
-                if cast.windstrike() then return end
-            else
-                if cast.stormstrike() then return end
-            end
-        -- Lightning Bolt
-            -- lightning_bolt,if=talent.overcharge.enabled&maelstrom>=60
-            if talent.overcharge and power >= 60 then
-                if cast.lightningBolt() then return end
-            end
         -- Lava Lash
-            -- lava_lash,if=buff.hot_hand.react
-            if buff.hotHand.exists then
+            -- lava_lash,if=talent.hot_hand.enabled&buff.hot_hand.react
+            if talent.hotHand and buff.hotHand.exists then
                 if cast.lavaLash() then return end
             end
-        -- Earthen Spike
-            -- earthen_spike
-            if talent.earthenSpike and cast.earthenSpike() then return end
+        -- Boulderfist
+            -- boulderfist,if=buff.boulderfist.remains<gcd|(charges_fractional>1.75&maelstrom<=100&active_enemies<=2)
+            if talent.boulderfist 
+                and (buff.boulderfist.remain < gcd or (charges.frac.boulderfist > 1.75 and power <= 100 and activeEnemies() <= 2))
+            then
+                if cast.boulderfist() then return end
+            end
         -- Crash Lightning
-            -- crash_lightning,if=active_enemies>1|talent.crashing_storm.enabled|feral_spirit.remains>5
-            if activeEnemies() > 1 or talent.crashingStorm or feralSpiritRemain > 5 then
+            -- crash_lightning,if=active_enemies>=4
+            if activeEnemies() >= 4 then
+                if cast.crashLightning() then return end
+            end
+        -- Windstrike
+            -- windstrike
+            if buff.ascendance.exists then
+                if cast.windstrike() then return end
+            end
+        -- Stormstrike
+            -- stormstrike,if=talent.overcharge.enabled&cooldown.lightning_bolt.remains<gcd&maelstrom>80
+            -- stormstrike,if=talent.fury_of_air.enabled&maelstrom>46&(cooldown.lightning_bolt.remains>gcd|!talent.overcharge.enabled)
+            -- stormstrike,if=!talent.overcharge.enabled&!talent.fury_of_air.enabled
+            if (talent.overcharge and cd.lightningBolt < gcd and power > 80)
+                or (talent.furyOfAir and power > 46 and (cd.lightningBolt > gcd or not talent.overcharge))
+                or (not talent.overcharge and not talent.furyOfAir)
+            then
+                if cast.stormstrike() then return end
+            end
+        -- Crash Lightning
+            -- crash_lightning,if=((active_enemies>1|talent.crashing_storm.enabled|talent.boulderfist.enabled)&!set_bonus.tier19_4pc)|feral_spirit.remains>5
+            if ((activeEnemies() > 1 or talent.crashingStorm or talent.boulderfist) and not eq.t19_4pc) or feralSpiritRemain > 5 then
                 if cast.crashLightning() then return end
             end
         -- Frostbrand
             -- frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<4.8
             if talent.hailstorm and buff.frostbrand.remain < 4.8 then
                 if cast.frostbrand() then return end
+            end
+        -- Lava Lash
+            -- lava_lash,if=talent.fury_of_air.enabled&talent.overcharge.enabled&(set_bonus.tier19_4pc&maelstrom>=80)
+            -- lava_lash,if=talent.fury_of_air.enabled&!talent.overcharge.enabled&(set_bonus.tier19_4pc&maelstrom>=53)
+            -- lava_lash,if=(!set_bonus.tier19_4pc&maelstrom>=120)|(!talent.fury_of_air.enabled&set_bonus.tier19_4pc&maelstrom>=40)
+            if (talent.furyOfAir and talent.overcharge and (eq.t19_4pc and power >= 80))
+                or (talent.furyOfAir and not talent.overcharge and (eq.t19_4pc and power >= 53))
+                or ((not eq.t19_4pc and power >= 120) or (not talent.furyOfAir and eq.t19_4pc and power >=40))
+            then
+                if cast.lavaLash() then return end
             end
         -- Flametongue
             -- flametongue,if=buff.flametongue.remains<4.8
@@ -463,25 +459,15 @@ local function runRotation()
             if talent.sundering and getDistance(units.dyn8) < 8 then
                 if cast.sundering() then return end
             end
-        -- Boulderfist
-            -- boulderfist,if=charges_fractional>1.75 
-            if charges.frac.boulderfist > 1.75 then
-                if cast.boulderfist() then return end
-            end
-        -- Lava Lash
-            -- lava_lash,if=maelstrom>=90
-            if power >= 90 then
-                if cast.lavaLash() then return end
-            end
         -- Rockbiter
             -- rockbiter
-            if cast.rockbiter() then return end
+            if not talent.boulderfist and cast.rockbiter() then return end
         -- Flametongue
             -- flametongue
             if cast.flametongue() then return end
         -- Boulderfist
             -- boulderfist
-            if cast.boulderfist() then return end
+            if talent.boulderfist and cast.boulderfist() then return end
         end -- End Action List - Default
 ---------------------
 --- Begin Profile ---

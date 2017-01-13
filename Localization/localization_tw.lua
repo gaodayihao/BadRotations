@@ -43,8 +43,12 @@ LC_RACIAL = "种族技能";
 LC_WAR_STOMP = "战争践踏";
 LC_TRINKETS = "饰品";
 LC_TRINKETS_DESCRIPTION = "自动使用饰品";
-LC_TRINKETS1_DURATION = "饰品1持续时间"
-LC_TRINKETS2_DURATION = "饰品2持续时间"
+LC_TRINKETS1_DURATION = "饰品1持续时间";
+LC_TRINKETS2_DURATION = "饰品2持续时间";
+LC_APL = "APL";
+LC_APL_710 = "7.10";
+LC_APL_715 = "7.15";
+LC_ENEMIES_FOR_AOE = "AOE敌人数量";
 
 -- Priest
 LC_BODY_AND_SOUL = "身心合一";
@@ -221,5 +225,11 @@ LC_EVASION = "闪避";
 LC_KICK = "脚踢";
 LC_BLIND = "致盲";
 LC_GOUGE = "凿击";
+
+-- Havoc Demon Hunter
+LC_LOW_FURY = "怒气过低 - 收集灵魂碎片！";
+LC_ENEMIES_FOR_AOE_HDH = "|cffFF0000AOE敌人数量，影响|cffFFBB00眼棱，邪能弹幕，伊利达雷之怒";
+LC_CONSUME_MAGIC = "吞噬魔法";
+LC_CHAOS_NOVA = "混沌新星";
 
 end

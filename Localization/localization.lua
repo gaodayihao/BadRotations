@@ -43,8 +43,12 @@ LC_RACIAL = "Racial";
 LC_WAR_STOMP = "War Stomp";
 LC_TRINKETS = "Trinkets";
 LC_TRINKETS_DESCRIPTION = "Trinkets";
-LC_TRINKETS1_DURATION = "Trinket1 Duration"
-LC_TRINKETS2_DURATION = "Trinket2 Duration"
+LC_TRINKETS1_DURATION = "Trinket1 Duration";
+LC_TRINKETS2_DURATION = "Trinket2 Duration";
+LC_APL = "APL";
+LC_APL_710 = "7.10";
+LC_APL_715 = "7.15";
+LC_ENEMIES_FOR_AOE = "Enemies For AOE";
 
 -- Priest
 LC_BODY_AND_SOUL = "Body And Soul";
@@ -221,3 +225,9 @@ LC_EVASION = "Evasion";
 LC_KICK = "Kick";
 LC_BLIND = "Blind";
 LC_GOUGE = "Gouge";
+
+-- Havoc Demon Hunter
+LC_LOW_FURY = "Low Fury - Collect Fragments!";
+LC_ENEMIES_FOR_AOE_HDH = "AOE";
+LC_CONSUME_MAGIC = "Consume Magic";
+LC_CHAOS_NOVA = "Chaos Nova";

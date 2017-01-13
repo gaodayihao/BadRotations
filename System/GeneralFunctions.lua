@@ -3098,6 +3098,16 @@ function TierScan(thisTier)
 				124346, -- shoulder
 			},
 		},
+        ["T19"] = {
+            ["SHAMAN"] = {
+                138345, -- legs
+                138348, -- shoulder
+                138346, -- chest
+                138341, -- hands
+                138343, -- head
+                138372, -- back
+            },
+        },
 	}
 	-- scan every items
 	for i=1, 19 do

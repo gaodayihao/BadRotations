@@ -50,10 +50,10 @@ function br.loader:new(spec,specName)
             -- Add All Matches to Talent List for Boolean Checks
             self.talent[k] = tempTalents[v]
             -- Add All Active Ability Matches to Ability/Spell List for Use Checks
-            if not IsPassiveSpell(v) and tempTalents[v] == true then
-                self.spell['abilities'][k] = v
-                self.spell[k] = v
-            end
+            -- if not IsPassiveSpell(v) and tempTalents[v] == true then
+            --     self.spell['abilities'][k] = v
+            --     self.spell[k] = v
+            -- end
         end
     end
 

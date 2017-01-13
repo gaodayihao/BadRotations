@@ -224,9 +224,10 @@ local function runRotation()
             if cast.felRush(nil,"debug") then 
                 MoveBackwardStart()
                 JumpOrAscendStart()
-                cast.felRush()
+                local sucess = cast.felRush()
                 MoveBackwardStop()
                 AscendStop()
+                if sucess then return true end
             end
             return
         end
@@ -324,7 +325,7 @@ local function runRotation()
         local function actionList_PostVengeful()
         -- Fel Rush
             if mode.mover == 1 and getDistance("target") < 5 then
-                cancelRushAnimation()
+                if cancelRushAnimation() then return end
             elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                 if cast.felRush() then return end
             end
@@ -367,7 +368,7 @@ local function runRotation()
             -- if not HasTalent(Prepared) and not HasTalent(Momentum)
             if getFacing("player","target",10) and not talent.prepared and not talent.momentum then
                 if mode.mover == 1 and getDistance("target") < 5 then
-                    cancelRushAnimation()
+                    if cancelRushAnimation() then return end
                 elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                     if cast.felRush() then return end
                 end
@@ -375,7 +376,7 @@ local function runRotation()
             -- if (ChargesRemaining(FelRush) >= 2 or (ChargesRemaining(FelRush) >= 1 and ChargeSecRemaining(FelRush) <= CooldownSecRemaining(VengefulRetreat))) and not HasBuff(Momentum)
             if getFacing("player","target",10) and (charges.felRush >= 2 or (charges.felRush >= 1 and recharge.felRush <= cd.vengefulRetreat)) and not buff.momentum.exists then
                 if mode.mover == 1 and getDistance("target") < 5 then
-                    cancelRushAnimation()
+                    if cancelRushAnimation() then return end
                 elseif mode.mover == 2 or getDistance("target") >= 5 then
                     if cast.felRush() then return end
                 end
@@ -411,7 +412,7 @@ local function runRotation()
         -- Fel Rush
             if getFacing("player","target",10) then
                 if mode.mover == 1 and getDistance("target") < 5 then
-                    cancelRushAnimation()
+                    if cancelRushAnimation() then return end
                 elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                     if cast.felRush() then return end
                 end
@@ -548,7 +549,7 @@ local function runRotation()
             -- Fel Rush
                     if getOptionValue("APL Mode") == 1 and getFacing("player","target",10) then
                         if mode.mover == 1 and getDistance("target") < 5 then
-                            cancelRushAnimation()
+                            if cancelRushAnimation() then return end
                         elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                             if cast.felRush() then return end
                         end
@@ -609,7 +610,7 @@ local function runRotation()
                     -- fel_rush,animation_cancel=1,if=time=0
                     if combatTime < 1 and getFacing("player","target",10) then
                         if mode.mover == 1 and getDistance("target") < 5 then
-                            cancelRushAnimation()
+                            if cancelRushAnimation() then return end
                         elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                             if cast.felRush() then return end
                         end
@@ -621,9 +622,9 @@ local function runRotation()
                     end
             -- Vengeful Retreat
                     -- vengeful_retreat,if=(talent.prepared.enabled|talent.momentum.enabled)&buff.prepared.down&buff.momentum.down
-                    if mode.mover == 1 and (talent.prepared or talent.momentum) and not buff.prepared.exists and not buff.momentum.exists and getDistance("target") < 5 then
+                    if not buff.bladeDance.exists and mode.mover == 1 and (talent.prepared or talent.momentum) and not buff.prepared.exists and not buff.momentum.exists and getDistance("target") < 5 then
                         if mode.mover == 1 then
-                            cancelRetreatAnimation()
+                            if cancelRetreatAnimation() then return end
                         elseif mode.mover == 2 and charges.felRush > 0 then
                             if cast.vengefulRetreat() then return end
                         end
@@ -635,7 +636,7 @@ local function runRotation()
                         and (not talent.felMastery or powerDeficit >= 25) and (charges.felRush == 2 or (moveIn > charges.felRush * 10 and addsIn > 10))
                     then
                         if mode.mover == 1 and getDistance("target") < 5 then
-                            cancelRushAnimation()
+                            if cancelRushAnimation() then return end
                         elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                             if cast.felRush() then return end
                         end
@@ -653,7 +654,7 @@ local function runRotation()
             -- Fury of the Illidari
                     -- fury_of_the_illidari,if=active_enemies>desired_targets|raid_event.adds.in>55&(!talent.momentum.enabled|buff.momentum.up)
                     if getOptionValue("Artifact") == 1 or (getOptionValue("Artifact") == 2 and useCDs()) and getDistance("target") < 5 then
-                        if #enemies.yards8 >= 1 or addsIn > 55 and (not talent.momentum or buff.momentum.exists) then
+                        if #enemies.yards8 >= 1 and (not talent.momentum or buff.momentum.exists) then
                             if cast.furyOfTheIllidari() then return end
                         end
                     end
@@ -728,7 +729,7 @@ local function runRotation()
                     -- fel_rush,animation_cancel=1,if=!talent.momentum.enabled&raid_event.movement.in>charges*10
                     if getFacing("player","target",10) and not talent.momentum and moveIn > charges.felRush * 10 then
                         if mode.mover == 1 and getDistance("target") < 5 then
-                            cancelRushAnimation()
+                            if cancelRushAnimation() then return end
                         elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                             if cast.felRush() then return end
                         end
@@ -750,7 +751,7 @@ local function runRotation()
                     --fel_rush,if=movement.distance>15|(buff.out_of_range.up&!talent.momentum.enabled)
                     if getFacing("player","target",10) and getDistance("target") >= 15 then
                         if mode.mover == 1 and getDistance("target") < 5 then
-                            cancelRushAnimation()
+                            if cancelRushAnimation() then return end
                         elseif mode.mover == 2 or (getDistance("target") >= 5 and mode.mover ~= 3) then
                             if cast.felRush() then return end
                         end
@@ -774,7 +775,7 @@ local function runRotation()
                     -- (HasTalent(Felblade) and CooldownSecRemaining(Felblade) <= GlobalCooldownSec or (CanUse(EyeBeam) and CooldownSecRemaining(Felblade) < SpellChannelTimeSec(EyeBeam))))
                     if mode.mover == 1 and (talent.prepared or talent.momentum) and ((cd.felRush <= gcd or (cast.eyeBeam(nil,"debug") and cd.felRush < eyeBeamCastRemain())) or (talent.felblade and cd.felblade <= gcd or (cast.eyeBeam(nil,"debug") and cd.felblade < eyeBeamCastRemain()))) and getDistance("target") < 5 then
                         if mode.mover == 1 then
-                            cancelRetreatAnimation()
+                            if cancelRetreatAnimation() then return end
                         elseif mode.mover == 2 then
                             if cast.vengefulRetreat() then return end
                         end
