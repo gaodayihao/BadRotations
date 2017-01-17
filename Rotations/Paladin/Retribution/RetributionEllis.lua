@@ -185,6 +185,7 @@ local function runRotation()
         local useArtifact                                                   = false
         
         local liadrinsFuryUnleashed                                         = 137048
+        local ashesToDust                                                   = 144358
         local bloodElfCanUseRacial                                          = getSpellCD(racial)==0 and useCDs() and race == "BloodElf" and isChecked(LC_RACIAL)
 
         if isChecked(LC_ARTIFACT) then
@@ -405,7 +406,7 @@ local function runRotation()
         local function actionList_AutoTarget()
             if autoTarget == false then return end
             if isValidUnit("target") then return end
-            local theEnemies = enemies.yards8
+            local theEnemies = enemies.yards5
             local targetUnit = nil
             for i = 1, #theEnemies do
                 local thisUnit = theEnemies[i]
@@ -465,6 +466,7 @@ local function runRotation()
             then
                 if cast.executionSentence() then return end
             end
+            if holyPower <= 3 and #enemies.yards5 >=2 and talent.divineHammer and cast.divineHammer() then return end
     -- Divine Storm
         -- if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.up&buff.divine_purpose.remains<gcd*2
         -- if=debuff.judgment.up&spell_targets.divine_storm>=2&holy_power>=5&buff.divine_purpose.react
@@ -474,8 +476,9 @@ local function runRotation()
                 ((buff.divinePurpose.exists and buff.divinePurpose.remain < gcd*2)
                 or (holyPower >=5 and buff.divinePurpose.exists)
                 or (holyPower >=3 and talent.crusade and buff.crusade.exists and (buff.crusade.stack < 15 or hasBloodLust()))
-                or (holyPower >=5 and (not talent.crusade or cd.crusade > gcd*3 or not autoUseCrusade))
-                or (holyPower >=3 and #enemies.yards8 >= 5))
+                or (holyPower >=5 and (not talent.crusade or cd.crusade > gcd * 3 or not autoUseCrusade))
+                or (holyPower >=3 and #enemies.yards8 >= 5)
+                or (holyPower >=3 and buff.crusade.exists and buff.crusade.remain < gcd))
             then
                 if cast.divineStorm() then return end
             end
@@ -488,14 +491,27 @@ local function runRotation()
                 ((buff.divinePurpose.exists and buff.divinePurpose.remain < gcd*2)
                 or (holyPower >=5 and buff.divinePurpose.exists)
                 or (holyPower >=3 and talent.crusade and buff.crusade.exists and (buff.crusade.stack < 15 or hasBloodLust()))
-                or (holyPower >=5 and (not talent.crusade or cd.crusade > gcd * 3 or not autoUseCrusade)))
+                or (holyPower >=5 and (not talent.crusade or cd.crusade > gcd * 3 or not autoUseCrusade))
+                or (holyPower >= 3 and buff.crusade.exists and buff.crusade.remain < gcd))
             then
                 if cast.templarsVerdict() then return end
             end
     -- Templar's Verdict / Divine Storm
             -- if=debuff.judgment.up&holy_power>=3&spell_targets.divine_storm>=2&(cooldown.wake_of_ashes.remains<gcd*2&artifact.wake_of_ashes.enabled|buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains<gcd)&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*4)
-            if judgmentUp and holyPower >= 3 and divineStormValid() 
+            if judgmentUp and holyPower >= 3
                 and (cd.wakeOfAshes < gcd * 2 and artifact.wakeOfAshes or buff.whisperOfTheNathrezim.exists and buff.whisperOfTheNathrezim.remain < gcd)
+                and (not talent.crusade or cd.crusade > gcd * 4 or not autoUseCrusade)
+            then
+                if divineStormValid() then
+                    if cast.divineStorm() then return end
+                else
+                    if cast.templarsVerdict() then return end
+                end
+            end
+            if judgmentUp 
+                and holyPower >=3 
+                and hasEquiped(ashesToDust)
+                and (debuff.wakeOfAshes[units.dyn5].exists and debuff.wakeOfAshes[units.dyn5].remain <= gcd)
                 and (not talent.crusade or cd.crusade > gcd * 4 or not autoUseCrusade)
             then
                 if divineStormValid() then
@@ -506,22 +522,39 @@ local function runRotation()
             end
     -- Wake of Ashes
             -- if=holy_power=0|holy_power=1&(cooldown.blade_of_justice.remains>gcd|cooldown.divine_hammer.remains>gcd)|holy_power=2&(cooldown.zeal.charges_fractional<=0.65|cooldown.crusader_strike.charges_fractional<=0.65)
-            if useArtifact and (holyPower == 0 
-                or holyPower == 1 and (cd.bladeOfJustice > gcd or talent.divineHammer and cd.divineHammer > gcd) 
+            if useArtifact and (holyPower == 0
+                or holyPower == 1 and (cd.bladeOfJustice > gcd or talent.divineHammer and cd.divineHammer > gcd)
                 or holyPower == 2 and (talent.zeal and charges.frac.zeal <= 0.65 or charges.frac.crusaderStrike <= 0.65))
-                and getDistance(units.dyn5) <= 5
+                and getDistance(units.dyn5) <= 8
                 and getFacing("player",units.dyn5,120)
+                and (not talent.crusade
+                        or not autoUseCrusade
+                        or not hasEquiped(ashesToDust)
+                        or (not buff.crusade.exists and cd.crusade >= 30 - (artifact.rank.wrathOfTheAshbringer * 2.5 + 20 - 10))
+                        or (buff.crusade.exists and (buff.crusade.stack >= 15 or buff.crusade.remain > 30 + gcd)))
             then
                 if cast.wakeOfAshes() then return end
             end
     -- Blade of Justice / Divine Hammer
             -- if=holy_power<=3&buff.whisper_of_the_nathrezim.up&buff.whisper_of_the_nathrezim.remains>gcd&buff.whisper_of_the_nathrezim.remains<gcd*3&debuff.judgment.up&debuff.judgment.remains>gcd*2
-            if holyPower <= 3 
-                and buff.whisperOfTheNathrezim.exists 
-                and buff.whisperOfTheNathrezim.remain > gcd 
-                and buff.whisperOfTheNathrezim.remain < gcd * 3 
-                and judgmentUp 
-                and debuff.judgment[units.dyn5].remain > gcd * 2 
+            if holyPower <= 3
+                and buff.whisperOfTheNathrezim.exists
+                and buff.whisperOfTheNathrezim.remain > gcd
+                and buff.whisperOfTheNathrezim.remain < gcd * 3
+                and debuff.judgment[units.dyn5].remain > gcd * 2
+            then
+                if not talent.divineHammer then
+                    if cast.bladeOfJustice() then return end
+                else
+                    if cast.divineHammer() then return end
+                end
+            end
+            if holyPower <= 3
+                and hasEquiped(ashesToDust)
+                and debuff.wakeOfAshes[units.dyn5].exists
+                and debuff.wakeOfAshes[units.dyn5].remain > gcd
+                and debuff.wakeOfAshes[units.dyn5].remain < gcd * 3
+                and debuff.judgment[units.dyn5].remain > gcd * 2
             then
                 if not talent.divineHammer then
                     if cast.bladeOfJustice() then return end
@@ -561,7 +594,7 @@ local function runRotation()
                 if cast.judgment() then return end
             end
     -- Consecration
-            if talent.consecration and cast.consecration() then return end
+            if getDistance(units.dyn5) <=5 and talent.consecration and cast.consecration() then return end
     -- Divine Storm / Templar's Verdict
             -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.divine_purpose.react
             -- actions+=/divine_storm,if=debuff.judgment.up&spell_targets.divine_storm>=2&buff.the_fires_of_justice.react&(!talent.crusade.enabled|cooldown.crusade.remains>gcd*3)
@@ -601,7 +634,7 @@ local function runRotation()
 --- Begin Profile ---
 ---------------------
     -- Pause
-        if pause() or mode.rotation == 4 or (IsMounted() and not buff.divineSteed.exists) then
+        if pause() or mode.rotation == 4 then
             return true
         else
 -----------------------

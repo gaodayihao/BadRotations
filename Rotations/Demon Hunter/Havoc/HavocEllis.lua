@@ -50,6 +50,12 @@ local function createToggles()
         [2] = { mode = "Off", value = 2 , overlay = "Fury Of The Illidari Disabled", tip = "Disable Fury Of The Illidari.", highlight = 0, icon = br.player.spell.furyOfTheIllidari}
     };
     CreateButton("FuryOfTheIllidari",7,0)
+-- Vengeful Retreat
+    VengefulRetreatModes = {
+        [1] = { mode = "On", value = 1 , overlay = "Fury Of The Illidari Enabled", tip = "Fury Of The Illidari Used.", highlight = 1, icon = br.player.spell.vengefulRetreat},
+        [2] = { mode = "Off", value = 2 , overlay = "Fury Of The Illidari Disabled", tip = "Disable Fury Of The Illidari.", highlight = 0, icon = br.player.spell.vengefulRetreat}
+    };
+    CreateButton("VengefulRetreat",8,0)
 end
 ---------------
 --- OPTIONS ---
@@ -122,6 +128,7 @@ local function runRotation()
         br.player.mode.mover = br.data.settings[br.selectedSpec].toggles["Mover"]
         br.player.mode.poolingForChaosStrike = br.data.settings[br.selectedSpec].toggles["PoolingForChaosStrike"]
         br.player.mode.furyOfTheIllidari = br.data.settings[br.selectedSpec].toggles["FuryOfTheIllidari"]
+        br.player.mode.vengefulRetreat = br.data.settings[br.selectedSpec].toggles["VengefulRetreat"]
 --- FELL FREE TO EDIT ANYTHING BELOW THIS AREA THIS IS JUST HOW I LIKE TO SETUP MY ROTATIONS ---
 --------------
 --- Locals ---
@@ -229,7 +236,7 @@ local function runRotation()
         end
 
         local function vengefulRetreatEx()
-                if cast.vengefulRetreat() then delayHack = getOptionValue(LC_ROTATION_TPS) return true end
+                if mode.vengefulRetreat == 1 and cast.vengefulRetreat() then delayHack = getOptionValue(LC_ROTATION_TPS) return true end
             return false
         end
 --------------------
@@ -338,7 +345,7 @@ local function runRotation()
         local function actionList_Simc()
         -- Blur
             -- blur,if=artifact.demon_speed.enabled&cooldown.fel_rush.charges_fractional<0.5&cooldown.vengeful_retreat.remains-buff.momentum.remains>4
-            if talent.momentum and artifact.demonSpeed and charges.frac.felRush < 0.5 and cd.vengefulRetreat - buff.momentum.remain > 4 then
+            if talent.momentum and artifact.demonSpeed and charges.frac.felRush < 0.5 and (cd.vengefulRetreat - buff.momentum.remain > 4 or mode.vengefulRetreat == 2 and buff.momentum.remain < 2) then
                 if cast.blur() then return true end
             end
         -- Cooldowns
@@ -366,7 +373,7 @@ local function runRotation()
             -- fel_rush,if=(talent.momentum.enabled|talent.fel_mastery.enabled)&(!talent.momentum.enabled|(charges=2|cooldown.vengeful_retreat.remains>4)&buff.momentum.down)&(!talent.fel_mastery.enabled|fury.deficit>=25)&(charges=2|(raid_event.movement.in>10&raid_event.adds.in>10))
             -- Fel Rush for Momentum and for fury from Fel Mastery.
             if (talent.momentum or talent.felMastery) 
-                and (not talent.momentum or (charges.felRush == 2 or cd.vengefulRetreat >4) and not buff.momentum.exists) 
+                and (not talent.momentum or (charges.felRush == 2 or cd.vengefulRetreat >4 or mode.vengefulRetreat == 2) and not buff.momentum.exists) 
                 and (not talent.felMastery or fury.deficit >= 25) 
                 and charges.felRush == 2
             then

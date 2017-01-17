@@ -1388,7 +1388,7 @@ br.idList = {
                 whisperOfTheNathrezim       = 207635,
             },
             debuffs                         = {
-
+                wakeOfAshes                 = 205273,
             },
             glyphs                          = {
                 glyphOfWingedVengeance      = 57979,
@@ -1439,6 +1439,7 @@ br.idList = {
             },
             buffs                           = {
                 divineSteed                 = 221885,
+                silverHandCharger           = 220507,
             },
             debuffs                         = {
                 judgment                    = 197277,
