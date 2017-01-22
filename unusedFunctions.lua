@@ -76,7 +76,7 @@ end
 function getLoot2()
     if looted == nil then looted = 0 end
     if lM:emptySlots() then
-        for i=1,GetObjectCountBR() do
+        for i=1,GetObjectCount() do
             if GetObjectExists(i) and bit.band(GetObjectType(i), ObjectTypes.Unit) == 8 then
                 local thisUnit = GetObjectIndex(i)
                 local hasLoot,canLoot = CanLootUnit(UnitGUID(thisUnit))

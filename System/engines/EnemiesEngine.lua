@@ -77,7 +77,7 @@ function EnemiesEngine()
 			return
 		end
 
-		AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+		addEventCallbackBR("COMBAT_LOG_EVENT_UNFILTERED",function(...)
 			local _, _, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
 
 			if br.enemyGUID[sourceGUID] == nil then
@@ -99,7 +99,7 @@ function EnemiesEngine()
 			end
 		end)
 
-		AddEventCallback("NAME_PLATE_UNIT_ADDED",function(...)
+		addEventCallbackBR("NAME_PLATE_UNIT_ADDED",function(...)
 			if br.namePlateUnitCount >= 30 then
 				table.wipe(br.namePlateUnit)
 				br.namePlateUnitCount = 0

@@ -187,7 +187,7 @@ local function runRotation()
 
         if not br.player.eventRegisted then
             br.player.exsanguinateList = {}
-            AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+            addEventCallbackBR("COMBAT_LOG_EVENT_UNFILTERED",function(...)
                 local _, combatEvent, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
                 if combatEvent == "SPELL_CAST_SUCCESS" 
                     and sourceGUID == UnitGUID("player")
@@ -221,7 +221,7 @@ local function runRotation()
                 end
             end,"Assassination")
 
-            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(source)
+            addEventCallbackBR("PLAYER_SPECIALIZATION_CHANGED",function(source)
                 if source ~= "player" then
                     return
                 end

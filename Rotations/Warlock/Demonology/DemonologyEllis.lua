@@ -191,7 +191,7 @@ local function runRotation()
             end
 
             -- buildPetPool()
-            AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+            addEventCallbackBR("COMBAT_LOG_EVENT_UNFILTERED",function(...)
                 local _, _, _, sourceGUID = ...
                 if sourceGUID ~= UnitGUID("player") then
                     return
@@ -199,7 +199,7 @@ local function runRotation()
                 buildPetPool(...)
             end, "Demonology")
 
-            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(source)
+            addEventCallbackBR("PLAYER_SPECIALIZATION_CHANGED",function(source)
                 if source ~= "player" then
                     return
                 end

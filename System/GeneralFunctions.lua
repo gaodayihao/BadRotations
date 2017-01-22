@@ -19,13 +19,13 @@
 -- 		end
 -- 	end
 -- );
-local GOC = GetObjectCount
-function GetObjectCount(BadRotations)
-    if BadRotations == "BadRotations" then
-        return GOC()
-    end
-    return 0
-end
+-- local GOC = GetObjectCount
+-- function GetObjectCount(BadRotations)
+--     if BadRotations == "BadRotations" then
+--         return GOC()
+--     end
+--     return 0
+-- end
 function GetObjectExists(Unit)
     if FireHack and ObjectExists(Unit) == true then
         return true
@@ -63,7 +63,7 @@ function GetObjectIndex(Index)
 end
 function GetObjectCountBR()
     if FireHack then
-        return GetObjectCount("BadRotations")
+        return GetObjectCount()
     else
         return 0
     end
@@ -1689,7 +1689,7 @@ function getTotemDistance(Unit1)
     end
 
 	if UnitIsVisible(Unit1) then
-		for i = 1,GetObjectCountBR() do
+		for i = 1,GetObjectCount() do
 			if UnitCreator(ObjectWithIndex(i)) == ObjectPointer("player") and (UnitName(ObjectWithIndex(i)) == "Searing Totem" or UnitName(ObjectWithIndex(i)) == "Magma Totem") then
 				X2,Y2,Z2 = GetObjectPosition(GetObjectIndex(i))
 			end

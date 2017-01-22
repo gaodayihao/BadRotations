@@ -199,7 +199,7 @@ local function runRotation()
             br.player.roaringBlazeUnits = {}
 
             -- Print("Event Add")
-            AddEventCallback("COMBAT_LOG_EVENT_UNFILTERED",function(...)
+            addEventCallbackBR("COMBAT_LOG_EVENT_UNFILTERED",function(...)
                 local _, combatEvent, _, sourceGUID, _, _, _, destGUID, destName, _, _, spellId, _, _ = ...
                 if talent.roaringBlaze and sourceGUID == UnitGUID("player") and combatEvent == "SPELL_CAST_SUCCESS" and spellId == spell.conflagrate then
                     -- Print("Roaring Blaze add.")
@@ -221,7 +221,7 @@ local function runRotation()
                 end
             end,"Destruction")
 
-            AddEventCallback("PLAYER_SPECIALIZATION_CHANGED",function(source)
+            addEventCallbackBR("PLAYER_SPECIALIZATION_CHANGED",function(source)
                 if source ~= "player" then
                     return
                 end

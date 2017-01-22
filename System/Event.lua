@@ -1,11 +1,11 @@
-local Frame = CreateFrame("Frame");
+local brEventFrame = CreateFrame("Frame");
 
 -- Event callbacks
-local EventCallbacks = {};
+local eventCallbacks = {};
 
-Frame:SetScript("OnEvent",
+brEventFrame:SetScript("OnEvent",
     function (self, Event, ...)
-        local Callbacks = EventCallbacks[Event];
+        local Callbacks = eventCallbacks[Event];
         if Callbacks then
             for _, CallBackWapper in pairs(Callbacks) do
                 CallBackWapper.Callback(...);
@@ -14,15 +14,15 @@ Frame:SetScript("OnEvent",
     end
 );
 
-function AddEventCallback (Event, Callback, Mark)
+function addEventCallbackBR (Event, Callback, Mark)
     if Mark == nil then
         Mark = "BR"
     end
-    local Callbacks = EventCallbacks[Event];
+    local Callbacks = eventCallbacks[Event];
     if not Callbacks then
-        Frame:RegisterEvent(Event);
-        EventCallbacks[Event] = {};
-        Callbacks = EventCallbacks[Event];
+        brEventFrame:RegisterEvent(Event);
+        eventCallbacks[Event] = {};
+        Callbacks = eventCallbacks[Event];
     end
     for _, CallBackWapper in pairs(Callbacks) do
         if CallBackWapper.Mark == Mark then
@@ -41,7 +41,7 @@ function RemoveEventCallback (Event, Mark)
     if Mark == nil then
         Mark = "BR"
     end
-    local Callbacks = EventCallbacks[Event];
+    local Callbacks = eventCallbacks[Event];
     if Callbacks and Mark then
         for i, CallBackWapper in pairs(Callbacks) do
             if CallBackWapper.Mark == Mark then
