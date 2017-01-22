@@ -181,6 +181,17 @@ LC_CATACLYSM = "灾变";
 LC_CATACLYSM_DESCRIPTION = "|cffFFFFFF灾变";
 
 -- Affliction Warlock
+LC_AGONY_TARGETS = "痛苦最大目标数";
+LC_AGONY_TARGETS_HP = "痛苦目标最低血量(百万)";
+LC_AGONY_TARGETS_TTD = "痛苦目标死亡倒计时不低于(秒)";
+LC_CORRUPTION_TARGETS = "腐蚀术最大目标数";
+LC_CORRUPTION_TARGETS_HP = "腐蚀术目标最低血量(百万)";
+LC_CORRUPTION_TARGETS_TTD = "腐蚀术目标死亡倒计时不低于(秒)";
+LC_SIPHON_LIFE_TARGETS = "生命虹吸最大目标数";
+LC_SIPHON_LIFE_TARGETS_HP = "生命虹吸目标最低血量(百万)";
+LC_SIPHON_LIFE_TARGETS_TTD = "生命虹吸目标死亡倒计时不低于(秒)";
+LC_REAP_SOULS = "收割灵魂";
+LC_REAP_SOULS_DESCRIPTION = "|cffFFFFFF多少个灵魂的时候启动神器技能，当选择|cffFFBB00恶毒之握|cffFFFFFF天赋时，始终为1";
 LC_SOC_MODE_ENABLE = "开启低血量ADD击杀模式，提高腐蚀之种优先级";
 LC_SOC_MODE_DISABLE = "闭关低血量ADD击杀模式";
 

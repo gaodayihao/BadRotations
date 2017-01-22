@@ -2143,17 +2143,21 @@ br.idList = {
             },
             buffs                           = {
                 compoundingHorror           = 199281,
+                empoweredLifeTap            = 235156,
                 deadwindHarvester           = 216708,
-                demonicPower                = 196099,
-                manaTap                     = 196104,
                 tormentedSouls              = 216695,
             },
             debuffs                         = {
                 agony                       = 980,
                 corruption                  = 146739,
+                haunt                       = 221812,
                 seedOfCorruption            = 27243,
                 siphonLife                  = 63106,
                 unstableAffliction          = 233490,
+                unstableAffliction2         = 233496,
+                unstableAffliction3         = 233497,
+                unstableAffliction4         = 233498,
+                unstableAffliction5         = 233499,
             },
             glyphs                          = {
 
@@ -2161,11 +2165,12 @@ br.idList = {
             talents                         = {
                 absoluteCorruption          = 196103,
                 contagion                   = 196105,
-                drainSoul                   = 198590,
+                empoweredLifeTap            = 235157,
                 grimoireOfSacrifice         = 108503,
                 haunt                       = 48181,
                 howlOfTerror                = 5484,
                 manaTap                     = 196104,
+                maleficGrasp                = 235155,
                 phantomSingularity          = 205179,
                 siphonLife                  = 63106,
                 soulConduit                 = 215941,

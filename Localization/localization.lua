@@ -181,6 +181,11 @@ LC_CATACLYSM = "Cataclysm";
 LC_CATACLYSM_DESCRIPTION = "Cataclysm";
 
 -- Affliction Warlock
+LC_AGONY_TARGETS = "Agony targets maxinum";
+LC_CORRUPTION_TARGETS = "Corruption targets maxinum";
+LC_SIPHON_LIFE_TARGETS = "Siphon Life targets maxinum";
+LC_REAP_SOULS = "Reap Souls";
+LC_REAP_SOULS_DESCRIPTION = "Reap Souls";
 LC_SOC_MODE_ENABLE = "Enable SOC mode, Seed of Corruption has higher priority";
 LC_SOC_MODE_DISABLE = "Enable SOC mode, Seed of Corruption has higher priority";
 

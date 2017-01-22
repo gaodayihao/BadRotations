@@ -350,14 +350,14 @@ local function runRotation()
                     if canUse(13) 
                         and (buff.crusade.exists and buff.crusade.remain <= getOptionValue(LC_TRINKETS1_DURATION) 
                             or buff.avengingWrath.exists and buff.avengingWrath.remain <= getOptionValue(LC_TRINKETS1_DURATION)
-                            or getOptionValue(LC_TRINKETS1_DURATION) == 0) 
+                            or (getOptionValue(LC_TRINKETS1_DURATION) == 0 and (buff.crusade.stack == 15 or not talent.crusade))) 
                     then
                         useItem(13)
                     end
                     if canUse(14) 
                         and (buff.crusade.exists and buff.crusade.remain <= getOptionValue(LC_TRINKETS2_DURATION) 
                             or buff.avengingWrath.exists and buff.avengingWrath.remain <= getOptionValue(LC_TRINKETS2_DURATION)
-                            or getOptionValue(LC_TRINKETS2_DURATION) == 0) 
+                            or (getOptionValue(LC_TRINKETS1_DURATION) == 0 and (buff.crusade.stack == 15 or not talent.crusade))) 
                     then
                         useItem(14)
                     end
