@@ -79,12 +79,13 @@ function br.loader:new(spec,specName)
         if self.cast == nil then self.cast = {} end        -- Cast Spell Functions
         -- Cycle through Abilities List
         for k,v in pairs(self.spell.abilities) do
-            -- Build Cast Funcitons
+           -- Build Cast Funcitons
             self.cast[k] = function(thisUnit,debug,minUnits,effectRng)
                 local spellCast = v
                 local spellName = GetSpellInfo(v)
                 local minRange = select(5,GetSpellInfo(spellName))
                 local maxRange = select(6,GetSpellInfo(spellName))
+                --if spellName == nil then print(v) end
                 if IsHelpfulSpell(spellName) then
                     if thisUnit == nil or not UnitIsFriend(thisUnit,"player") then 
                         thisUnit = "player"
@@ -431,7 +432,7 @@ function br.loader:new(spec,specName)
 
             -- Build Spell Cooldown
             self.cd[k] = getSpellCD(v)
-
+            
             -- Build Cast Debug
             --self.cast.debug[k] = self.cast[k](nil,"debug")
         end

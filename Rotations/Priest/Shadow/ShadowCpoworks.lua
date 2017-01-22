@@ -7,16 +7,16 @@ local function createToggles()
     -- Rotation Button
     RotationModes = {
         [1] = { mode = "Auto", value = 1 , overlay = "Automatic Rotation", tip = "Swaps between Single and Multiple based on number of targets in range.", highlight = 1, icon = br.player.spell.mindFlay },
-        [2] = { mode = "Mult", value = 2 , overlay = "Multiple Target Rotation", tip = "Multiple target rotation used.", highlight = 0, icon = br.player.spell.mindSear },
+        [2] = { mode = "Mult", value = 2 , overlay = "Multiple Target Rotation", tip = "Multiple target rotation used.", highlight = 0, icon = br.player.spell.mindFlay },
         [3] = { mode = "Sing", value = 3 , overlay = "Single Target Rotation", tip = "Single target rotation used.", highlight = 0, icon = br.player.spell.mindFlay },
         [4] = { mode = "Off", value = 4 , overlay = "DPS Rotation Disabled", tip = "Disable DPS Rotation", highlight = 0, icon = br.player.spell.shadowMend}
     };
     CreateButton("Rotation",1,0)
     -- Cooldown Button
     CooldownModes = {
-        [1] = { mode = "Auto", value = 1 , overlay = "Cooldowns Automated", tip = "Automatic Cooldowns - Boss Detection.", highlight = 1, icon = br.player.spell.powerInfusion },
-        [2] = { mode = "On", value = 1 , overlay = "Cooldowns Enabled", tip = "Cooldowns used regardless of target.", highlight = 0, icon = br.player.spell.powerInfusion },
-        [3] = { mode = "Off", value = 3 , overlay = "Cooldowns Disabled", tip = "No Cooldowns will be used.", highlight = 0, icon = br.player.spell.powerInfusion }
+        [1] = { mode = "Auto", value = 1 , overlay = "Cooldowns Automated", tip = "Automatic Cooldowns - Boss Detection.", highlight = 1, icon = br.player.spell.mindBlast },
+        [2] = { mode = "On", value = 1 , overlay = "Cooldowns Enabled", tip = "Cooldowns used regardless of target.", highlight = 0, icon = br.player.spell.mindBlast },
+        [3] = { mode = "Off", value = 3 , overlay = "Cooldowns Disabled", tip = "No Cooldowns will be used.", highlight = 0, icon = br.player.spell.mindBlast }
     };
    	CreateButton("Cooldown",2,0)
     -- Defensive Button
@@ -25,12 +25,6 @@ local function createToggles()
         [2] = { mode = "Off", value = 2 , overlay = "Defensive Disabled", tip = "No Defensives will be used.", highlight = 0, icon = br.player.spell.dispersion }
     };
     CreateButton("Defensive",3,0)
-    -- Void Form Button
-    VoidEruptionModes = {
-        [1] = { mode = "On", value = 1 , overlay = "Void Eruption Enabled", tip = "Void Eruption will be used.", highlight = 1, icon = br.player.spell.voidEruption },
-        [2] = { mode = "Off", value = 2 , overlay = "Void Eruption Disabled", tip = "Void Eruption will not be used.", highlight = 0, icon = br.player.spell.voidEruption }
-    };
-    CreateButton("VoidEruption",4,0)
 end
 
 ---------------
@@ -231,7 +225,7 @@ local function runRotation()
                 cast.shadowform()
             end
             -- Power Word: Shield Body and Soul
-            if talent.bodyAndSoul and isMoving("player") and not IsMounted() then -- 
+            if talent.bodyAndSoul and isMoving("player") and not IsMounted() then
                 if cast.powerWordShield("player") then return end
             end                
         end  -- End Action List - Pre-Combat
@@ -249,11 +243,15 @@ local function runRotation()
                 if cast.mindBender() then return end
             end
             -- Void Eruption
-            if mode.voidEruption == 1 and ((talent.legacyOfTheVoid and power > 84) or power > 99) then
-                if cast.voidEruption() then return end
+            if ((talent.legacyOfTheVoid and power > 65) or power > 99) then
+                if cast.voidEruption("target") then return end
             end
             -- Shadow Crash
-            if cast.shadowCrash() then return end
+            -- castGroundAtBestLocation(spellID, radius, minUnits, maxRange, minRange, spellType)
+            if talent.shadowCrash then
+                if cast.shadowCrash("best",nil,1,8) then return end
+            end
+            --if cast.shadowCrash("best",false,1,8) then return end
             
             -- Shadow Word Death
             -- if ChargesRemaining(ShadowWordDeath) = SpellCharges(ShadowWordDeath)
@@ -263,40 +261,29 @@ local function runRotation()
             -- Mind Blast
             if cast.mindBlast() then return end
             -- Shadow Word: Pain  
-            if getDebuffRemain(units.dyn40,spell.shadowWordPain,"player") <= 4 then
-                for i=1,#enemies.yards40 do
-                    local thisUnit = enemies.yards40[i]
-                    if getDebuffRemain(thisUnit,spell.shadowWordPain,"player") <= 4 and isValidUnit(thisUnit) then --isAggroed(thisUnit) and hasThreat(thisUnit) then
-                        if cast.shadowWordPain(thisUnit) then return end 
+            for i = 1, #enemies.yards40 do
+                local thisUnit = enemies.yards40[i]
+                local swp = debuff.shadowWordPain[thisUnit]
+                if swp ~= nil then
+                    if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
+                        if ttd(thisUnit) > swp.duration and (not swp or swp.refresh) then
+                            if cast.shadowWordPain(thisUnit) then return end
+                        end
                     end
                 end
-            end
-
-            if getDebuffRemain(units.dyn40,spell.shadowWordPain,"player") > 4 and debuff.shadowWordPain[units.dyn40].count < SWPmaxTargets and (debuff.vampiricTouch[units.dyn40].count >= 1 or isMoving("player")) then
-                for i=1,#enemies.yards40 do
-                    local thisUnit = enemies.yards40[i]
-                    if getDebuffRemain(thisUnit,spell.shadowWordPain,"player") <= 4 and isValidUnit(thisUnit) then --isAggroed(thisUnit) and hasThreat(thisUnit) then
-                        if cast.shadowWordPain(thisUnit) then return end 
-                    end
-                end
-            end              
+            end            
             -- Vampiric Touch
-            if getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") <= 6 and not isCastingSpell(spell.vampiricTouch) then
-                for i=1,#enemies.yards40 do
-                    local thisUnit = enemies.yards40[i]
-                    if isValidUnit(thisUnit) then --isAggroed(thisUnit) and hasThreat(thisUnit) then
-                        if cast.vampiricTouch(thisUnit) then return end 
+            for i = 1, #enemies.yards40 do
+                local thisUnit = enemies.yards40[i]
+                local vt = debuff.vampiricTouch[thisUnit]
+                if vt ~= nil then
+                    if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
+                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) then
+                            if cast.vampiricTouch(thisUnit) then return end
+                        end
                     end
                 end
             end
-            if getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") > 6 and not isCastingSpell(spell.vampiricTouch) and debuff.vampiricTouch[units.dyn40].count < VTmaxTargets and debuff.shadowWordPain[units.dyn40].count >= 1 then
-                for i=1,#enemies.yards40 do
-                    local thisUnit = enemies.yards40[i]
-                    if getDebuffRemain(thisUnit,spell.vampiricTouch,"player") <= 6 and isValidUnit(thisUnit) then --isAggroed(thisUnit) and hasThreat(thisUnit) then
-                        if cast.vampiricTouch(thisUnit) then return end 
-                    end
-                end
-            end 
             -- Shadow Word: Void
             if cast.shadowWordVoid() then return end
             -- Mind Shear
@@ -323,7 +310,7 @@ local function runRotation()
                 if cast.voidTorrent() then return end
             end
             --VoidBolt
-            if cast.voidBolt() then return end 
+            if cast.voidBolt("target") then return end 
             --Dispersion
             -- if HasBuff(SurrenderedSoul) and Abs(AlternatePowerRegen * GlobalCooldownSec) > AlternatePower and not CanUse(ShadowWordDeath)
             if buff.surrenderedSoul.exists and (powgen * gcd) > power and not cast.shadowWordDeath(units.dyn40,true) then
@@ -340,7 +327,7 @@ local function runRotation()
             end
             --Shadow Crash
             if talent.shadowCrash then
-                if cast.shadowCrash() then return end
+                if cast.shadowCrash("best",nil,1,8) then return end
             end
             --SWD
             -- if not HasBuff(SurrenderedSoul) and ((HasTalent(ReaperOfSouls) and AlternatePowerToMax >= 30) or not HasTalent(ReaperOfSouls))
@@ -372,14 +359,32 @@ local function runRotation()
                 if cast.shadowfiend() then return end
             end
             -- Shadow Word: Pain
-            if getDebuffRemain(units.dyn40,spell.shadowWordPain,"player") <= 4 then
-                if cast.shadowWordPain(units.dyn40) then return end 
-            end              
+            for i = 1, #enemies.yards40 do
+                local thisUnit = enemies.yards40[i]
+                local swp = debuff.shadowWordPain[thisUnit]
+                if swp ~= nil then
+                    if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
+                        if ttd(thisUnit) > swp.duration and (not swp or swp.refresh) then
+                            if cast.shadowWordPain(thisUnit) then return end
+                        end
+                    end
+                end
+            end             
             -- Vampiric Touch
-             if getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") <= 6 and not isCastingSpell(spell.vampiricTouch) then
-                if cast.vampiricTouch(units.dyn40) then return end 
-            end 
-            -- Mind Sear
+            for i = 1, #enemies.yards40 do
+                local thisUnit = enemies.yards40[i]
+                local vt = debuff.vampiricTouch[thisUnit]
+                if vt ~= nil then
+                    if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
+                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) then
+                            if cast.vampiricTouch(thisUnit) then return end
+                        end
+                    end
+                end
+            end
+            --  if getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") <= 6 and not isCastingSpell(spell.vampiricTouch) then
+            --     if cast.vampiricTouch(units.dyn40) then return end 
+            -- end 
             -- Mind Spike / Mind Flay
             if talent.mindSpike then
                 if cast.mindSpike() then return end

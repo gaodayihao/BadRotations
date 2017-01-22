@@ -78,17 +78,16 @@ Raidable means if its good to raid with.
 |:----|------:|:-------|:---:|:-----:|
 ||||
 | **Death Knight** |||
-|Frost|100% (SimC)|Ellis|7.1|:interrobang:
-|Frost|0%|CuteOne|7.1|:interrobang:
+|Frost|100%|CuteOne|7.1.5|:interrobang:
 |Blood|100%|CuteOne/Vilt|7.1|:white_check_mark:
 |Unholy|0%||7.0|
 ||||
 | **Demon Hunter** |||
-|Havoc|100% (SimC)|CuteOne|7.1|:white_check_mark:
+|Havoc|100% (SimC)|CuteOne|7.1.5|:white_check_mark:
 |Vengeance|100% (SimC)|Dubwub/CuteOne|7.1|:white_check_mark:
 ||||
 | **Druid** |||
-|Feral|100% (SimC)|CuteOne|7.1|:white_check_mark:
+|Feral|100% (SimC)|CuteOne|7.1.5|:white_check_mark:
 |Guardian|100% (SimC)|CuteOne|7.1|:white_check_mark:
 |Restoration|0%||7.0|
 |Moonkin|0%||7.0|
@@ -101,18 +100,17 @@ Raidable means if its good to raid with.
 | **Mage** |||
 |Arcane|0%||7.0|
 |Fire|100%|CuteOne|7.1|:interrobang:
-|Frost|100%||7.1|:interrobang:
+|Frost|100%|CuteOne/dbtftw|7.1.5|:interrobang:
 ||||
 | **Monk** |||
 |Brewmaster|0%||7.0|
 |Mistweaver|70%|Cpoworks/Svs/Zu|7.1|:heavy_check_mark:
-|Windwalker|100% (SimC/AMR)|CuteOne|7.1|:white_check_mark:
+|Windwalker|100% (SimC/AMR)|CuteOne|7.1.5|:white_check_mark:
 ||||
 | **Paladin** |||
 |Holy|0%||7.0|
 |Protection|0%||7.0|
-|Retribution|100%|CuteOne|7.1|:interrobang:
-|Retribution|100%|Ellis|7.1|:white_check_mark:
+|Retribution|100%|CuteOne|7.1.5|:interrobang:
 ||||
 | **Priest** |||
 |Discipline|70%|Cpoworks/Svs|7.1|:heavy_check_mark:
@@ -123,23 +121,19 @@ Raidable means if its good to raid with.
 | **Rogue** |||
 |Assassination|100%|CuteOne|7.1|:interrobang:
 |Outlaw|100%|CuteOne|7.1|:interrobang:
-|Subtlety|100%|CuteOne|7.1|:interrobang::x:
+|Subtlety|100%|CuteOne|7.1.5|:white_check_mark:
 ||||
 | **Shaman** |||
 |Elemental|100%|CuteOne|7.0|:interrobang:
-|Elemental|100%(SimC)|Ellis|7.1|:white_check_mark:
-|Enhancement|100%|CuteOne|7.1|:white_check_mark:
-|Enhancement|100%(SimC)|Ellis|7.1|:white_check_mark:
+|Enhancement|100%|CuteOne|7.1.5|:white_check_mark:
 |Restoration|0%||7.0|
 ||||
 | **Warlock** |||
-|Affliction|100%|CuteOne|7.1|:interrobang:
+|Affliction|100%|CuteOne|7.1.5|:interrobang:
 |Demonology|100%|CuteOne|7.1|:interrobang:
-|Demonology|100%|Ellis|7.1|:white_check_mark:
-|Destruction|100%|CuteOne|7.1|:white_check_mark:
-|Destruction|100%|Ellis|7.1|:white_check_mark:
+|Destruction|100%|CuteOne|7.1.5|:white_check_mark:
 ||||
 | **Warrior** |||
-|Arms|100%|CuteOne|7.1|:white_check_mark:
-|Fury|100%|CuteOne|7.1|:interrobang:
-|Protection|100%|CuteOne|7.1|:white_check_mark:
+|Arms|100%|CuteOne|7.1.5|:white_check_mark:
+|Fury|100%|CuteOne|7.1.5|:white_check_mark:
+|Protection|100%|CuteOne|7.1.5|:white_check_mark:

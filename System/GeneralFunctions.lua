@@ -1931,16 +1931,17 @@ function getRegen(Unit)
 end
 -- TODO: update BL list
 function hasBloodLust()
-    if UnitBuffID("player",2825)        -- Bloodlust
-        or UnitBuffID("player",80353)       -- Timewarp
-        or UnitBuffID("player",32182)       -- Heroism
-        or UnitBuffID("player",90355)       -- Ancient Hysteria
-        or UnitBuffID("player",146555)      -- Drums of Rage
-    then
-        return true
-    else
-        return false
-    end
+	if UnitBuffID("player",90355)       	-- Ancient Hysteria
+		or UnitBuffID("player",2825)        -- Bloodlust
+		or UnitBuffID("player",146555)      -- Drums of Rage
+		or UnitBuffID("player",32182)       -- Heroism
+		or UnitBuffID("player",90355) 		-- Netherwinds
+		or UnitBuffID("player",80353)       -- Timewarp
+	then
+		return true
+	else
+		return false
+	end
 end
 -- if hasEmptySlots() then
 function hasEmptySlots()

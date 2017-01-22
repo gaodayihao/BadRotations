@@ -61,7 +61,7 @@ local function createOptions()
             -- Pre-Pull Timer
             br.ui:createSpinner(section, "Pre-Pull Timer",  5,  1,  10,  1,  "|cffFFFFFFSet to desired time to start Pre-Pull (DBM Required). Min: 1 / Max: 10 / Interval: 1")
             -- AoE Slider
-            br.ui:createSpinner(section, "AoE Threshold",  7,  1,  10,  1,  "|cffFFFFFFSet to desired targets to start AoE Rotation. Min: 1 / Max: 10 / Interval: 1")
+            br.ui:createSpinnerWithout(section, "AoE Threshold",  7,  1,  10,  1,  "|cffFFFFFFSet to desired targets to start AoE Rotation. Min: 1 / Max: 10 / Interval: 1")
             -- Artifact 
             br.ui:createDropdownWithout(section,"Artifact", {"|cff00FF00Everything","|cffFFFF00Cooldowns","|cffFF0000Never"}, 1, "|cffFFFFFFWhen to use Artifact Ability.")
             -- Berserker Rage
@@ -87,10 +87,12 @@ local function createOptions()
             br.ui:createCheckbox(section, "Potion")
             -- Flask / Crystal
             br.ui:createCheckbox(section, "Flask / Crystal")
+            -- Racial
+            br.ui:createCheckbox(section, "Racial")
             -- Legendary Ring
             br.ui:createCheckbox(section, "Ring of Collapsing Futures")
             -- Trinkets
-            br.ui:createDropdownWithout(section, "Trinkets", {"|cff00FF001st Only","|cff00FF002nd Only","|cffFFFF00Both","|cffFF0000None"}, 1, "|cffFFFFFFWhen to use Avatar Ability.")
+            br.ui:createDropdownWithout(section, "Trinkets", {"|cff00FF001st Only","|cff00FF002nd Only","|cffFFFF00Both","|cffFF0000None"}, 1, "|cffFFFFFFSelect Trinket Usage.")
             -- Touch of the Void
             br.ui:createCheckbox(section,"Touch of the Void")
              -- Avatar
@@ -98,9 +100,9 @@ local function createOptions()
             -- Battle Cry
             br.ui:createDropdownWithout(section, "Battle Cry", {"|cff00FF00Everything","|cffFFFF00Cooldowns","|cffFF0000Never"}, 1, "|cffFFFFFFWhen to use Battle Cry Ability.")
             -- Bladestorm
-            br.ui:createSpinnerWithout(section, "Bladestorm",  5,  1,  10,  1,  "|cffFFFFFFSet to desired targets to use Bladestorm when set to AOE. Min: 1 / Max: 10 / Interval: 1")
+            br.ui:createSpinner(section, "Bladestorm",  5,  1,  10,  1,  "|cffFFFFFFSet to desired targets to use Bladestorm when set to AOE. Min: 1 / Max: 10 / Interval: 1")
             -- Ravager
-            br.ui:createDropdown(section,"Ravager",{"Best","Target"},1,"Desired Target of Heroic Leap")
+            br.ui:createDropdown(section,"Ravager",{"Best","Target"},1,"Desired Target of Ravager")
         br.ui:checkSectionState(section)
         -------------------------
         --- DEFENSIVE OPTIONS ---
@@ -310,7 +312,7 @@ local function runRotation()
                     end
                 end 
             -- Gift of the Naaru
-                if isChecked("Gift of the Naaru") and php <= getOptionValue("Gift of the Naaru") and br.player.race=="Draenei" then
+                if isChecked("Gift of the Naaru") and php <= getOptionValue("Gift of the Naaru") and br.player.race=="Draenei" and cd.giftOfTheNaaru == 0 then
                     if castSpell("player",racial,false,false,false) then return end
                 end
             -- Commanding Shout
@@ -396,7 +398,7 @@ local function runRotation()
                 -- blood_fury,if=buff.battle_cry.up|target.time_to_die<=16
                 -- berserking,if=buff.battle_cry.up|target.time_to_die<=11
                 -- arcane_torrent,if=buff.battle_cry_deadly_calm.down&rage.deficit>40
-                if useCDs() and ((br.player.race == "Orc" and (buff.battleCry.exists or ignoreBattleCry or ttd(units.dyn5) <= 16)) 
+                if useCDs() and isChecked("Racial") and ((br.player.race == "Orc" and (buff.battleCry.exists or ignoreBattleCry or ttd(units.dyn5) <= 16)) 
                     or (br.player.race == "Troll" and (buff.battleCry.exists or ignoreBattleCry or ttd(units.dyn5) <= 11)) 
                     or (br.player.race == "BloodElf" and (not buff.battleCry.exists and powerDeficit > 40))) 
                 then

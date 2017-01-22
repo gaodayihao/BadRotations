@@ -229,9 +229,9 @@ local function runRotation()
         if hasEquiped(137032) then shadowWalker = 1 else shadowWalker = 0 end
         -- variable,name=ssw_er,value=equipped.shadow_satyrs_walk*(10-floor(target.distance*0.5))
         --local sswVar = shadowWalker * (10 - math.floor(getDistance(units.dyn5)*0.5))
-        local sswRefund = shadowWalker * (12 + getOptionValue("SSW Offset"))
+        local sswRefund = shadowWalker * (4 + getOptionValue("SSW Offset"))
         -- variable,name=ed_threshold,value=energy.deficit<=(20+talent.vigor.enabled*35+talent.master_of_shadows.enabled*25+variable.ssw_er)
-        local edThreshVar = (powerDeficit <= (15 + (vigorous * 35) + (mosTalent * 30) + sswRefund))
+        local edThreshVar = (powerDeficit <= (15 + (vigorous * 35) + (mosTalent * 25) + sswRefund))
 
         -- Custom Functions
         local function usePickPocket()
@@ -504,7 +504,7 @@ local function runRotation()
             -- Print("PreCombat")
         -- Stealth
             -- stealth
-            if isChecked("Stealth") and (not IsResting() or isDummy("target")) then
+            if isChecked("Stealth") and (not IsResting() or isDummy("target")) and not inCombat then
                 if getOptionValue("Stealth") == 1 then
                     if cast.stealth() then return end
                 end
@@ -536,7 +536,7 @@ local function runRotation()
         local function actionList_Opener()
             if isValidUnit("target") then
         -- Shadowstep
-                if isChecked("Shadowstep") and (not stealthingAll or power < 40) and not inCombat then
+                if isChecked("Shadowstep") and (not stealthingAll or power < 40) and not inCombat and getDistance("target") >= 8 then
                     if cast.shadowstep("target") then return end 
                 end
         -- Shadowstrike
@@ -590,7 +590,7 @@ local function runRotation()
 --- In Combat - Begin Rotation ---
 ----------------------------------
         -- Shadowstep
-                if isChecked("Shadowstep") then
+                if isChecked("Shadowstep") and getDistance("target") >= 8 then
                     if cast.shadowstep("target") then return end 
                 end
         -- Marked for Death
