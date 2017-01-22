@@ -1,9 +1,11 @@
 local DiesalGUI = LibStub("DiesalGUI-1.0")
 
-function br.ui:createCheckbox(parent, text, tooltip)
+function br.ui:createCheckbox(parent, text, tooltip, defaultValue, tooltipFromOther)
     local newBox = DiesalGUI:Create('Toggle')
     local parent = parent
     local anchor = anchor or "TOPLEFT"
+    local defaultValue = defaultValue or false
+    local tooltipFromOther = tooltipFromOther or false
 
     -- Set text
     newBox:SetText(text)
@@ -32,7 +34,7 @@ function br.ui:createCheckbox(parent, text, tooltip)
 
     -- Read check value from config, false if nothing found
     -- Set default
-    if br.data.settings[br.selectedSpec][br.selectedProfile][text.."Check"] == nil then br.data.settings[br.selectedSpec][br.selectedProfile][text.."Check"] = false end
+    if br.data.settings[br.selectedSpec][br.selectedProfile][text.."Check"] == nil then br.data.settings[br.selectedSpec][br.selectedProfile][text.."Check"] = defaultValue end
     local check = br.data.settings[br.selectedSpec][br.selectedProfile][text.."Check"]
     if check == 0 then check = false end
     if check == 1 then check = true end
@@ -55,7 +57,13 @@ function br.ui:createCheckbox(parent, text, tooltip)
     if tooltip then
         newBox:SetEventListener("OnEnter", function(this, event)
             GameTooltip:SetOwner(Minimap, "ANCHOR_CURSOR", 50 , 50)
-            GameTooltip:SetText(tooltip, 214/255, 25/255, 25/255)
+            GameTooltip:ClearLines()
+            if tooltipFromOther then
+                GameTooltip:AddLine(tooltip, 255/255, 187/255, 00/255, true)
+            else
+                GameTooltip:AddLine(tooltip.."|r|n|n|n|n"..LC_DEFALUT_VALUE..": |cffFFFFFF"..tostring(defaultValue).."|r", 255/255, 187/255, 00/255, true)
+            end
+            GameTooltip:SetWidth(50)
             GameTooltip:Show()
         end)
         newBox:SetEventListener("OnLeave", function(this, event)

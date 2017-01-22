@@ -168,7 +168,7 @@ function EnemiesEngine()
 		local  maxDistance = maxDistance or 40
 		for thisUnit,v in pairs(br.enemy) do
 			-- here i want to scan the enemies table and find any occurances of invalid units
-			if not ObjectExists(thisUnit) or not isValidUnit(thisUnit) then
+			if not isValidUnit(thisUnit) then
 				-- i will remove such units from table
 				br.enemy[thisUnit] = nil
 				br.enemyGUID[v.guid] = nil
@@ -259,7 +259,7 @@ function EnemiesEngine()
 			for k, v in pairs(br.enemy) do
 				local thisUnit = br.enemy[k].unit
 				-- check if unit is valid
-				if GetObjectExists(thisUnit) and (not InCombat) then
+				if GetObjectExists(thisUnit) and UnitIsVisible(unit) and (not InCombat) then
 					if unit == "player" and not precise then
 						if getDistance("player",thisUnit) <= Radius then
 							tinsert(getEnemiesTable,thisUnit)
@@ -278,10 +278,10 @@ function EnemiesEngine()
 	end
 	function getTableEnemies(unit,Range,table)
 		local getTableEnemies = { }
-		if table == nil then return getTableEnemies end
+		if table == nil or unit == nil or not ObjectExists(unit) then return getTableEnemies end
 		for i = 1, #table do
 			local thisUnit = table[i]
-			if getDistance(unit,thisUnit) <= Range then
+			if GetObjectExists(thisUnit) and UnitIsVisible(unit) and getDistance(unit,thisUnit) <= Range then
 				tinsert(getTableEnemies,thisUnit)
 			end
 		end

@@ -209,6 +209,7 @@ function UnitAuraID(unit,spellID)
     end 
 end
 function UnitBuffID(unit,spellID,filter)
+    if unit == nil or not ObjectExists(unit) then return nil end
     local spellName = GetSpellInfo(spellID)
     if filter == nil then
         return UnitBuff(unit,spellName)
@@ -234,6 +235,7 @@ function UnitBuffID(unit,spellID,filter)
     end
 end
 function UnitDebuffID(unit,spellID,filter)
+    if unit == nil or not ObjectExists(unit) then return nil end
     local spellName = GetSpellInfo(spellID)
     if filter == nil then
         return UnitDebuff(unit,spellName)
@@ -2672,7 +2674,7 @@ function isValidTarget(Unit)
     end
 end
 function isValidUnit(Unit)
-    if not ObjectExists(Unit) then
+    if not ObjectExists(Unit) or not UnitIsVisible(Unit) then
         return false
     end
     if specialUnitVerify[GetObjectID(Unit)] ~= nil then
@@ -2762,6 +2764,19 @@ function pause(skipCastingCheck)
 	else
 		pausekey = SpecificToggle("Pause Mode")
 	end
+
+    if UnitInVehicle("player") then
+        return true
+    end
+
+	if HasOverrideActionBar() then
+		return true
+	end
+
+	if InCinematic() then
+		return true
+	end
+
 	-- DPS Testing
 	if isChecked("DPS Testing") then
 		if GetObjectExists("target") and isInCombat("player") then

@@ -1563,6 +1563,7 @@ br.idList = {
                 shadowWordPain              = 589,
                 shadowWordVoid              = 205351,
                 silence                     = 15487,
+                surrenderToMadness          = 193223,
                 vampiricEmbrace             = 15286,
                 vampiricTouch               = 34914,
                 voidBolt                    = 205448,
@@ -1577,6 +1578,7 @@ br.idList = {
                 voidForm                    = 194249,
                 surrenderedSoul             = 212570,
                 shadowform                  = 232698,
+                surrenderToMadness          = 193223,
             },
             debuffs                         = {
                 shadowWordPain              = 589,
@@ -1590,6 +1592,7 @@ br.idList = {
                 legacyOfTheVoid             = 193225,
                 powerInfusion               = 10060,
                 shadowCrash                 = 205385,
+                surrenderToMadness          = 193223,
             },
         },
         -- All
@@ -1614,6 +1617,7 @@ br.idList = {
 
             },
             buffs                           = {
+                bodyAndSoul                 = 224098, --
                 powerWordShield             = 17,
             },
             debuffs                         = {

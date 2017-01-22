@@ -1,11 +1,19 @@
 local DiesalGUI = LibStub("DiesalGUI-1.0")
 
-function br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tooltipSpin, hideCheckbox)
+function br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tooltipSpin, hideCheckbox, cbDefault)
     local newSpinner = DiesalGUI:Create('Spinner')
     local parent = parent
+    local cbDefault = cbDefault or false
+    local tooltipSpin = tooltipSpin or tooltip
+    if tooltip then
+        tooltip = tooltip.."|r|n|n|n|n"..LC_DEFALUT_VALUE.."1: |cffFFFFFF"..tostring(cbDefault).."|r|n"..LC_DEFALUT_VALUE.."2: |cffFFFFFF"..tostring(number)
+    end
+    if tooltipSpin then
+        tooltipSpin = tooltipSpin .."|r|n|n|n|n"..LC_DEFALUT_VALUE.."1: |cffFFFFFF"..tostring(cbDefault).."|r|n"..LC_DEFALUT_VALUE.."2: |cffFFFFFF"..tostring(number)
+    end
 
     -- Create Checkbox for Spinner
-    local checkBox = br.ui:createCheckbox(parent, text, tooltip)
+    local checkBox = br.ui:createCheckbox(parent, text, tooltip, cbDefault, true)
 
     -- Calculate position
     local howManyBoxes = 0
@@ -47,11 +55,11 @@ function br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tool
         br.data.settings[br.selectedSpec][br.selectedProfile][text.."Status"] = newSpinner:GetNumber()
     end)
     -- Event: Tooltip
-    if tooltip or tooltipSpin then
-        local tooltip = tooltipSpin or tooltip
+    if tooltipSpin then
         newSpinner:SetEventListener("OnEnter", function(this, event)
             GameTooltip:SetOwner(Minimap, "ANCHOR_CURSOR", 50 , 50)
-            GameTooltip:SetText(tooltip, 214/255, 25/255, 25/255)
+            GameTooltip:ClearLines()
+            GameTooltip:AddLine(tooltipSpin, 255/255, 187/255, 00/255, true)
             GameTooltip:Show()
         end)
         newSpinner:SetEventListener("OnLeave", function(this, event)
@@ -66,6 +74,6 @@ function br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tool
     return newSpinner
 end
 
-function br.ui:createSpinnerWithout(parent, text, number, min, max, step, tooltip, tooltipSpin)
-    return br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tooltipSpin, true)
+function br.ui:createSpinnerWithout(parent, text, number, min, max, step, tooltip, tooltipSpin, cbDefault)
+    return br.ui:createSpinner(parent, text, number, min, max, step, tooltip, tooltipSpin, true, cbDefault)
 end
