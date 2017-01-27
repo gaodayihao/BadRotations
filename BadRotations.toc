@@ -73,6 +73,7 @@ System\UI\Elements\Section.lua
 System\UI\Elements\Spinner.lua
 System\UI\Elements\Text.lua
 System\UI\Elements\Window.lua
+System\UI\Elements\Custom.lua
 System\UI\Windows\Config.lua
 System\UI\Windows\Debug.lua
 System\UI\Windows\Help.lua

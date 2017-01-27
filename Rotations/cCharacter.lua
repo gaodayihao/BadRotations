@@ -29,6 +29,9 @@ function cCharacter:new(class)
 		t18_2pc = false,
 		t18_4pc = false,
 		t18_classTrinket = false,
+		-- T18
+		t19_2pc = false,
+		t19_4pc = false,
 	}
 	self.gcd            = 1.5       -- Global Cooldown
 	self.gcdMax         = 1.5       -- Global Cooldown

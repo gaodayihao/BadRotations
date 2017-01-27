@@ -239,8 +239,8 @@ local function runRotation()
                 end
             end
             --MindBender
-            if isChecked("Shadowfiend / Mind Bender") and talent.mindBender then
-                if cast.mindBender() then return end
+            if isChecked("Shadowfiend / Mind Bender") and talent.mindbender then
+                if cast.mindbender() then return end
             end
             -- Void Eruption
             if ((talent.legacyOfTheVoid and power > 65) or power > 99) then
@@ -317,8 +317,8 @@ local function runRotation()
                 if cast.dispersion() then return end
             end
             --MindBender
-            if useCDs() and isChecked("Shadowfiend / Mind Bender") and talent.mindBender then
-                if cast.mindBender() then return end  
+            if useCDs() and isChecked("Shadowfiend / Mind Bender") and talent.mindbender then
+                if cast.mindbender() then return end  
             end
             --Power Infusion
             -- if (BuffStack(Voidform) >= 10 and not HasBuff(SurrenderedSoul)) or BuffStack(Voidform) > 60

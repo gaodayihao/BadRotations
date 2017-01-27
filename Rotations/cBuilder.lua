@@ -112,7 +112,7 @@ function br.loader:new(spec,specName)
                 if effectRng == nil then effectRng = 8 end
                 if not select(2,IsUsableSpell(v)) and getSpellCD(v) == 0 and isKnown(v) and amIinRange then
                     if debug == "debug" then
-                        return castSpell(thisUnit,spellCast,false,false,false,false,false,false,false,true)
+                        return castSpell(thisUnit,spellCast,false,getCastTime(spellCast) > 0,false,false,false,false,false,true)
                     else
                         if thisUnit == "best" then
                             return castGroundAtBestLocation(spellCast,effectRng,minUnits,maxRange,minRange,debug)
@@ -122,13 +122,13 @@ function br.loader:new(spec,specName)
                             end
                         elseif debug == "dead" then
                             if thisUnit == nil then thisUnit = "player" end
-                            return castSpell(thisUnit,spellCast,false,false,false,true,true,true,true,false)
+                            return castSpell(thisUnit,spellCast,false,getCastTime(spellCast) > 0,false,true,true,true,true,false)
                         elseif debug == "face" then
                             if thisUnit == nil then thisUnit = "player" end
-                            return castSpell(thisUnit,spellCast,true,false,false,true,false,true,true,false)
+                            return castSpell(thisUnit,spellCast,true,getCastTime(spellCast) > 0,false,true,false,true,true,false)
                         else
                             if thisUnit == nil then thisUnit = "player" end
-                            return castSpell(thisUnit,spellCast,false,false,false,true,false,true,true,false)
+                            return castSpell(thisUnit,spellCast,false,getCastTime(spellCast) > 0,false,true,false,true,true,false)
                         end
                     end
                 elseif debug == "debug" then

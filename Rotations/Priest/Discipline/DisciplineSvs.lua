@@ -220,7 +220,7 @@ local function runRotation()
             --MindbBender/Shadowfiend
             if isChecked("Rapture") then
                 if getLowAllies(getValue("Rapture")) >= getValue("Rapture Targets") then    
-                    if cast.mindBender() then return end
+                    if cast.mindbender() then return end
                     if cast.shadowfiend() then return end    
                 end
             end

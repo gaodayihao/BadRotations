@@ -3123,6 +3123,14 @@ function TierScan(thisTier)
                 138343, -- head
                 138372, -- back
             },
+            ["PRIEST"] = {
+                138316, -- legs
+                138322, -- shoulder
+                138319, -- chest
+                138310, -- hands
+                138313, -- head
+                138370, -- back
+            },
         },
 	}
 	-- scan every items

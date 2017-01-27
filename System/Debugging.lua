@@ -73,3 +73,21 @@ function br.timer:useTimer(timerName, interval)
         return false
     end
 end
+
+br.timer.rotation_wait_start = 0
+br.timer.rotation_wait = 0
+function br.timer:wait(interval)
+    br.timer.rotation_wait_start = GetTime()
+    br.timer.rotation_wait = interval
+end
+
+function br.timer:waitting()
+    if GetTime() - br.timer.rotation_wait_start < br.timer.rotation_wait then
+        return true
+    else
+        br.timer.rotation_wait_start = 0
+        br.timer.rotation_wait = 0
+        return false
+    end
+    return false
+end

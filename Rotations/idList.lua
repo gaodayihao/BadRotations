@@ -1550,7 +1550,6 @@ br.idList = {
         [258] = {
             abilities                       = {
                 dispersion                  = 47585,
-                mindBender                  = 200174,
                 mindBlast                   = 8092,
                 mindBomb                    = 205369,
                 mindFlay                    = 15407,
@@ -1571,14 +1570,19 @@ br.idList = {
                 voidTorrent                 = 205065,
             },
             artifacts                       = {
-
+                sphereOfInsanity            = 194179,
+                unleashTheShadows           = 194093,
+                voidTorrent                 = 205065,
             },
             buffs                           = {
-                shadowyInsight              = 124430,
-                voidForm                    = 194249,
-                surrenderedSoul             = 212570,
+                dispersion                  = 47585,
                 shadowform                  = 232698,
+                shadowyInsight              = 124430,
+                shadowyInsight              = 124430,
+                surrenderedSoul             = 212570,
                 surrenderToMadness          = 193223,
+                voidForm                    = 194249,
+                voidTorrent                 = 205065,
             },
             debuffs                         = {
                 shadowWordPain              = 589,
@@ -1588,11 +1592,18 @@ br.idList = {
 
             },
             talents                         = {
+                auspiciousSpirits           = 155271,
                 bodyAndSoul                 = 64129,
+                fortressOfTheMind           = 193195,
                 legacyOfTheVoid             = 193225,
+                misery                      = 238558,
                 powerInfusion               = 10060,
+                reaperOfSouls               = 199853,
                 shadowCrash                 = 205385,
+                shadowyInsight              = 162452,
                 surrenderToMadness          = 193223,
+                sanlayn                     = 199855,
+                shadowWordVoid              = 205351,
             },
         },
         -- All
@@ -1602,7 +1613,7 @@ br.idList = {
                 fade                        = 586,
                 levitate                    = 1706,
                 massDispel                  = 32375,
-                mindBender                  = 200174,
+                mindbender                  = 200174,
                 shadowMend                  = 186263,
                 shadowWordPain              = 589,
                 shadowfiend                 = 34433,
@@ -1627,7 +1638,7 @@ br.idList = {
 
             },
             talents                         = {
-
+                mindbender                  = 200174,
             },
         },
     },

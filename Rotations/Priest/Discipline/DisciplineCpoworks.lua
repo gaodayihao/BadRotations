@@ -122,7 +122,7 @@ local function runRotation()
             --powerWordSolace
             if cast.powerWordSolace() then return end
             --mindbBender
-            if cast.mindBender() then return end
+            if cast.mindbender() then return end
             --shadowfiend
             if cast.shadowfiend() then return end
             -- Purge The Wicked

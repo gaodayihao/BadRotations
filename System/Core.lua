@@ -126,7 +126,7 @@ function BadRotationsUpdate(self)
 		br:AcceptQueues()
 	end
 	
-	if br.timer:useTimer("RotationUpdate", 1/(getOptionValue(LC_ROTATION_TPS) or 15) * (rd/100)) then
+	if not br.timer:waitting() and br.timer:useTimer("RotationUpdate", 1/(getOptionValue(LC_ROTATION_TPS) or 15) * (rd/100)) then
 		--[[Class/Spec Selector]]
 		br.selectedProfile = br.data.settings[br.selectedSpec]["Rotation".."Drop"] or 1
 		local playerSpec = GetSpecializationInfo(GetSpecialization())
