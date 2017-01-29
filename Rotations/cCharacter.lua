@@ -253,7 +253,7 @@ function cCharacter:new(class)
 	function self.getGlobalCooldown()
 		local gcd = (1.5 / ((UnitSpellHaste("player")/100)+1)) --getSpellCD(61304)
 		if gcd < 0.75 then
-			return  0.75
+			return 0.75
 		else
 			return gcd
 		end
@@ -261,7 +261,12 @@ function cCharacter:new(class)
 
 -- Return the Maximum Global Cooldown time
 	function self.getGlobalCooldownMaximum()
-		return 1.5
+		local gcd = (1.5 / ((UnitSpellHaste("player")/100)+1)) --getSpellCD(61304)
+		if gcd < 0.75 then
+			return 0.75
+		else
+			return gcd
+		end
 	end
 
 -- Starts auto attack when in melee range and facing enemy
