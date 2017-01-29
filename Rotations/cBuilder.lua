@@ -162,6 +162,9 @@ function br.loader:new(spec,specName)
 --------------
 
     function self.update()
+        if not self.inCombat then
+            self.updateOOC()
+        end
         -- Call baseUpdate()
         self.baseUpdate()
         self.cBuilder()

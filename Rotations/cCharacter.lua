@@ -312,7 +312,7 @@ function cCharacter:new(class)
 
 -- Updates special Equipslots
 	function self.baseGetEquip()
-        if br.equipHasChanged == nil or br.equipHasChanged then
+        -- if br.equipHasChanged == nil or br.equipHasChanged then
 		-- Checks T17 Set
 			local t17 = 0 --[[TierScan("T17")]]
 			self.eq.t17_2pc = t17>=2 or false
@@ -341,7 +341,7 @@ function cCharacter:new(class)
 			self.eq.t19_2pc = t19>=2 or false
 			self.eq.t19_4pc = t19>=4 or false
             br.equipHasChanged = false
-        end
+        -- end
 	end
 
 -- Sets the racial
