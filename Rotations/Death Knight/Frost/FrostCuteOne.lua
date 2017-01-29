@@ -77,7 +77,7 @@ local function createOptions()
             -- Obliteration
             br.ui:createCheckbox(section,"Obliteration")
             -- Pillar of Frost
-            br.ui:createCheckbox(section,"Pillar of Frost")
+            br.ui:createDropdownWithout(section, "Pillar of Frost", {"|cff00FF00Everything","|cffFFFF00Cooldowns","|cffFF0000Never"}, 1, "|cffFFFFFFWhen to use Pillar of Frost Ability.")
         br.ui:checkSectionState(section)
         -------------------------
         --- DEFENSIVE OPTIONS ---
@@ -177,6 +177,8 @@ local function runRotation()
         local runes             = br.player.power.runes.frac
         local swimming          = IsSwimming()
         local talent            = br.player.talent
+        local t19_2pc           = TierScan("T19") >= 2
+        local t19_4pc           = TierScan("T19") >= 4
         local ttd               = getTTD
         local units             = br.player.units
 
@@ -274,11 +276,6 @@ local function runRotation()
     -- Action List - Cooldowns
         local function actionList_Cooldowns()
             if useCDs() and getDistance(units.dyn5) < 5 then
-        -- Pillar of Frost
-                -- pillar_of_frost
-                if isChecked("Pillar of Frost") then
-                    if cast.pillarOfFrost() then return end
-                end
         -- Trinkets
                 if isChecked("Trinkets") then
                     if canUse(13) then
@@ -342,7 +339,7 @@ local function runRotation()
             end
         -- Remorseless Winter
             -- remorseless_winter,if=talent.gathering_storm.enable
-            if talent.gatheringStorm then
+            if talent.gatheringStorm and getDistance(units.dyn5) < 5 then
                 if cast.remorselessWinter() then return end
             end
         -- Howling Blast
@@ -358,13 +355,13 @@ local function runRotation()
             end
             -- end
         -- Frost Strike
-            -- frost_strike,if=runic_power>=90&set_bonus.tier19_4pc -- Needs T19 logic
-            -- if runicPower >= 90 and tier19_4pc then
-            --     if cast.frostStrike() then return end
-            -- end
+            -- frost_strike,if=runic_power>=90&set_bonus.tier19_4pc
+            if runicPower >= 90 and t19_4pc then
+                if cast.frostStrike() then return end
+            end
         -- Remorseless Winter
             -- remorseless_winter,if=buff.rime.react&equipped.132459
-            if (buff.rime.exists and hasEquiped(132459)) then
+            if (buff.rime.exists and hasEquiped(132459)) and getDistance(units.dyn5) < 5 then
                 if cast.remorselessWinter() then return end
             end
         -- Howling Blast
@@ -373,18 +370,18 @@ local function runRotation()
                 if cast.howlingBlast() then return end
             end
         -- Frost Strike
-            -- frost_strike,if=runic_power>=70
-            if runicPower >= 70 then
+            -- frost_strike,if=runic_power>=70|((talent.gathering_storm.enabled&cooldown.remorseless_winter.remains<3&cooldown.breath_of_sindragosa.remains>10)&rune<5)
+            if runicPower >= 70 or ((talent.gatheringStorms and cd.remorselessWinter < 3 and cd.breathOfSindragosa > 10) and runes < 5) then
                 if cast.frostStrike() then return end
             end
         -- Obliterate
-            -- obliterate,if=!buff.rime.react
-            if not buff.rime.exists then
+            -- obliterate,if=!buff.rime.react&!(talent.gathering_storm.enabled&!(cooldown.remorseless_winter.remains>2|rune>4))
+            if not buff.rime.exists and not (talent.gatheringStorm and not (cd.remorselessWinter > 2 or runes > 4)) then
                 if cast.obliterate() then return end
             end
         -- Horn of Winter
-            -- horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70
-            if cd.breathOfSindragosa > 15 and runicPower <= 70 then
+            -- horn_of_winter,if=cooldown.breath_of_sindragosa.remains>15&runic_power<=70&rune<5
+            if cd.breathOfSindragosa > 15 and runicPower <= 70 and runes < 5 then
                 if cast.hornOfWinter() then return end
             end
         -- Frost Strike
@@ -394,7 +391,7 @@ local function runRotation()
             end
         -- Remorseless Winter
             -- remorseless_winter,if=cooldown.breath_of_sindragosa.remains>10
-            if cd.breathOfSindragosa > 10 then
+            if cd.breathOfSindragosa > 10 and getDistance(units.dyn5) < 5 then
                 if cast.remorselessWinter() then return end
             end
         end
@@ -406,13 +403,13 @@ local function runRotation()
                 if cast.howlingBlast() then return end
             end
         -- Remorseless Winter
-            -- remorseless_winter,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.react&(equipped.132459|talent.gathering_storm.enabled)
-            if (--[[(runicPower >= 20 and tier19_4pc) or]] runicPower >= 30) and buff.rime.exists and (hasEquiped(132459) or talent.gatheringStorm) then
+            -- remorseless_winter,if=runic_power>=30&((buff.rime.react&equipped.132459)|(talent.gathering_storm.enabled))
+            if runicPower >= 30 and ((buff.rime.exists and hasEquiped(132459)) or (talent.gatheringStorm)) and getDistance(units.dyn5) < 5 then
                 if cast.remorselessWinter() then return end
             end
         -- Howling Blast
-            -- howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.react&!dot.hungering_rune_weapon.ticking
-            if (--[[(runicPower >= 20 and tier19_4pc) or]] runicPower >= 30) and buff.rime.exists then
+            -- howling_blast,if=((runic_power>=20&set_bonus.tier19_4pc)|runic_power>=30)&buff.rime.react
+            if ((runicPower >= 20 and t19_4pc) or runicPower >= 30) and buff.rime.exists then
                 if cast.howlingBlast() then return end
             end
         -- Obliterate
@@ -421,14 +418,22 @@ local function runRotation()
                 if cast.obliterate() then return end
             end
         -- Horn of Winter
-            -- horn_of_winter,if=runic_power<70&!dot.hungering_rune_weapon.ticking
-            if runicPower < 70 and not buff.hungeringRuneWeapon.exists then
+            -- horn_of_winter,if=runic_power<70&!buff.hungering_rune_weapon.up&rune<5
+            if runicPower < 70 and not buff.hungeringRuneWeapon.exists and runes < 5 then
                 if cast.hornOfWinter() then return end
             end
             if isChecked("Empower/Hungering Rune Weapon") and useCDs() then
         -- Hungering Rune Weapon
-                -- hungering_rune_weapon,if=runic_power<30&!dot.hungering_rune_weapon.ticking
-                if runicPower < 30 and not buff.hungeringRuneWeapon.exists then
+                -- hungering_rune_weapon,if=equipped.140806&(runic_power<30|(runic_power<70&talent.gathering_storm.enabled))&!buff.hungering_rune_weapon.up&rune<2
+                if hasEquiped(140806) and (runicPower < 30 or (runicPower < 70 and talent.gatheringStorm)) and not buff.hungeringRuneWeapon.exists and runes < 2 then
+                    if cast.hungeringRuneWeapon() then return end
+                end
+                -- hungering_rune_weapon,if=talent.runic_attenuation.enabled&runic_power<30&!buff.hungering_rune_weapon.up&rune<2
+                if talent.runicAttenuation and runicPower < 30 and not buff.hungeringRuneWeapon.exists and runes < 2 then
+                    if cast.hungeringRuneWeapon() then return end
+                end
+                -- hungering_rune_weapon,if=runic_power<25&!buff.hungering_rune_weapon.up&rune<2
+                if runicPower < 25 and not buff.hungeringRuneWeapon.exists and runes < 2 then
                     if cast.hungeringRuneWeapon() then return end
                 end
         -- Empower Rune Weapon
@@ -439,7 +444,7 @@ local function runRotation()
             end
         -- Remorseless Winter
             -- remorseless_winter,if=talent.gathering_storm.enabled|!set_bonus.tier19_4pc|runic_power<30
-            if talent.gatheringStorm --[[or not tier19_4pc ]]or runicPower < 20 then -- TODO: T19 Check
+            if (talent.gatheringStorm or not t19_4pc or runicPower < 20) and getDistance(units.dyn5) < 5 then
                 if cast.remorselessWinter() then return end
             end
         end
@@ -460,13 +465,15 @@ local function runRotation()
                 if cast.howlingBlast() then return end
             end
         -- Obliterate
-            -- obliterate,if=equipped.132366&talent.runic_attenuation.enabled&set_bonus.tier19_2pc=1 -- TODO T19 Logic
-            -- if hasEquiped(132366) and talent.runicAttenuation and tier19_2pc then
-            --     if cast.obliterate() then return end
-            -- end
+            -- obliterate,if=equipped.132366&talent.frozen_pulse.enabled&set_bonus.tier19_2pc=1
+            if hasEquiped(132366) and talent.frozenPulse and t19_2pc then
+                if cast.obliterate() then return end
+            end
         -- Remorseless Winter
             -- remorseless_winter,if=(buff.rime.react&equipped.132459&!(buff.obliteration.up&spell_targets.howling_blast<2))|talent.gathering_storm.enabled
-            if (buff.rime.exists and hasEquiped(132459) and not (buff.obliteration.exists and ((mode.rotation == 1 and #enemies.yards10 < 2) or mode.rotation == 3))) or talent.gatheringStorm then
+            if ((buff.rime.exists and hasEquiped(132459) and not (buff.obliteration.exists and ((mode.rotation == 1 and #enemies.yards10 < 2) or mode.rotation == 3))) or talent.gatheringStorm)  
+                and getDistance(units.dyn5) < 5 
+            then
                 if cast.remorselessWinter() then return end
             end
         -- Howling Blast
@@ -485,7 +492,7 @@ local function runRotation()
             end
         -- Remorseless Winter
             -- remorseless_winter,if=spell_targets.remorseless_winter>=2&!(talent.frostscythe.enabled&buff.killing_machine.react&spell_targets.frostscythe>=2)
-            if #enemies.yards10t >= 2 and not (talent.frostscythe and buff.killingMachine.exists and ((mode.rotation == 1 and #enemies.yards8 >= 2) or mode.rotation == 2)) then
+            if #enemies.yards10t >= 2 and getDistance(units.dyn5) < 5 and not (talent.frostscythe and buff.killingMachine.exists and ((mode.rotation == 1 and #enemies.yards8 >= 2) or mode.rotation == 2)) then
                 if cast.remorselessWinter() then return end
             end
         -- Frostscythe
@@ -496,7 +503,7 @@ local function runRotation()
         -- Glacial Advance
             -- glacial_advance,if=spell_targets.glacial_advance>=2
             if ((mode.rotation == 1 and #enemies.yards10 >= getOptionValue("Glacial Advance")) or mode.rotation == 2) then
-                if cast.glacialAdvance() then return end
+                if cast.glacialAdvance("player") then return end
             end
         -- Frostscythe
             -- frostscythe,if=spell_targets.frostscythe>=3
@@ -508,17 +515,31 @@ local function runRotation()
             if buff.killingMachine.exists then
                 if cast.obliterate() then return end
             end
+        -- Frost Strike
+            -- frost_strike,if=(talent.horn_of_winter.enabled|talent.hungering_rune_weapon.enabled)&(set_bonus.tier19_2pc=1|set_bonus.tier19_4pc=1)
+            if (talent.hornOfWinter or talent.hungeringRuneWeapon) and (t19_2pc or t19_4pc) then
+                if cast.frostStrike() then return end
+            end
+        -- Obliterate
             -- obliterate
             if cast.obliterate() then return end
         -- Glacial Advance
             -- glacial_advance
             if #enemies.yards10 >= getOptionValue("Glacial Advance") then
-                if cast.glacialAdvance() then return end
+                if cast.glacialAdvance("player") then return end
             end
         -- Horn of Winter
             -- horn_of_winter,if=!dot.hungering_rune_weapon.ticking
             if not buff.hungeringRuneWeapon.exists then
                 if cast.hornOfWinter() then return end
+            end
+        -- Frost Strike
+            -- frost_strike
+            if cast.frostStrike() then return end
+        -- Remorseless Winter
+            -- remorseless_winter,if=talent.frozen_pulse.enabled
+            if talent.frozenPulse then
+                if cast.remorselessWinter() then return end
             end
             if isChecked("Empower/Hungering Rune Weapon") and useCDs() then
         -- Empower Rune Weapon
@@ -540,7 +561,7 @@ local function runRotation()
             end
         -- Howling Blast
             -- howling_blast,target_if=!dot.frost_fever.ticking
-            if not debuff.frostFever[units.dyn30].exists then
+            if debuff.frostFever[units.dyn30] ~= nil and not debuff.frostFever[units.dyn30].exists then
                 if cast.howlingBlast() then return end
             end
             -- howling_blast,if=buff.rime.react&!(buff.obliteration.up&spell_targets.howling_blast<2)
@@ -575,7 +596,7 @@ local function runRotation()
         -- Glacial Advance
             -- glacial_advance
             if #enemies.yards10 >= getOptionValue("Glacial Advance") then
-                if cast.glacialAdvance() then return end
+                if cast.glacialAdvance("player") then return end
             end
         -- Frost Strike
             -- frost_strike
@@ -628,6 +649,11 @@ local function runRotation()
     -----------------------------
     --- In Combat - Cooldowns ---
     -----------------------------
+        -- Pillar of Frost
+                -- pillar_of_frost
+                if getOptionValue("Pillar of Frost") == 1 or (getOptionValue("Pillar of Frost") == 2 and useCDs()) then
+                    if cast.pillarOfFrost() then return end
+                end
                 if actionList_Cooldowns() then return end
     ---------------------------
     --- SimulationCraft APL ---

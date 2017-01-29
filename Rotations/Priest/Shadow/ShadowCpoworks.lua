@@ -267,7 +267,7 @@ local function runRotation()
                 if swp ~= nil then
                     if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
                         if ttd(thisUnit) > swp.duration and (not swp or swp.refresh) then
-                            if cast.shadowWordPain(thisUnit) then return end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return end
                         end
                     end
                 end
@@ -278,8 +278,8 @@ local function runRotation()
                 local vt = debuff.vampiricTouch[thisUnit]
                 if vt ~= nil then
                     if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
-                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) then
-                            if cast.vampiricTouch(thisUnit) then return end
+                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) and lastSpellCast ~= spell.vampiricTouch then
+                            if cast.vampiricTouch(thisUnit,"aoe") then return end
                         end
                     end
                 end
@@ -306,7 +306,7 @@ local function runRotation()
             --Cooldowns
             if actionList_Cooldowns() then return end
             --Void Torrent
-            if ttd(units.dyn40) > 5 and getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") >= 6 and getDebuffRemain(units.dyn40,spell.shadowWordPain,"player") >= 4 then
+            if useCDs() and ttd(units.dyn40) > 5 and getDebuffRemain(units.dyn40,spell.vampiricTouch,"player") >= 6 and getDebuffRemain(units.dyn40,spell.shadowWordPain,"player") >= 4 and buff.voidForm.stack >= 23 then
                 if cast.voidTorrent() then return end
             end
             --VoidBolt
@@ -365,7 +365,7 @@ local function runRotation()
                 if swp ~= nil then
                     if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
                         if ttd(thisUnit) > swp.duration and (not swp or swp.refresh) then
-                            if cast.shadowWordPain(thisUnit) then return end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return end
                         end
                     end
                 end
@@ -376,8 +376,8 @@ local function runRotation()
                 local vt = debuff.vampiricTouch[thisUnit]
                 if vt ~= nil then
                     if UnitIsUnit(thisUnit,"target") or hasThreat(thisUnit) or isDummy(thisUnit) then
-                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) then
-                            if cast.vampiricTouch(thisUnit) then return end
+                        if ttd(thisUnit) > vt.duration and (not vt or vt.refresh) and lastSpellCast ~= spell.vampiricTouch then
+                            if cast.vampiricTouch(thisUnit,"aoe") then return end
                         end
                     end
                 end
@@ -395,8 +395,10 @@ local function runRotation()
 -----------------
 --- Rotations ---
 -----------------
-        if actionList_Extra() then return end
-        if actionList_Defensive() then return end
+        if not IsMounted() then
+            if actionList_Extra() then return end
+            if actionList_Defensive() then return end
+        end
 ---------------------------------
 --- Out Of Combat - Rotations ---
 ---------------------------------

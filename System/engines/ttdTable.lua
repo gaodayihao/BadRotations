@@ -73,7 +73,7 @@ function getTTD(unit)
 	local thisUnit = unit
 	local sucess,result = pcall(string.find,thisUnit,"0x")
 	if sucess and not result then
-		if UnitExists(thisUnit) and not UnitIsDeadOrGhost(thisUnit) then
+		if ObjectExists(thisUnit) and not UnitIsDeadOrGhost(thisUnit) and UnitIsVisible(thisUnit) then
 			thisUnit = GetObjectWithGUID(UnitGUID(thisUnit))
 		else
 			return -2

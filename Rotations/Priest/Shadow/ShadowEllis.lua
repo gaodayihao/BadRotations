@@ -407,7 +407,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd.max,moving=1,cycle_targets=1
             if moving and talent.misery and debuff.shadowWordPain[units.dyn40].remain < gcdMax then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
             if moving and talent.misery and not forceSingle and getOptionValue(LC_SWP_MAX_TARGETS) > 1 then
                 for i = 1,#enemies.yards40 do
@@ -415,7 +415,7 @@ local function runRotation()
                     if (debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) or debuff.shadowWordPain[thisUnit].exists)
                         and debuff.shadowWordPain[thisUnit].remain < gcdMax
                     then
-                        if cast.shadowWordPain(thisUnit,"face") then return true end
+                        if cast.shadowWordPain(thisUnit,"aoe") then return true end
                     end
                 end
             end
@@ -440,7 +440,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&dot.shadow_word_pain.remains<(3+(4%3))*gcd
             if not talent.misery and debuff.shadowWordPain[units.dyn40].remain <(3+(4%3))*gcd then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&dot.vampiric_touch.remains<(4+(4%3))*gcd
@@ -466,7 +466,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- shadow_word_pain,if=!talent.misery.enabled&!ticking&talent.legacy_of_the_void.enabled&insanity>=70,cycle_targets=1
             if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and talent.legacyOfTheVoid and insanity >= 70 then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
             if not talent.misery 
                 and talent.legacyOfTheVoid 
@@ -477,14 +477,14 @@ local function runRotation()
                 for i = 1,#enemies.yards40 do
                     local thisUnit = enemies.yards40[i]
                     if not debuff.shadowWordPain[thisUnit].exists then
-                        if cast.shadowWordPain(thisUnit,"face") then return true end
+                        if cast.shadowWordPain(thisUnit,"aoe") then return true end
                     end
                 end
             end
     -- Vampiric Touch
             -- vampiric_touch,if=!talent.misery.enabled&!ticking&talent.legacy_of_the_void.enabled&insanity>=70,cycle_targets=1
             if not talent.misery and not debuff.vampiricTouch[units.dyn40].exists and talent.legacyOfTheVoid and insanity >= 70 then
-                if cast.vampiricTouch(units.dyn40,"face") then return true end
+                if cast.vampiricTouch(units.dyn40,"aoe") then return true end
             end
             if not talent.misery 
                 and talent.legacyOfTheVoid 
@@ -524,13 +524,13 @@ local function runRotation()
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
             if not talent.misery and (activeEnemies < 5 and (talent.auspiciousSpirits or talent.shadowyInsight)) then
                 if not debuff.shadowWordPain[units.dyn40].exists and ttd(units.dyn40) > 10 then
-                    if cast.shadowWordPain(units.dyn40,"face") then return true end
+                    if cast.shadowWordPain(units.dyn40,"aoe") then return true end
                 end
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end
@@ -554,13 +554,13 @@ local function runRotation()
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
             if not talent.misery and (activeEnemies < 5 and artifact.sphereOfInsanity) then
                 if not debuff.shadowWordPain[units.dyn40].exists and ttd(units.dyn40) > 10 then
-                    if cast.shadowWordPain(units.dyn40,"face") then return true end
+                    if cast.shadowWordPain(units.dyn40,"aoe") then return true end
                 end
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end
@@ -574,7 +574,7 @@ local function runRotation()
             -- mind_flay,interrupt=1,chain=1
             if isCastingSpell(spell.mindFlay) or cast.mindFlay() then return true end
     -- Shadow Word:Pain
-            if cast.shadowWordPain(units.dyn40,"face") then return true end
+            if cast.shadowWordPain(units.dyn40,"aoe") then return true end
         end -- End Action List - main
     -- Action List - vf
         local function actionList_Vf()
@@ -673,7 +673,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
             if moving and talent.misery and debuff.shadowWordPain[units.dyn40].remain < gcd then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
             if moving and talent.misery and not forceSingle and getOptionValue(LC_SWP_MAX_TARGETS) > 1 then
                 for i = 1,#enemies.yards40 do
@@ -681,7 +681,7 @@ local function runRotation()
                     if (debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) or debuff.shadowWordPain[thisUnit].exists)
                         and debuff.shadowWordPain[thisUnit].remain < gcd
                     then
-                        if cast.shadowWordPain(thisUnit,"face") then return true end
+                        if cast.shadowWordPain(thisUnit,"aoe") then return true end
                     end
                 end
             end
@@ -706,7 +706,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
             if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and (activeEnemies < 5 or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
@@ -720,7 +720,7 @@ local function runRotation()
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end
@@ -744,7 +744,7 @@ local function runRotation()
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end
@@ -753,7 +753,7 @@ local function runRotation()
             -- chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
             if isCastingSpell(spell.mindFlay) or cast.mindFlay() then return true end
     -- Shadow Word:Pain
-            if cast.shadowWordPain(units.dyn40,"face") then return true end
+            if cast.shadowWordPain(units.dyn40,"aoe") then return true end
         end -- End Action List - vf
     -- Action List - s2m
         local function actionList_S2M()
@@ -847,7 +847,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=talent.misery.enabled&dot.shadow_word_pain.remains<gcd,moving=1,cycle_targets=1
             if moving and talent.misery and debuff.shadowWordPain[units.dyn40].remain < gcd then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
             if moving and talent.misery and not forceSingle and getOptionValue(LC_SWP_MAX_TARGETS) > 1 then
                 for i = 1,#enemies.yards40 do
@@ -855,7 +855,7 @@ local function runRotation()
                     if (debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) or debuff.shadowWordPain[thisUnit].exists)
                         and debuff.shadowWordPain[thisUnit].remain < gcd
                     then
-                        if cast.shadowWordPain(thisUnit,"face") then return true end
+                        if cast.shadowWordPain(thisUnit,"aoe") then return true end
                     end
                 end
             end
@@ -880,7 +880,7 @@ local function runRotation()
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
             if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and (activeEnemies < 5 or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
-                if cast.shadowWordPain(units.dyn40,"face") then return true end
+                if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
@@ -894,7 +894,7 @@ local function runRotation()
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end
@@ -918,7 +918,7 @@ local function runRotation()
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
                         if not debuff.shadowWordPain[thisUnit].exists and ttd(thisUnit) > 10 then
-                            if cast.shadowWordPain(thisUnit,"face") then return true end
+                            if cast.shadowWordPain(thisUnit,"aoe") then return true end
                         end
                     end
                 end

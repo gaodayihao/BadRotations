@@ -59,36 +59,34 @@ frame:SetScript("OnEvent", frame.OnEvent)
 --[[This function is refired everytime wow ticks. This frame is located at the top of Core.lua]]
 
 function BadRotationsUpdate(self)
+	-- LoS Line Draw *TEMP*
+	if FireHack and isChecked("Healer Line of Sight Indicator") then
+		inLoSHealer()
+	end
 		-- Close windows and swap br.selectedSpec on Spec Change
 	if select(2,GetSpecializationInfo(GetSpecialization())) ~= br.selectedSpec then
 		-- Closing the windows will save the position
-		br.ui:closeWindow("all")
-			
-		-- Update Selected Spec/Profile
-		br.selectedSpec = select(2,GetSpecializationInfo(GetSpecialization()))
-		br.activeSpecGroup = GetActiveSpecGroup()
-
+	    br.ui:closeWindow("all")
+	    	
+	    -- Update Selected Spec/Profile
+	    br.selectedSpec = select(2,GetSpecializationInfo(GetSpecialization()))
+	    br.activeSpecGroup = GetActiveSpecGroup()
+	    br:loadSettings()
+	    
 		-- Recreate Config Window and commandHelp with new Spec
-		if br.ui.window.config.parent == nil then br.ui:createConfigWindow() end
+	    if br.ui.window.config.parent == nil then br.ui:createConfigWindow() end
 		commandHelp = nil
 		commandHelp = ""
 		slashHelpList()
-		-- if br.data.settings[br.selectedSpec] == nil then
-		-- 	br.data.settings[br.selectedSpec] = {
-		-- 		toggles = {},
-		-- 	}
-		-- 	br.data.settings[br.selectedSpec].toggles["Power"] = 1
-		-- end
-		-- if br.data.settings[br.selectedSpec].toggles == nil then
-		-- 	br.data.settings[br.selectedSpec].toggles = {}
-		-- 	br.data.settings[br.selectedSpec].toggles["Power"] = 1
-		-- end
 	end
+	
 	-- prevent ticking when firechack isnt loaded
 	-- if user click power button, stop everything from pulsing and hide frames.
-	if not getOptionCheck("Start/Stop BadRotations") or br.data.settings[br.selectedSpec].toggles["Power"] ~= 1 then
-		br.ui:closeWindow("all")
-		return false
+	if FireHack ~= nil then
+		if not getOptionCheck("Start/Stop BadRotations") or (br.data.settings[br.selectedSpec].toggles["Power"] ~= nil and br.data.settings[br.selectedSpec].toggles["Power"] ~= 1) then
+			br.ui:closeWindow("all")
+			return false
+		end
 	end
 	if FireHack == nil then
 		if br.dirtyHack == true then
@@ -117,6 +115,7 @@ function BadRotationsUpdate(self)
 
 	    -- Rotation Log
 	    if getOptionCheck("Rotation Log") then
+	    	if not br.ui.window['debug']['parent'] then br.ui:createDebugWindow() end
 	    	br.ui:showWindow("debug")
 	    else
 	    	br.ui:closeWindow("debug")

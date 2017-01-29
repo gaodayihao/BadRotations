@@ -119,18 +119,18 @@ Raidable means if its good to raid with.
 |Shadow|100%(SimC)|Ellis|7.1|:white_check_mark:
 ||||
 | **Rogue** |||
-|Assassination|100%|CuteOne|7.1|:interrobang:
+|Assassination|100%|CuteOne|7.1.5|:interrobang:
 |Outlaw|100%|CuteOne|7.1|:interrobang:
 |Subtlety|100%|CuteOne|7.1.5|:white_check_mark:
 ||||
 | **Shaman** |||
-|Elemental|100%|CuteOne|7.0|:interrobang:
+|Elemental|100%|CuteOne|7.1.5|:interrobang:
 |Enhancement|100%|CuteOne|7.1.5|:white_check_mark:
 |Restoration|0%||7.0|
 ||||
 | **Warlock** |||
 |Affliction|100%|CuteOne|7.1.5|:interrobang:
-|Demonology|100%|CuteOne|7.1|:interrobang:
+|Demonology|100%|CuteOne|7.1.5|:interrobang:
 |Destruction|100%|CuteOne|7.1.5|:white_check_mark:
 ||||
 | **Warrior** |||
