@@ -74,6 +74,8 @@ LC_VAMPIRIC_EMBRACE = "Vampiric Embrace";
 LC_VAMPIRIC_EMBRACE_DESCRIPTION = "|cffFFBB00Vampiric Embrace";
 LC_VT_MAX_TARGETS = "VT Max Targets";
 LC_VT_MAX_TARGETS_DESCRIPTION = "|cffFFBB00Amount of dots to apply";
+LC_ACTIVE_ENEMIES = "Active Enemies";
+LC_ACTIVE_ENEMIES_DESCRIPTION = "Active Enemies for DoT usage.";
 
 -- DeathKnight
 LC_DARK_SUCCOR = "Dark Succor";

@@ -59,11 +59,13 @@ local function createOptions()
         -- -- Auto Facing
         --     br.ui:createCheckbox(section, LC_AUTO_FACING, LC_AUTO_FACING_DESCRIPTION)
         -- SWP Max Targets
-            br.ui:createSpinnerWithout(section, LC_SWP_MAX_TARGETS, 5,  1,  10,  1, LC_SWP_MAX_TARGETS_DESCRIPTION)
+            br.ui:createSpinnerWithout(section, LC_SWP_MAX_TARGETS, 6,  1,  10,  1, LC_SWP_MAX_TARGETS_DESCRIPTION)
         -- VT Max Targets
             br.ui:createSpinnerWithout(section, LC_VT_MAX_TARGETS,  3,  1,  10,  1, LC_VT_MAX_TARGETS_DESCRIPTION)
         -- Body And Soul
             br.ui:createSpinner(section, LC_BODY_AND_SOUL,  1.5,  0,  5,  0.5, LC_BODY_AND_SOUL_DESCRIPTION, nil, false, true)
+        -- Active Enemies
+            br.ui:createSpinner(section, LC_ACTIVE_ENEMIES,  5,  1,  10,  1, LC_ACTIVE_ENEMIES_DESCRIPTION)
         -- Nonexecute Actors
             --br.ui:createSpinnerWithout(section, LC_EXECUTE_ACTORS,  1,  1,  25,  1, LC_EXECUTE_ACTORS_DESCRIPTION)
         -- Artifact
@@ -131,7 +133,7 @@ local function runRotation()
 --- Locals ---
 --------------
         local artifact                                      = br.player.artifact
-        local autoFacing                                    = isChecked(LC_AUTO_FACING)
+        local autoFacing                                    = false --[[isChecked(LC_AUTO_FACING)]]
         local autoTarget                                    = isChecked(LC_AUTO_TARGET)
         local buff                                          = br.player.buff
         local cast                                          = br.player.cast
@@ -501,8 +503,8 @@ local function runRotation()
             end
     -- Shadow Word:Death
             -- if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(90-20*talent.reaper_of_souls.enabled)
-            if (activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2))
-                and charges.shadowWordDeath == 2
+            if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2))
+                and]] charges.shadowWordDeath == 2
                 and (insanity <= 90 and not talent.reaperOfSouls or insanity <= 70 and talent.reaperOfSouls)
             then
                 if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
@@ -514,15 +516,15 @@ local function runRotation()
     -- Mind Blast
             -- if=active_enemies<=4&talent.legacy_of_the_void.enabled&(insanity<=81|(insanity<=75.2&talent.fortress_of_the_mind.enabled))
             -- if=active_enemies<=4&!talent.legacy_of_the_void.enabled|(insanity<=96|(insanity<=95.2&talent.fortress_of_the_mind.enabled))
-            if (activeEnemies <= 4 and talent.legacyOfTheVoid and (insanity <= 81 or (insanity <= 75.2 and talent.fortressOfTheMind)))
+            if ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and talent.legacyOfTheVoid and (insanity <= 81 or (insanity <= 75.2 and talent.fortressOfTheMind)))
                 or
-                (activeEnemies <= 4 and not talent.legacyOfTheVoid or (insanity <= 96 or (insanity <= 95.2 and talent.fortressOfTheMind)))
+                ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and not talent.legacyOfTheVoid or (insanity <= 96 or (insanity <= 95.2 and talent.fortressOfTheMind)))
             then
                 if cast.mindBlast() then delayHack = getOptionValue(LC_ROTATION_TPS) / 3 return true end
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and (talent.auspiciousSpirits or talent.shadowyInsight)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and (talent.auspiciousSpirits or talent.shadowyInsight)) then
                 if not debuff.shadowWordPain[units.dyn40].exists and ttd(units.dyn40) > 10 then
                     if cast.shadowWordPain(units.dyn40,"aoe") then return true end
                 end
@@ -537,7 +539,7 @@ local function runRotation()
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 4 or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
                 if not debuff.vampiricTouch[units.dyn40].exists and ttd(units.dyn40) > 10 then
                     if cast.vampiricTouch() then return true end
                 end
@@ -552,7 +554,7 @@ local function runRotation()
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and artifact.sphereOfInsanity) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and artifact.sphereOfInsanity) then
                 if not debuff.shadowWordPain[units.dyn40].exists and ttd(units.dyn40) > 10 then
                     if cast.shadowWordPain(units.dyn40,"aoe") then return true end
                 end
@@ -594,7 +596,7 @@ local function runRotation()
                 and debuff.shadowWordPain[units.dyn40].remain > 5.5 
                 and debuff.vampiricTouch[units.dyn40].remain > 5.5
                 and (not talent.surrenderToMadness or (talent.surrenderToMadness and ttd(units.dyn40) > s2mcheck - insanityDrainStacks + 60))
-                and not buff.powerInfusion.exists
+                -- and not buff.powerInfusion.exists
             then
                 if cast.voidTorrent() then return true end
             end
@@ -624,8 +626,8 @@ local function runRotation()
             if cast.voidBolt() then return true end
     -- Shadow Word:Death
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(10+20*talent.reaper_of_souls.enabled))<100
-            if (activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) 
-                and currentInsanityDrain*gcdMax > insanity 
+            if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) 
+                and ]]currentInsanityDrain*gcdMax > insanity 
                 and (insanity - (currentInsanityDrain*gcdMax) + (10+20*reaperOfSoulsVar)) < 100 
             then
                 if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
@@ -642,18 +644,18 @@ local function runRotation()
             end
     -- Mind Blast
             -- if=active_enemies<=4
-            if activeEnemies <= 4 then
+            if not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES) then
                 if cast.mindBlast() then delayHack = getOptionValue(LC_ROTATION_TPS) / 3 return true end
             end
     -- Wait
             -- wait,sec=action.mind_blast.usable_in,if=action.mind_blast.usable_in<gcd.max*0.28&active_enemies<=4
-            if cd.mindBlast > 0 and cd.mindBlast < gcdMax*0.28 and activeEnemies <= 4 then
+            if cd.mindBlast > 0 and cd.mindBlast < gcdMax*0.28 and (not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) then
                 br.timer:wait(cd.mindBlast)
                 return true
             end
     -- Shadow Word:Death
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
-            if (activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) and charges.shadowWordDeath == 2 then
+            if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) and]] charges.shadowWordDeath == 2 then
                 if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
                     or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
                 then
@@ -705,17 +707,17 @@ local function runRotation()
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
-            if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and (activeEnemies < 5 or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
+            if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
                 if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
-            if not debuff.vampiricTouch[units.dyn40].exists and not talent.misery and (activeEnemies < 4 or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
+            if not debuff.vampiricTouch[units.dyn40].exists and not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
                 if cast.vampiricTouch() then return true end
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and (talent.auspiciousSpirits or talent.shadowyInsight)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and (talent.auspiciousSpirits or talent.shadowyInsight)) then
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -727,7 +729,7 @@ local function runRotation()
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 4 or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
                 if not forceSingle and debuff.vampiricTouch["target"].count < getOptionValue(LC_VT_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -739,7 +741,7 @@ local function runRotation()
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and artifact.sphereOfInsanity) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and artifact.sphereOfInsanity) then
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -789,7 +791,11 @@ local function runRotation()
                 and not buff.powerInfusion.exists 
                 and (insanity - (currentInsanityDrain * gcdMax) + (20 + 40*reaperOfSoulsVar) < 100)
             then
-                if cast.shadowWordDeath() then return true end
+                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
+                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                then
+                    if cast.shadowWordDeath() then return true end
+                end
             end
     -- Power Infusion
             -- if=cooldown.shadow_word_death.charges=0&cooldown.shadow_word_death.remains>3*gcd.max&buff.voidform.stack>50
@@ -801,12 +807,12 @@ local function runRotation()
             if cast.voidBolt() then return true end
     -- Shadow Word:Death
             -- if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(20+40*talent.reaper_of_souls.enabled))<100
-            if (activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2))
+            --[[if (activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2))
                 and currentInsanityDrain * gcdMax > insanity 
                 and (insanity -(currentInsanityDrain*gcdMax)+(20+40*reaperOfSoulsVar)) < 100
             then
                 if cast.shadowWordDeath() then return true end
-            end
+            end]]
     -- Wait
             -- wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
             if cd.voidBolt > 0 and cd.voidBolt < gcdMax*0.28 then
@@ -820,7 +826,7 @@ local function runRotation()
             end
     -- Mind Blast
             -- if=active_enemies<=5
-            if activeEnemies <= 5 then
+            if not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES) then
                 if cast.mindBlast() then delayHack = getOptionValue(LC_ROTATION_TPS) / 3 return true end
             end
     -- Wait
@@ -831,8 +837,12 @@ local function runRotation()
             end
     -- Shadow Word:Death
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
-            if (activeEnemies<=4 or (talent.reaperOfSouls and activeEnemies <=2)) and charges.shadowWordDeath == 2 then
-                if cast.shadowWordDeath() then return true end
+            if --[[(activeEnemies<=4 or (talent.reaperOfSouls and activeEnemies <=2)) and]] charges.shadowWordDeath == 2 then
+                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
+                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                then
+                    if cast.shadowWordDeath() then return true end
+                end
             end
     -- Shadowfiend
             -- shadowfiend,if=!talent.mindbender.enabled,if=buff.voidform.stack>15
@@ -879,17 +889,17 @@ local function runRotation()
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&(active_enemies<5|talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled|artifact.sphere_of_insanity.rank)
-            if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and (activeEnemies < 5 or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
+            if not talent.misery and not debuff.shadowWordPain[units.dyn40].exists and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.auspiciousSpirits or talent.shadowyInsight or artifact.sphereOfInsanity) then
                 if cast.shadowWordPain(units.dyn40,"aoe") then return true end
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank))
-            if not debuff.vampiricTouch[units.dyn40].exists and not talent.misery and (activeEnemies < 4 or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
+            if not debuff.vampiricTouch[units.dyn40].exists and not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
                 if cast.vampiricTouch() then return true end
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&(talent.auspicious_spirits.enabled|talent.shadowy_insight.enabled)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and (talent.auspiciousSpirits or talent.shadowyInsight)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and (talent.auspiciousSpirits or talent.shadowyInsight)) then
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -901,7 +911,7 @@ local function runRotation()
             end
     -- Vampiric Touch
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<4|talent.sanlayn.enabled|(talent.auspicious_spirits.enabled&artifact.unleash_the_shadows.rank)),cycle_targets=1
-            if not talent.misery and (activeEnemies < 4 or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) or talent.sanlayn or (talent.auspiciousSpirits and artifact.unleashTheShadows)) then
                 if not forceSingle and debuff.vampiricTouch["target"].count < getOptionValue(LC_VT_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -913,7 +923,7 @@ local function runRotation()
             end
     -- Shadow Word:Pain
             -- if=!talent.misery.enabled&!ticking&target.time_to_die>10&(active_enemies<5&artifact.sphere_of_insanity.rank),cycle_targets=1
-            if not talent.misery and (activeEnemies < 5 and artifact.sphereOfInsanity) then
+            if not talent.misery and ((not isChecked(LC_ACTIVE_ENEMIES) or activeEnemies < getOptionValue(LC_ACTIVE_ENEMIES)) and artifact.sphereOfInsanity) then
                 if not forceSingle and debuff.shadowWordPain["target"].count < getOptionValue(LC_SWP_MAX_TARGETS) then
                     for i = 1,#enemies.yards40 do
                         local thisUnit = enemies.yards40[i]
@@ -936,6 +946,8 @@ local function runRotation()
         end
 
         if buff.dispersion.exists then return true end
+
+        if IsMounted() or IsFlying() then return true end
 
         local isPause = pause(true)
         if isPause or mode.rotation==4 or delayHack >= 1 then

@@ -74,6 +74,8 @@ LC_VAMPIRIC_EMBRACE = "吸血鬼的拥抱";
 LC_VAMPIRIC_EMBRACE_DESCRIPTION = "|cffFFBB00当血量低于设定百分比时使用|cffFF0000吸血鬼的拥抱";
 LC_VT_MAX_TARGETS = "多目标 吸血之触";
 LC_VT_MAX_TARGETS_DESCRIPTION = "|cffFFBB00吸血之触 目标上限";
+LC_ACTIVE_ENEMIES = "目标敌人数量与DOT";
+LC_ACTIVE_ENEMIES_DESCRIPTION = "目标8码内敌人数量小于设置值时才多目标施放DOT";
 
 -- DeathKnight
 LC_DARK_SUCCOR = "黑暗救赎";

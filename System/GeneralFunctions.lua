@@ -1,31 +1,3 @@
--- Dirty hacks FireHack TrackingFilter, it makes FPS drop when object count over 1000
--- The code in FireHack\Scripts\Tracking.lua line 51.
--- AddTimerCallback(1,
--- 	function ()
--- 		for Index = 1, GetObjectCount() do
--- 			local Object = GetObjectWithIndex(Index);
--- 			if ObjectIsType(Object, ObjectTypes.Unit) or ObjectIsType(Object, ObjectTypes.GameObject) then
--- 				local Tracked = false;
-
--- 				for Name, Filter in pairs(Filters) do
--- 					if Filter.Enabled and Filter.Function(Object) then
--- 						Tracked = true;
--- 						break;
--- 					end
--- 				end
-
--- 				ObjectSetTracked(Object, Tracked);
--- 			end
--- 		end
--- 	end
--- );
--- local GOC = GetObjectCount
--- function GetObjectCount(BadRotations)
---     if BadRotations == "BadRotations" then
---         return GOC()
---     end
---     return 0
--- end
 function GetObjectExists(Unit)
     if FireHack and ObjectExists(Unit) == true then
         return true
