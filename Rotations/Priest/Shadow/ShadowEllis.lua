@@ -56,14 +56,14 @@ local function createOptions()
         section = br.ui:createSection(br.ui.window.profile, LC_GENERAL)
         -- Auto Target
             br.ui:createCheckbox(section, LC_AUTO_TARGET, LC_AUTO_TARGET_DESCRIPTION, true)
+        -- Body And Soul
+            br.ui:createSpinner(section, LC_BODY_AND_SOUL,  1.5,  0,  5,  0.5, LC_BODY_AND_SOUL_DESCRIPTION, nil, false, true)
         -- -- Auto Facing
         --     br.ui:createCheckbox(section, LC_AUTO_FACING, LC_AUTO_FACING_DESCRIPTION)
         -- SWP Max Targets
             br.ui:createSpinnerWithout(section, LC_SWP_MAX_TARGETS, 6,  1,  10,  1, LC_SWP_MAX_TARGETS_DESCRIPTION)
         -- VT Max Targets
             br.ui:createSpinnerWithout(section, LC_VT_MAX_TARGETS,  3,  1,  10,  1, LC_VT_MAX_TARGETS_DESCRIPTION)
-        -- Body And Soul
-            br.ui:createSpinner(section, LC_BODY_AND_SOUL,  1.5,  0,  5,  0.5, LC_BODY_AND_SOUL_DESCRIPTION, nil, false, true)
         -- Active Enemies
             br.ui:createSpinner(section, LC_ACTIVE_ENEMIES,  5,  1,  10,  1, LC_ACTIVE_ENEMIES_DESCRIPTION)
         -- Nonexecute Actors
@@ -169,6 +169,7 @@ local function runRotation()
         local ttd                                           = getTTD
         local units                                         = br.player.units
         local useArtifact                                   = false
+        local dyn40HP                                       = getHP(units.dyn40)
 
         local bodyAndSoul                                   = -1
         
@@ -370,7 +371,7 @@ local function runRotation()
         end -- End Action List - Extra
     -- Action List - Defensive
         local function actionList_Defensive()
-            if useDefensive() and getHP("player")>0 then
+            if useDefensive() and php > 0 then
                 -- Gift of the Naaru
                 if isChecked("Gift of the Naaru") and php <= getOptionValue("Gift of the Naaru") and php > 0 and br.player.race=="Draenei" then
                     if castSpell("player",racial,false,false,false) then return end
@@ -396,7 +397,37 @@ local function runRotation()
         end  -- End Action List - Pre-Combat
     -- Action List - Opener
         local function actionList_Opener()
-        end -- End Action List - Pre-Combat
+        end -- End Action List - Opener
+    -- Action List - Any Enemy Shadow Word:Death
+        local function actionList_AnyEnemyShadowWordDeath()
+            if (dyn40HP > 35 and talent.reaperOfSouls or dyn40HP > 20 and not talent.reaperOfSouls) and buff.voidForm.exists and charges.shadowWordDeath > 0 then
+                local s2mVar = 1 if buff.surrenderToMadness.exists then s2mVar = 2 end
+                if charges.shadowWordDeath == 2 or 
+                    (currentInsanityDrain*gcdMax > insanity  
+                        and (insanity - (currentInsanityDrain*gcdMax) + (15+15*reaperOfSoulsVar)*s2mVar) < 100
+                        and (not buff.powerInfusion.exists or not buff.surrenderToMadness.exists))
+                then
+                    for i = 1,#enemies.yards40 do
+                        local thisUnit = enemies.yards40[i]
+                        local unitHP = getHP(thisUnit)
+                        if unitHP < 20 and not talent.reaperOfSouls
+                            or unitHP < 35 and talent.reaperOfSouls
+                        then
+                            if cast.shadowWordDeath(thisUnit,"aoe") then return true end
+                        end
+                    end
+                end
+            end
+            if talent.twistOfFate and not buff.twistOfFate.exists then
+                for i = 1,#enemies.yards40 do
+                    local thisUnit = enemies.yards40[i]
+                    local unitHP = getHP(thisUnit)
+                    if unitHP < 35 then
+                        if cast.shadowWordPain(thisUnit,"aoe") then return true end
+                    end
+                end
+            end
+        end -- End Action List - Any Enemy Shadow Word:Death
     -- Action List - Main
         local function actionList_Main()
     -- Surrender To Madness
@@ -505,12 +536,12 @@ local function runRotation()
             -- if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2&insanity<=(90-20*talent.reaper_of_souls.enabled)
             if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2))
                 and]] charges.shadowWordDeath == 2
-                and (insanity <= 90 and not talent.reaperOfSouls or insanity <= 70 and talent.reaperOfSouls)
+                and (insanity <= 85 and not talent.reaperOfSouls or insanity <= 70 and talent.reaperOfSouls)
             then
-                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
-                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                if dyn40HP < 20 and not talent.reaperOfSouls
+                    or dyn40HP < 35 and talent.reaperOfSouls
                 then
-                    if cast.shadowWordDeath() then return true end
+                    if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
                 end
             end
     -- Mind Blast
@@ -572,6 +603,9 @@ local function runRotation()
             if talent.shadowWordVoid and ((insanity <= 70 and talent.legacyOfTheVoid) or (insanity <= 85 and not talent.legacyOfTheVoid)) then
                 if cast.shadowWordVoid() then return true end
             end
+
+            if actionList_AnyEnemyShadowWordDeath() then return true end
+
     -- Mind Flay
             -- mind_flay,interrupt=1,chain=1
             if isCastingSpell(spell.mindFlay) or cast.mindFlay() then return true end
@@ -628,12 +662,12 @@ local function runRotation()
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+(10+20*talent.reaper_of_souls.enabled))<100
             if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) 
                 and ]]currentInsanityDrain*gcdMax > insanity 
-                and (insanity - (currentInsanityDrain*gcdMax) + (10+20*reaperOfSoulsVar)) < 100 
+                and (insanity - (currentInsanityDrain*gcdMax) + (15+15*reaperOfSoulsVar)) < 100 
             then
-                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
-                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                if dyn40HP < 20 and not talent.reaperOfSouls
+                    or dyn40HP < 35 and talent.reaperOfSouls
                 then
-                    if cast.shadowWordDeath() then return true end
+                    if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
                 end
             end
     -- Wait
@@ -656,10 +690,10 @@ local function runRotation()
     -- Shadow Word:Death
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
             if --[[(activeEnemies <= 4 or (talent.reaperOfSouls and activeEnemies <= 2)) and]] charges.shadowWordDeath == 2 then
-                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
-                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                if dyn40HP < 20 and not talent.reaperOfSouls
+                    or dyn40HP < 35 and talent.reaperOfSouls
                 then
-                    if cast.shadowWordDeath() then return true end
+                    if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
                 end
             end
     -- Shadowfiend
@@ -751,6 +785,9 @@ local function runRotation()
                     end
                 end
             end
+
+            if actionList_AnyEnemyShadowWordDeath() then return true end
+
     -- Mind Flay
             -- chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
             if isCastingSpell(spell.mindFlay) or cast.mindFlay() then return true end
@@ -789,12 +826,12 @@ local function runRotation()
             -- if=current_insanity_drain*gcd.max>insanity&!buff.power_infusion.up&(insanity-(current_insanity_drain*gcd.max)+(20+40*talent.reaper_of_souls.enabled)<100)
             if currentInsanityDrain * gcdMax > insanity 
                 and not buff.powerInfusion.exists 
-                and (insanity - (currentInsanityDrain * gcdMax) + (20 + 40*reaperOfSoulsVar) < 100)
+                and (insanity - (currentInsanityDrain * gcdMax) + (30 + 30*reaperOfSoulsVar) < 100)
             then
-                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
-                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                if dyn40HP < 20 and not talent.reaperOfSouls
+                    or dyn40HP < 35 and talent.reaperOfSouls
                 then
-                    if cast.shadowWordDeath() then return true end
+                    if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
                 end
             end
     -- Power Infusion
@@ -811,7 +848,7 @@ local function runRotation()
                 and currentInsanityDrain * gcdMax > insanity 
                 and (insanity -(currentInsanityDrain*gcdMax)+(20+40*reaperOfSoulsVar)) < 100
             then
-                if cast.shadowWordDeath() then return true end
+                if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
             end]]
     -- Wait
             -- wait,sec=action.void_bolt.usable_in,if=action.void_bolt.usable_in<gcd.max*0.28
@@ -838,10 +875,10 @@ local function runRotation()
     -- Shadow Word:Death
             -- shadow_word_death,if=(active_enemies<=4|(talent.reaper_of_souls.enabled&active_enemies<=2))&cooldown.shadow_word_death.charges=2
             if --[[(activeEnemies<=4 or (talent.reaperOfSouls and activeEnemies <=2)) and]] charges.shadowWordDeath == 2 then
-                if getHP(units.dyn40) <= 20 and not talent.reaperOfSouls
-                    or getHP(units.dyn40) <= 35 and talent.reaperOfSouls
+                if dyn40HP < 20 and not talent.reaperOfSouls
+                    or dyn40HP < 35 and talent.reaperOfSouls
                 then
-                    if cast.shadowWordDeath() then return true end
+                    if cast.shadowWordDeath(units.dyn40,"aoe") then return true end
                 end
             end
     -- Shadowfiend
@@ -933,6 +970,9 @@ local function runRotation()
                     end
                 end
             end
+
+            if actionList_AnyEnemyShadowWordDeath() then return true end
+
     -- Mind Flay
             -- chain=1,interrupt_immediate=1,interrupt_if=ticks>=2&(action.void_bolt.usable|(current_insanity_drain*gcd.max>insanity&(insanity-(current_insanity_drain*gcd.max)+30)<100&cooldown.shadow_word_death.charges>=1))
             if isCastingSpell(spell.mindFlay) or cast.mindFlay() then return true end
